@@ -1,3 +1,6 @@
+# Curved, Motion Paths, Ropes:
+# https://discourse.panda3d.org/t/solved-create-curve-as-specified-by-movement-of-camera/11580/8
+# https://docs.panda3d.org/1.10/python/programming/physics/bullet/softbody-rope
 
 # import gl
 
@@ -7,6 +10,12 @@ from direct.showbase.ShowBase import ShowBase
 from direct.filter.CommonFilters import CommonFilters
 from direct.showbase.ShowBase import ShowBase
 from math import sin, cos, pi
+from direct.interval.LerpInterval import LerpPosInterval
+from direct.interval.IntervalGlobal import *
+from direct.gui.OnscreenText import OnscreenText
+
+from panda3d.core import Randomizer
+from direct.showbase.RandomNumGen import RandomNumGen, randHash
 
 from panda3d.core import GraphicsWindow
 
@@ -16,11 +25,25 @@ from panda3d.core import loadPrcFileData
 from panda3d.core import PandaSystem
 print("Panda version:", PandaSystem.getVersionString())
 
+from MIDI import MIDIFile
+name = 'music/MIDI perka.mid'
+# name = 'music/MIDI perka melody.mid'
+c = MIDIFile(name)
+print(name)
+c.parse()
+track = c[0]
+track.parse()
+
 class MyApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
 
-        self.music = self.loader.loadSfx("music/PrevForMiklesz.ogg")
+        print(self.win.gsg.driver_vendor)
+        print(self.win.gsg.driver_renderer)
+
+        # self.music = self.loader.loadSfx("music/PrevForMiklesz.ogg")
+        self.music = self.loader.loadSfx("music/perka.ogg")
+        # self.music = self.loader.loadSfx("music/co sekunde.wav")
 
         # print(self.win.getGsg().getSupportsBasicShaders())
         # quit()
@@ -123,6 +146,18 @@ class MyApp(ShowBase):
 
         self.camLens.setFov(100)
 
+        #self.cam.setPos(-1.2, -1.0, +0.0)
+        # self.cam.setPos(-1, +1, 0)
+        # self.cam.setHpr(+270, 0, 0)
+
+        # self.cam.setPos(0, 0, 0)
+        # self.cam.setHpr(0, 0, 0)
+
+
+        # self.cam.lookAt(+2.0, 0, 0)
+
+        #self.cam.setHpr(-45, 0, 0)
+
         # self.wireframeOn()
         # self.toggleShowVertices()
         # self.toggleTexture()
@@ -143,11 +178,103 @@ class MyApp(ShowBase):
 
 
         # X, Y, Z, H, P, R, Scale Y, FOV
-        self.currents= [0, 0, 0, 0, 0, 0, 0, 0]
-        self.lasts   = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.currents= [0, 0, 0, 0, 0, 0, 1, self.camLens.getFov()[0]]
+        self.lasts   = [0, 0, 0, 0, 0, 0, 1, self.camLens.getFov()[0]]
         self.deltas  = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.weights = [.5, .5, .5, .5, .5, .5, 50, 1]
+        self.weights = [.2, .2, .2, .2, .2, .2, 50, .1]
         self.delta = 0
+
+        # i = LerpPosInterval(self.cam,
+        #                     5,
+        #                     (2, -1.3, 0),
+        #                     startPos=None,
+        #                     other=None,
+        #                     blendType='easeInOut',
+        #                     bakeInStart=1,
+        #                     fluid=0,
+        #                     name=None)
+
+        # X = -2.5..+2.7
+        # Y = -1.2..+0.4
+        # Z = -1.7..+0.4
+
+        period = 120/125
+
+        # i0 = LerpPosInterval(nodePath=self.cam, duration=period, pos=(-1.2, +1.0, +0.0), blendType='easeOut')
+        # i1 = LerpPosInterval(nodePath=self.cam, duration=period, pos=(+0.8, +1.0, +0.0), blendType='easeOut')
+        # i2 = LerpPosInterval(nodePath=self.cam, duration=period, pos=(+0.8, -1.0, +0.0), blendType='easeOut')
+        # i3 = LerpPosInterval(nodePath=self.cam, duration=period, pos=(-1.2, -1.0,  0.0), blendType='easeOut')
+
+        # i0 = LerpPosInterval(nodePath=self.cam, duration=period, pos=( 0, -1,  0))
+        # i1 = LerpPosInterval(nodePath=self.cam, duration=period, pos=(-1,  0,  0))
+        # i2 = LerpPosInterval(nodePath=self.cam, duration=period*8, pos=( 0,  1,  0))
+        # i3 = LerpPosInterval(nodePath=self.cam, duration=period, pos=( 1,  0,  0))
+
+        # pan = LerpPosHprInterval(nodePath=self.cam, duration=period*8, pos=(+1, +1, 0), hpr=())
+        # pan = LerpPosInterval(nodePath=self.cam, duration=period*8, pos=(+1, +1, 0))
+
+        # i0 = LerpPosInterval(nodePath=self.cam, duration=period/2, pos=(-1.2, +1.0, +0.0), blendType='easeOut')
+        # i1 = LerpPosInterval(nodePath=self.cam, duration=period/2, pos=(+0.8, +1.0, +0.0), blendType='easeOut')
+        # i2 = LerpPosInterval(nodePath=self.cam, duration=period/2, pos=(+0.8, -1.0, +0.0), blendType='easeOut')
+        # i3 = LerpPosInterval(nodePath=self.cam, duration=period/2, pos=(-1.2, -1.0,  0.0), blendType='easeOut')
+
+        self.dummy = self.render.attachNewNode("dummy")
+        mySequence = Sequence()
+        rn = Randomizer()
+        old_hpr = self.cam.getHpr()
+        for interval_index in range(64):
+            pos1 = (rn.randomRealUnit()*4.79, rn.randomRealUnit()*3.81, rn.randomReal(2.66-1.75))
+            self.dummy.setPos(pos1)
+            self.dummy.lookAt(0, 0, 0)
+            new_hpr = self.dummy.getHpr()
+
+            if new_hpr[0]-old_hpr[0]>180:
+                new_hpr[0]-=360
+
+            if new_hpr[0]-old_hpr[0]<-180:
+                new_hpr[0]+=360
+
+
+            if abs(new_hpr[0]-old_hpr[0])>180:
+                overfull = True
+            else:
+                overfull = False
+
+            print('old_hpr:', old_hpr, 'new_hpr:', new_hpr, 'overfull:', overfull)
+            old_hpr = new_hpr
+            interval = LerpPosHprInterval(nodePath=self.cam, duration=period, pos=pos1, hpr=new_hpr, blendType='easeOut')
+            mySequence.append(interval)
+        # quit()
+
+        # i1 = LerpPosHprInterval(nodePath=self.cam, duration=period/2, pos=(+0.8, +1.0, +0.0), hpr=(-90*2-45, 0, 0), blendType='easeOut')
+        # i2 = LerpPosHprInterval(nodePath=self.cam, duration=period/2, pos=(+0.8, -1.0, +0.0), hpr=(-90*3-45, 0, 0), blendType='easeOut')
+        # i3 = LerpPosHprInterval(nodePath=self.cam, duration=period/2, pos=(-1.2, -1.0,  0.0), hpr=(-90*4-45, 0, 0), blendType='easeOut')
+
+        # i0 = LerpHprInterval(nodePath=self.cam, duration=period, hpr=(90*1, 0, 0))
+        # i1 = LerpHprInterval(nodePath=self.cam, duration=period, hpr=(90*2, 0, 0))
+        # i2 = LerpHprInterval(nodePath=self.cam, duration=period, hpr=(90*3, 0, 0))
+        # i3 = LerpHprInterval(nodePath=self.cam, duration=period, hpr=(90*4, 0, 0))
+        # i4 = LerpHprInterval(nodePath=self.cam, duration=period, hpr=(90*5, 0, 0))
+
+        def beat(t):
+            # Do something based on t.
+            fov = cos(t * 30) * (1 - t) * 10 + 100  # sin
+            self.camLens.setFov(fov)
+            # print('beat', t)
+
+        i = LerpFunc(beat, fromData=0, toData=1, duration=period/4)
+        # i = LerpFunc(beat, fromData=0, toData=1, duration=period/4, blendType='easeOut')
+
+        self.beat_start = 0
+        def beat_start(task):
+            # print('beat start', self.beat_start)
+            self.beat_start += 1
+            i.start()
+
+        # mySequence = Sequence(i0, i1, i2, i3)
+        # mySequence = Sequence(i2)
+        # mySequence = Sequence(i0, i1, i2, i3, i4)
+        # mySequence = Sequence(i0, i, i1, i, i2, i, i3, i)
 
         # print(self.music.status())
         while self.music.status() != AudioSound.PLAYING:
@@ -155,9 +282,52 @@ class MyApp(ShowBase):
         # print(self.music.status())
         # print(AudioSound.PLAYING)
 
+        print('Starting music, time:', self.music.getTime())
+
+        # mySequence.loop()
+        mySequence.start()
+        # pan.start()
+
+        # beat_start(0)
+
+        t0 = False
+        time = 0
+        prev_time = 0
+        for ev in track:
+            # print(ev)
+            if 'NOTE_ON' in str(ev):
+                if not t0:
+                    t0 = ev.time
+                # time = (ev.time - t0) / 192 * period
+                # print(time, ev.message.note)
+                if str(ev.message.note)=='C3' and (time-prev_time)>=period*2:
+                    # pass
+                    # print(time, ev.message.note)
+                    #self.taskMgr.doMethodLater(time, beat_start, 'beat')
+                    prev_time = time
+
+        for range_time in range(16, 64, 1):
+            time = range_time * period
+            print(time)
+            self.taskMgr.doMethodLater(time, beat_start, 'beat')
+
+        self.textObject = OnscreenText(text=str(round(self.music.getTime(), 2)), pos=(-1.8, +.9), fg=(1, 0.5, 0.5, 1),
+                                  bg=(0, 0, 0, 1), scale=0.07, align=TextNode.ALeft)
         self.taskMgr.add(self.myTask, "myTask")
 
+        self.max_delta = 0
+
+        print('Starting demo, time:', self.music.getTime())
+        # quit()
+
     def myTask(self, task):
+
+        # print(self.music.getTime())
+        self.textObject.destroy()
+        self.textObject = OnscreenText(text=str(round(self.music.getTime(),2)), pos=(-1.8, +.9), fg=(1, 0.5, 0.5, 1), bg=(0, 0, 0, 1), scale=0.07, align=TextNode.ALeft)
+
+        # print(self.cam.getPos(), self.cam.getHpr())
+        # print(self.camLens.getFov()[0])
 
         # print(self.pos)
         # print(self.hpr)
@@ -172,17 +342,20 @@ class MyApp(ShowBase):
 
         # self.model.setScale(1, 1+task.time, 1)
 
-        angle = sin(task.time*1)*90
-        self.cam.setH(angle)
+        # angle = sin(task.time*1)*90
+        # self.cam.setH(angle)
+        # self.cam.lookAt(+0.0, -0.0, 0.0)  #-1
+        # self.cam.headsUp(+0.0, -0.0, -1.0)
+        # self.cam.setPos(angle/100, -1.3, 0)
 
         decay = 1
-        if task.time % 1 < .5:
-            decay = ( 1 - (task.time % 1)*2 ) * 2
-        else:
-            decay = 0
-        fov = sin(task.time*60)*decay+100
-        fov = 100
-        self.camLens.setFov(fov)
+        # if task.time % 1 < .5:
+        #     decay = ( 1 - (task.time % 1)*2 ) * 2
+        # else:
+        #     decay = 0
+        # fov = sin(task.time*60)*decay+100
+        # fov = 10
+        # self.camLens.setFov(fov)
 
         # scale_y = sin(task.time*5)*2+2
         # scale_y = task.time+1
@@ -198,7 +371,10 @@ class MyApp(ShowBase):
         self.currents[4] = self.hpr[1]
         self.currents[5] = self.hpr[2]
         self.currents[6] = scale_y
-        self.currents[7] = fov
+        self.currents[7] = self.camLens.getFov()[0]
+
+        if task.frame < 3:
+            self.lasts = self.currents[:]
 
         for i in range(8):
             self.deltas[i] = self.currents[i] - self.lasts[i]
@@ -207,7 +383,12 @@ class MyApp(ShowBase):
         for i in range(8):
             self.delta += abs(self.deltas[i]*self.weights[i])
 
-        # print(self.delta)
+        if self.delta > self.max_delta:
+            self.max_delta = self.delta
+
+        # print(self.currents)
+        # print(self.max_delta, self.delta)
+
         # self.filters.setBlurSharpen(0)
         self.filters.setBlurSharpen(1 - self.delta)
         # self.filters.setBlurSharpen(2 - self.delta * 2)

@@ -1,6 +1,7 @@
 from setuptools import setup
 
 #'console_apps': {
+#'gui_apps': {
 
 setup(
     name="demo",
