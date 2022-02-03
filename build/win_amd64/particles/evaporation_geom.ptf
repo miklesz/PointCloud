@@ -1,0 +1,113 @@
+
+self.reset()
+self.setPos(0.000, 0.000, 0.000)
+self.setHpr(0.000, 0.000, 0.000)
+self.setScale(1.000, 1.000, 1.000)
+p0 = Particles.Particles('particles-1')
+# Particles parameters
+p0.setFactory("PointParticleFactory")
+p0.setRenderer("GeomParticleRenderer")
+p0.setEmitter("BoxEmitter")
+# p0.setPoolSize(10000)
+p0.setPoolSize(10000)
+p0.setBirthRate(0.2500)
+# p0.setLitterSize(20)
+p0.setLitterSize(200)
+p0.setLitterSpread(0)
+p0.setSystemLifespan(0.0000)
+p0.setLocalVelocityFlag(1)
+p0.setSystemGrowsOlderFlag(0)
+# Factory parameters
+p0.factory.setLifespanBase(8.0000)
+p0.factory.setLifespanSpread(0.0000)
+p0.factory.setMassBase(1.0000)
+p0.factory.setMassSpread(0.0000)
+p0.factory.setTerminalVelocityBase(400.0000)
+p0.factory.setTerminalVelocitySpread(0.0000)
+# Point factory parameters
+# Renderer parameters
+p0.renderer.setAlphaMode(BaseParticleRenderer.PRALPHAOUT)
+p0.renderer.setUserAlpha(0.10)
+# p0.renderer.setUserAlpha(1.00)
+# Geom parameters
+# ball = loader.loadModel("ball.dae")
+
+def create_points():
+
+    # Define GeomVertexArrayFormats for the various vertex attributes.
+
+    array = GeomVertexArrayFormat()
+    array.add_column(InternalName.make("vertex"), 3, Geom.NT_float32, Geom.C_point)
+    array.add_column(InternalName.make("color"), 4, Geom.NT_uint8, Geom.C_color)
+    array.add_column(InternalName.make("index"), 1, Geom.NT_int32, Geom.C_index)
+
+    vertex_format = GeomVertexFormat()
+    vertex_format.add_array(array)
+    vertex_format = GeomVertexFormat.register_format(vertex_format)
+
+    vertex_data = GeomVertexData("point_data", vertex_format, Geom.UH_static)
+    vertex_data.set_num_rows(8)
+
+    pos_writer = GeomVertexWriter(vertex_data, "vertex")
+    index_writer = GeomVertexWriter(vertex_data, "index")
+
+    index = 0
+
+    # # create 8 points as if they were the corner vertices of a cube
+    # for z in (-1., 1.):
+    #     for x, y in ((-1., -1.), (-1., 1.), (1., 1.), (1., -1.)):
+    #         pos_writer.add_data3(x, y, z)
+    #         index_writer.add_data1i(index)
+    #         index += 1
+
+    pos_writer.add_data3(0, 0, 0)
+    index_writer.add_data1i(index)
+    index += 1
+
+    prim = GeomPoints(Geom.UH_static)
+    prim.add_next_vertices(8)
+    geom = Geom(vertex_data)
+    geom.add_primitive(prim)
+    node = GeomNode("points_geom_node")
+    node.add_geom(geom)
+
+    return node
+
+# model = base.render.attach_new_node(create_points())
+# model = create_points()
+model = loader.loadModel("ball.dae")
+# model.writeBamFile("point_cloud.bam")
+# model = loader.loadModel("point_cloud.bam")
+
+# p0.renderer.setGeomNode(model)
+p0.renderer.setGeomNode(model.node())
+
+# p0.renderer.setTexture(loader.loadTexture('Weißes_Quadrat_10x10_Pixel.png'))
+# p0.renderer.setColor(LVector4(1.00, 1.00, 1.00, 1.00))
+# p0.renderer.setXScaleFlag(1)
+# p0.renderer.setYScaleFlag(1)
+# p0.renderer.setAnimAngleFlag(0)
+# p0.renderer.setInitialXScale(0.01)
+# p0.renderer.setFinalXScale(0.01)
+# p0.renderer.setInitialYScale(0.01)
+# p0.renderer.setFinalYScale(0.01)
+# p0.renderer.setNonanimatedTheta(0.0000)
+# p0.renderer.setAlphaBlendMethod(BaseParticleRenderer.PPNOBLEND)
+# p0.renderer.setAlphaDisable(0)
+# Emitter parameters
+p0.emitter.setEmissionType(BaseParticleEmitter.ETEXPLICIT)
+p0.emitter.setAmplitude(1.0000)
+p0.emitter.setAmplitudeSpread(0.7500)
+p0.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 1.0000))
+p0.emitter.setExplicitLaunchVector(LVector3(0.0000, 0.0000, 0.0000))
+p0.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
+# Box parameters
+p0.emitter.setMinBound((-5, -5, -4.0))
+p0.emitter.setMaxBound((+5, +5, -4.0))
+self.addParticles(p0)
+f0 = ForceGroup.ForceGroup('vertex')
+# Force parameters
+force0 = LinearNoiseForce(0.1500, 0)
+force0.setActive(1)
+f0.addForce(force0)
+self.addForceGroup(f0)

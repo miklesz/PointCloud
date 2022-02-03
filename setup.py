@@ -10,6 +10,7 @@ setup(
             'include_patterns': [
                 'models/*',
                 'music/*',
+                'particles/*'
             ],
             'gui_apps': {
                 'demo': 'main.py',
