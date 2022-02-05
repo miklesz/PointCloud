@@ -19,10 +19,26 @@ from direct.particles.ParticleEffect import ParticleEffect
 from direct.particles.ForceGroup import ForceGroup
 
 import sys
+import platform
 
 # Set const
 VERBOSE = True
 # VERBOSE = False
+
+
+def toggle_fullscreen():
+    global fullscreen
+    # props.setUndecorated(True)
+    # props.set_fullscreen(True)
+    # print('size:', local_props.has_fixed_size())
+    local_props = WindowProperties()
+    if fullscreen:
+        local_props.set_size(1280, 720)
+        fullscreen = False
+    else:
+        local_props.set_size(base.pipe.get_display_width(), base.pipe.get_display_height())
+        fullscreen = True
+    base.win.request_properties(local_props)
 
 
 def beat(t):
@@ -41,6 +57,7 @@ def beat_start(task):
 
 def accept():
     base.accept('escape', sys.exit)
+    base.accept('f', toggle_fullscreen)
     base.accept('m', move_to_random)
     base.accept('b', beat_interval.start)
     base.accept('c', toggle_cartoon_ink)
@@ -76,11 +93,14 @@ def main_task(task):
     text = f'''\
 Yo FuCkErS!
 time: {str(round(music.getTime(), 2))}
-m: move to random position (once)
-b: beat (once)
+escape: sys.exit
+
+# Window Properties
+f: toggle full-screen (now: {fullscreen})
+
+# Render Modes and Common Filters
 c: toggle cartoon ink (now: {cartoon_ink})
 p: toggle render mode perspective (now: {base.render.get_render_mode_perspective()})
-o: toggle pos intervals (now: {pos_intervals})
 )/(: inc/dec bloom intensity (now: {bloom})
 ]/[: inc/dec render mode thickness (now: {render_mode_thickness})
 >/<: inc/dec cartoon ink separation (now: {separation})
@@ -95,12 +115,18 @@ o: toggle pos intervals (now: {pos_intervals})
 7: set preset 7 (`???`)
 8: set preset 8 (`???`)
 9: set preset 9 (`???`)
-escape: sys.exit
-iddqd: ok, just joking ;-)'''
+
+# Effects
+m: set random position (once)
+o: set random position (now: {pos_intervals})
+b: beat (once)
+'''
     if 'text_object' in globals():
         text_object.destroy()
+    # pos=(-1.60, +.96)
+    # pos=(-1.77, +.96)
     text_object = OnscreenText(text=text,
-                               pos=(-1.77, +.9),
+                               pos=(-1.77, +.96),
                                fg=(1, 1, 0, 1),
                                bg=(0, 0, 0, .5),
                                scale=0.05,
@@ -162,11 +188,17 @@ base = ShowBase()
 
 has_force = False
 
+# Print platform
+if VERBOSE:
+    print('platform.python_version:', platform.python_version())
+    print('platform.machine:', platform.machine())
+
 # Print base.win.gsg
 if VERBOSE:
     print('base.win.gsg.driver_vendor:', base.win.gsg.driver_vendor)
     print('base.win.gsg.driver_renderer:', base.win.gsg.driver_renderer)
     print('base.win.gsg.supports_basic_shaders:', base.win.gsg.supports_basic_shaders)
+    # exit()
 
 # print PandaSystem.getVersionString()
 if VERBOSE:
@@ -176,11 +208,12 @@ if VERBOSE:
 music = base.loader.loadSfx("music/perka.ogg")
 
 # Set window
+fullscreen = False
 props = WindowProperties()
-props.setSize(base.pipe.getDisplayWidth(), base.pipe.getDisplayHeight())
-# props.setFixedSize(1)
+props.setIconFilename('icon-256.png')
 props.setTitle('Amiga Rulez!')
-base.win.requestProperties(props)
+base.win.request_properties(props)
+toggle_fullscreen()
 
 # Setting background color
 base.setBackgroundColor(0, 0, 0)

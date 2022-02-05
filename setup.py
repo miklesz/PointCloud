@@ -3,6 +3,13 @@ from setuptools import setup
 #'console_apps': {
 #'gui_apps': {
 
+# Set up output logging, important for GUI apps!
+# 'log_filename': '$USER_APPDATA/Asteroids/output.log',
+# 'log_append': False,
+
+# 'log_filename': 'output.log',
+# 'log_append': False,
+
 setup(
     name="demo",
     options = {
@@ -20,13 +27,17 @@ setup(
                 # Alternatively, use "*" to set the icon for all apps.
                 "demo": ["icon-256.png"],
             },
+
+            # Set up output logging, important for GUI apps!
             'log_filename': 'output.log',
             'log_append': False,
+
             'plugins': [
                 'pandagl',
                 'p3openal_audio',
                 'p3assimp',
             ],
+            'platforms': ['manylinux2010_x86_64', 'macosx_10_9_x86_64', 'win_amd64'],
         }
     }
 )

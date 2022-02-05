@@ -12,12 +12,16 @@ setup(
             'gui_apps': {
                 'asteroids': 'main.py',
             },
-            'log_filename': '$USER_APPDATA/Asteroids/output.log',
+            # 'log_filename': '$USER_APPDATA/Asteroids/output.log',
+            'log_filename': 'output.log',
             'log_append': False,
             'plugins': [
                 'pandagl',
                 'p3openal_audio',
             ],
+            'platforms': ['win_amd64'],
+            # 'platforms': ['macosx_10_9_x86_64'],
+            # 'platforms': ['manylinux2010_x86_64'],
         }
     }
 )
