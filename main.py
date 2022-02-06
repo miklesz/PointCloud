@@ -211,7 +211,7 @@ music = base.loader.loadSfx("music/perka.ogg")
 fullscreen = False
 props = WindowProperties()
 props.setIconFilename('icon-256.png')
-props.setTitle('Amiga Rulez!')
+props.setTitle('Kramsta by Damage')
 base.win.request_properties(props)
 toggle_fullscreen()
 
@@ -220,6 +220,7 @@ base.setBackgroundColor(0, 0, 0)
 
 # Load model
 model = base.loader.loadModel("models/office.ply")
+# model = base.loader.loadModel("models_other/ball.dae")
 model.reparentTo(base.render)
 if VERBOSE:
     model.ls()

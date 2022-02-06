@@ -11,7 +11,7 @@ from setuptools import setup
 # 'log_append': False,
 
 setup(
-    name="demo",
+    name="Kramsta",
     options = {
         'build_apps': {
             'include_patterns': [
@@ -20,12 +20,12 @@ setup(
                 'particles/*'
             ],
             'gui_apps': {
-                'demo': 'main.py',
+                'Kramsta': 'main.py',
             },
             "icons": {
                 # The key needs to match the key used in gui_apps/console_apps.
                 # Alternatively, use "*" to set the icon for all apps.
-                "demo": ["icon-256.png"],
+                "Kramsta": ["icon-256.png"],
             },
 
             # Set up output logging, important for GUI apps!
