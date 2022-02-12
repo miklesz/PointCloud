@@ -17,7 +17,7 @@ setup(
             'include_patterns': [
                 'models/*',
                 'music/*',
-                'particles/*'
+                # 'particles/*'
             ],
             'gui_apps': {
                 'Kramsta': 'main.py',
@@ -38,6 +38,8 @@ setup(
                 'p3assimp',
             ],
             'platforms': ['manylinux2010_x86_64', 'macosx_10_9_x86_64', 'win_amd64'],
+            # 'platforms': ['macosx_10_9_x86_64', 'win_amd64'],
+            # 'platforms': ['macosx_10_9_x86_64'],
         }
     }
 )

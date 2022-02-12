@@ -1,29 +1,115 @@
-from direct.showbase.ShowBase import ShowBase
+# Standard library imports
+from math import *
+import platform
+import sys
+
+# Related third party imports
 from direct.filter.CommonFilters import CommonFilters
-from direct.interval.IntervalGlobal import *
 from direct.gui.OnscreenText import OnscreenText
+from direct.interval.IntervalGlobal import *
+from direct.interval.LerpInterval import LerpPosHprInterval
+# from direct.particles.ForceGroup import ForceGroup
+from direct.particles.ParticleEffect import ParticleEffect
+from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.core import *
-from math import *
-
-from direct.interval.LerpInterval import LerpPosHprInterval
-
-from panda3d.core import Filename
-# from panda3d.physics import BaseParticleEmitter, BaseParticleRenderer
-# from panda3d.physics import PointParticleFactory, SpriteParticleRenderer
+# from panda3d.core import Filename
 from panda3d.physics import LinearNoiseForce
+from direct.particles.ForceGroup import ForceGroup
+from direct.particles.Particles import Particles
+from panda3d.physics import BaseParticleEmitter, BaseParticleRenderer
 # from panda3d.physics import DiscEmitter
 # from panda3d.physics import LinearJitterForce, LinearRandomForce
-# from direct.particles.Particles import Particles
-from direct.particles.ParticleEffect import ParticleEffect
-from direct.particles.ForceGroup import ForceGroup
+# from panda3d.physics import PointParticleFactory, SpriteParticleRenderer
 
-import sys
-import platform
+# Globals
+current_modes_and_filters = {}
 
-# Set const
+# Constants
 VERBOSE = True
 # VERBOSE = False
+PRESET_0 = {
+    'bloom': False, 'bloom_intensity': 1.0,
+    'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
+    'cartoon_ink': False, 'cartoon_ink_separation': 1,
+    'render_mode_perspective': False,
+    'render_mode_thickness': 1,
+}
+PRESET_1 = {
+    'bloom': False, 'bloom_intensity': 1.0,
+    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+    'cartoon_ink': True, 'cartoon_ink_separation': 2,
+    'render_mode_perspective': False,
+    'render_mode_thickness': 10,
+}
+PRESET_2 = {
+    'bloom': True, 'bloom_intensity': 1.0,
+    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+    'cartoon_ink': False, 'cartoon_ink_separation': 1,
+    'render_mode_perspective': False,
+    'render_mode_thickness': 2,
+}
+PRESET_3 = {
+    'bloom': True, 'bloom_intensity': 0.5,
+    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+    'cartoon_ink': False, 'cartoon_ink_separation': 1,
+    'render_mode_perspective': False,
+    'render_mode_thickness': 3,
+}
+PRESET_4 = {
+    'bloom': False, 'bloom_intensity': 0.0,
+    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+    'cartoon_ink': True, 'cartoon_ink_separation': 1,
+    'render_mode_perspective': True,
+    'render_mode_thickness': 40,
+}
+
+
+def change_mode_or_filter(mode_or_filter, change):
+    if change is None:
+        current_modes_and_filters[mode_or_filter] ^= True
+    else:
+        current_modes_and_filters[mode_or_filter] += change
+    set_modes_and_filters()
+
+
+def set_modes_and_filters(preset=None):
+    global current_modes_and_filters
+    if preset:
+        current_modes_and_filters = preset
+    print(current_modes_and_filters)
+    if current_modes_and_filters['bloom']:
+        filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
+                          mintrigger=0.0,
+                          desat=0,
+                          intensity=current_modes_and_filters['bloom_intensity'],
+                          size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
+    else:
+        filters.del_bloom()
+    if current_modes_and_filters['blur_sharpen']:
+        filters.set_blur_sharpen(amount=current_modes_and_filters['blur_sharpen_amount'])
+    else:
+        filters.del_blur_sharpen()
+    if current_modes_and_filters['cartoon_ink']:
+        filters.set_cartoon_ink(separation=current_modes_and_filters['cartoon_ink_separation'])
+    else:
+        filters.del_cartoon_ink()
+    base.render.set_render_mode_perspective(current_modes_and_filters['render_mode_perspective'], 1)
+    if current_modes_and_filters['render_mode_perspective']:
+        base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness']/1000)
+    else:
+        base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+
+
+def toggle_pos_intervals():
+    """Toggle position intervals"""
+    global pos_intervals
+    if pos_intervals:
+        sequence.finish()
+        pos_intervals = False
+    else:
+        sequence.start()
+        pos_intervals = True
 
 
 def toggle_fullscreen():
@@ -34,11 +120,17 @@ def toggle_fullscreen():
     local_props = WindowProperties()
     if fullscreen:
         local_props.set_size(1280, 720)
+        local_props.setOrigin((-2, -2))
         fullscreen = False
     else:
         local_props.set_size(base.pipe.get_display_width(), base.pipe.get_display_height())
+        local_props.setOrigin((0, 0))
         fullscreen = True
     base.win.request_properties(local_props)
+
+
+def toggle_volume():
+    music.set_volume(float(not music.get_volume()))
 
 
 def beat(t):
@@ -47,47 +139,46 @@ def beat(t):
     # print('beat', t)
 
 
-def beat_start(task):
-    global beat_count
-    # print('beat start', self.beat_start)
-    beat_count += 1
-    # beat_interval.start()
-    # return task  # Unnecessary
+# def beat_start(task):
+#     global beat_count
+#     # print('beat start', self.beat_start)
+#     beat_count += 1
+#     # beat_interval.start()
+#     # return task  # Unnecessary
+#     # return task
 
 
 def accept():
     base.accept('escape', sys.exit)
+    base.accept('v', toggle_volume)
     base.accept('f', toggle_fullscreen)
     base.accept('m', move_to_random)
     base.accept('b', beat_interval.start)
-    base.accept('c', toggle_cartoon_ink)
-    base.accept('p', toggle_render_mode_perspective)
     base.accept('o', toggle_pos_intervals)
-    base.accept(']', inc_render_mode_thickness)
-    base.accept('[', dec_render_mode_thickness)
-    base.accept('shift-0', inc_bloom)
-    base.accept('shift-9', dec_bloom)
-    base.accept('shift-.', inc_separation)
-    base.accept('shift-,', dec_separation)
-    base.accept('shift-]', inc_blur_sharpen)
-    base.accept('shift-[', dec_blur_sharpen)
-    base.accept('0', preset_0)
-    base.accept('1', preset_1)
-    base.accept('2', preset_2)
-    base.accept('3', preset_3)
-    base.accept('4', preset_4)
+    base.accept('shift-b', change_mode_or_filter, ['bloom', None])
+    base.accept('shift-0', change_mode_or_filter, ['bloom_intensity', +0.1])
+    base.accept('shift-9', change_mode_or_filter, ['bloom_intensity', -0.1])
+    base.accept('shift-c', change_mode_or_filter, ['cartoon_ink', None])
+    base.accept('shift-.', change_mode_or_filter, ['cartoon_ink_separation', +1])
+    base.accept('shift-,', change_mode_or_filter, ['cartoon_ink_separation', -1])
+    base.accept('shift-u', change_mode_or_filter, ['blur_sharpen', None])
+    base.accept('shift-]', change_mode_or_filter, ['blur_sharpen_amount', +0.1])
+    base.accept('shift-[', change_mode_or_filter, ['blur_sharpen_amount', -0.1])
+    base.accept(']', change_mode_or_filter, ['render_mode_thickness', +1])
+    base.accept('[', change_mode_or_filter, ['render_mode_thickness', -1])
+    base.accept('p', change_mode_or_filter, ['render_mode_perspective', None])
+    base.accept('0', set_modes_and_filters, [PRESET_0])
+    base.accept('1', set_modes_and_filters, [PRESET_1])
+    base.accept('2', set_modes_and_filters, [PRESET_2])
+    base.accept('3', set_modes_and_filters, [PRESET_3])
+    base.accept('4', set_modes_and_filters, [PRESET_4])
+    base.accept('s', start_steam)
 
 
 def main_task(task):
     global lasts
     global max_delta
     global text_object
-    global render_mode_thickness
-    global cartoon_ink
-    global bloom
-    global pos_intervals
-    global separation
-    global blur_sharpen
 
     # Onscreen text
     text = f'''\
@@ -95,16 +186,24 @@ Yo FuCkErS!
 time: {str(round(music.getTime(), 2))}
 escape: sys.exit
 
+# Setting Volume
+v: toggle volume (now: {music.get_volume()})
+
 # Window Properties
 f: toggle full-screen (now: {fullscreen})
 
-# Render Modes and Common Filters
-c: toggle cartoon ink (now: {cartoon_ink})
-p: toggle render mode perspective (now: {base.render.get_render_mode_perspective()})
-)/(: inc/dec bloom intensity (now: {bloom})
-]/[: inc/dec render mode thickness (now: {render_mode_thickness})
->/<: inc/dec cartoon ink separation (now: {separation})
-{{/}}: adjust blur/sharpen (now: {blur_sharpen})
+# Render Modes
+p: toggle render mode perspective (now: {current_modes_and_filters['render_mode_perspective']})
+]/[: inc/dec render mode thickness (now: {current_modes_and_filters['render_mode_thickness']})
+
+# Common Filters
+B: toggle bloom (now: {current_modes_and_filters['bloom']})
+C: toggle cartoon ink (now: {current_modes_and_filters['cartoon_ink']})
+U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
+)/(: inc/dec bloom intensity (now: {round(current_modes_and_filters['bloom_intensity'], 1)})
+>/<: inc/dec cartoon ink separation (now: {current_modes_and_filters['cartoon_ink_separation']})
+{{/}}: inc/dec blur/sharpen (now: {current_modes_and_filters['blur_sharpen_amount']})
+
 0: set preset 0 (`None`)
 1: set preset 1 (`Outdoor`)
 2: set preset 2 (`Indoor 2px`)
@@ -120,6 +219,7 @@ p: toggle render mode perspective (now: {base.render.get_render_mode_perspective
 m: set random position (once)
 o: set random position (now: {pos_intervals})
 b: beat (once)
+s: steam (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -131,6 +231,12 @@ b: beat (once)
                                bg=(0, 0, 0, .5),
                                scale=0.05,
                                align=TextNode.ALeft)
+    # OnscreenText(text=text,
+    #                            pos=(-1.77, +.96),
+    #                            fg=(1, 1, 0, 1),
+    #                            bg=(0, 0, 0, .5),
+    #                            scale=0.05,
+    #                            align=TextNode.ALeft)
 
     # decay = 1
     scale_y = 1
@@ -164,23 +270,97 @@ b: beat (once)
 
     lasts = currents[:]
 
+    # Box force
     # print(task.time)
-    global p
-    global has_force
-    if task.time > 6 and not has_force:
-        # p.removeAllForces()
-        f0 = ForceGroup('vertex')
-        force0 = LinearNoiseForce(0.1500, 0)
-        # force0 = LinearJitterForce(0.1500, 0)
-        force0.setActive(1)
-        f0.addForce(force0)
-        p.softStop()
-        p.addForceGroup(f0)
-        has_force = True
-        print("Force added!")
-        print(type(p))
+    # global p
+    # global has_force
+    # if task.time > 6 and not has_force:
+    #     # p.removeAllForces()
+    #     f0 = ForceGroup('vertex')
+    #     force0 = LinearNoiseForce(0.1500, 0)
+    #     # force0 = LinearJitterForce(0.1500, 0)
+    #     force0.setActive(1)
+    #     f0.addForce(force0)
+    #     p.softStop()
+    #     p.addForceGroup(f0)
+    #     has_force = True
+    #     print("Force added!")
+    #     print(type(p))
 
     return Task.cont
+
+
+def move_to_random():
+    # start_pos = base.cam.get_hpr()
+    start_hpr = base.cam.get_hpr()
+    pos = (rn.randomRealUnit() * 4.79, rn.randomRealUnit() * 3.81, rn.randomReal(2.66 - 1.75))
+    pos_dummy = base.render.attach_new_node("pos dummy")
+    pos_dummy.set_pos(pos)
+    pos_dummy.look_at(0, 0, 0)
+    hpr = pos_dummy.get_hpr()
+    if hpr[0]-start_hpr[0] > +180:
+        hpr[0] -= 360
+    if hpr[0]-start_hpr[0] < -180:
+        hpr[0] += 360
+    random_interval = LerpPosHprInterval(nodePath=base.cam,
+                                         duration=1,
+                                         pos=pos,
+                                         hpr=hpr,
+                                         blendType='easeInOut')
+    # Sequence just to avoid warnings!
+    random_sequence = Sequence()
+    random_sequence.append(random_interval)
+    random_sequence.start()
+
+
+def init_steam():
+    global current_modes_and_filters
+    litter_size = 200
+    particle_effect = ParticleEffect()
+    particles = Particles('steam')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
+    particles.set_emitter("BoxEmitter")
+    particles.setPoolSize(litter_size*60*8)
+    particles.setBirthRate(1/60)
+    particles.setLitterSize(litter_size)
+    # Factory parameters
+    particles.factory.set_lifespan_base(8)
+    particles.factory.set_terminal_velocity_base(400.0000)
+    # Renderer parameters
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
+    particles.renderer.set_user_alpha(0.45)
+    # Emitter parameters
+    particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
+    particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.3800))
+    particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
+    # Box parameters
+    particles.emitter.set_min_bound((-2.89104, -2.71256, -1.75318))
+    particles.emitter.set_max_bound((2.76295, 2.03709, -1.75318))
+    particle_effect.add_particles(particles)
+    # Force
+    force_group = ForceGroup('vertex')
+    # Force parameters
+    linear_noise_force = LinearNoiseForce(0.1500, 0)
+    linear_noise_force.setActive(True)
+    force_group.addForce(linear_noise_force)
+    particle_effect.add_force_group(force_group)
+    return particle_effect
+
+
+def start_steam():
+    steam_interval = ParticleInterval(
+        particleEffect=init_steam(),
+        parent=model,
+        worldRelative=True,
+        duration=16,
+        softStopT=8,
+        cleanup=True,
+        name='steam'
+    )
+    steam_interval.start()
 
 
 # Init ShowBase
@@ -220,6 +400,8 @@ base.setBackgroundColor(0, 0, 0)
 
 # Load model
 model = base.loader.loadModel("models/office.ply")
+# model = base.loader.loadModel("models/DNA.egg")
+# model = base.loader.loadModel("models/scene.gltf")
 # model = base.loader.loadModel("models_other/ball.dae")
 model.reparentTo(base.render)
 if VERBOSE:
@@ -338,280 +520,35 @@ for interval_index in range(64):
     sequence.append(interval)
 
 
-def move_to_random():
-    # start_pos = base.cam.get_hpr()
-    start_hpr = base.cam.get_hpr()
-    pos = (rn.randomRealUnit() * 4.79, rn.randomRealUnit() * 3.81, rn.randomReal(2.66 - 1.75))
-    pos_dummy = base.render.attach_new_node("pos dummy")
-    pos_dummy.set_pos(pos)
-    pos_dummy.look_at(0, 0, 0)
-    hpr = pos_dummy.get_hpr()
-    if hpr[0]-start_hpr[0] > +180:
-        hpr[0] -= 360
-    if hpr[0]-start_hpr[0] < -180:
-        hpr[0] += 360
-    random_interval = LerpPosHprInterval(nodePath=base.cam,
-                                         duration=1,
-                                         pos=pos,
-                                         hpr=hpr,
-                                         blendType='easeInOut')
-    # Sequence just to avoid warnings!
-    random_sequence = Sequence()
-    random_sequence.append(random_interval)
-    random_sequence.start()
-
-
 # Append beat intervals
 beat_interval = LerpFunc(beat, fromData=0, toData=1, duration=period/4)
 beat_count = 0
 
+# Render modes and common filters
+filters = CommonFilters(base.win, base.cam)
+set_modes_and_filters(PRESET_0)
+
 base.enableParticles()
-# Start of the code from ptf
-p = ParticleEffect()
-# p.loadConfig(Filename('particles/evaporation_point.ptf'))
-p.loadConfig(Filename('particles/box.ptf'))
-# p.loadConfig(Filename('particles/evaporation_sprite.ptf'))
-p.start(parent=model)
-# p.setPos(3.000, 0.000, 2.250)
-p.setPos(0, 0, 0)
 
 base.cam.set_pos(0, -2, 0)
 
-# print(p.getForceGroupDict())
-# p.removeAllForces()
-
-# Common filters
-filters = CommonFilters(base.win, base.cam)
-render_mode_thickness = 1
-cartoon_ink = False
-bloom = 0.0
 pos_intervals = False
-separation = 1
-blur_sharpen = 1.0
-
-
-# Cartoon Ink
-def toggle_cartoon_ink():
-    """Toggle cartoon ink"""
-    global cartoon_ink
-    if cartoon_ink:
-        filters.del_cartoon_ink()
-        cartoon_ink = False
-    else:
-        filters.set_cartoon_ink()   # separation=1)
-        cartoon_ink = True
-
-
-def toggle_pos_intervals():
-    """Toggle position intervals"""
-    global pos_intervals
-    if pos_intervals:
-        sequence.finish()
-        pos_intervals = False
-    else:
-        sequence.start()
-        pos_intervals = True
-
-
-# Bloom Intensity
-def inc_bloom():
-    change_bloom(step=+.1)
-
-
-def dec_bloom():
-    change_bloom(step=-.1)
-
-
-def change_bloom(step):
-    """Change bloom intensity"""
-    global bloom
-    bloom = round(bloom+step, 1)
-    if bloom < 0.0:
-        bloom = 0.0
-    filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
-                      mintrigger=0.0,
-                      desat=0,
-                      intensity=bloom,
-                      size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
-
-
-def toggle_render_mode_perspective():
-    """Toggle render mode perspective"""
-    global render_mode_thickness
-    if base.render.get_render_mode_perspective():
-        base.render.set_render_mode_perspective(False, 1)
-        base.render.set_render_mode_thickness(render_mode_thickness)
-    else:
-        base.render.set_render_mode_perspective(True, 1)
-        base.render.set_render_mode_thickness(render_mode_thickness/1000)
-
-
-def inc_separation():
-    change_separation(step=+1)
-
-
-def dec_separation():
-    change_separation(step=-1)
-
-
-def change_separation(step):
-    """Change cartoon ink separation"""
-    global separation
-    separation += step
-    if separation == 0:
-        separation = 1
-    if cartoon_ink:
-        filters.setCartoonInk(separation=separation)
-
-
-def inc_blur_sharpen():
-    change_blur_sharpen(step=+.1)
-
-
-def dec_blur_sharpen():
-    change_blur_sharpen(step=-.1)
-
-
-def change_blur_sharpen(step):
-    """Change blur/sharpen"""
-    global blur_sharpen
-    blur_sharpen = round(blur_sharpen+step, 1)
-    filters.set_blur_sharpen(amount=blur_sharpen)
-
-
-# Rendering modes
-def inc_render_mode_thickness():
-    change_render_mode_thickness(step=+1)
-
-
-def dec_render_mode_thickness():
-    change_render_mode_thickness(step=-1)
-
-
-def change_render_mode_thickness(step):
-    """Change render mode thickness"""
-    global render_mode_thickness
-    render_mode_thickness += step
-    if render_mode_thickness == 0:
-        render_mode_thickness = 1
-    if base.render.get_render_mode_perspective():
-        base.render.set_render_mode_thickness(render_mode_thickness/1000)
-    else:
-        base.render.set_render_mode_thickness(render_mode_thickness)
-
-
-def preset_0():
-    global render_mode_thickness
-    global cartoon_ink
-    global separation
-    global blur_sharpen
-    global bloom
-    render_mode_thickness = 1
-    base.render.set_render_mode_thickness(render_mode_thickness)
-    cartoon_ink = False
-    filters.del_cartoon_ink()
-    blur_sharpen = 1.0
-    filters.set_blur_sharpen(amount=blur_sharpen)
-    bloom = 0.0
-    filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
-                      mintrigger=0.0,
-                      desat=0,
-                      intensity=bloom,
-                      size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
-    base.render.set_render_mode_perspective(False, 1)
-
-
-def preset_1():
-    global render_mode_thickness
-    global cartoon_ink
-    global separation
-    global blur_sharpen
-    global bloom
-    render_mode_thickness = 10
-    base.render.set_render_mode_thickness(render_mode_thickness)
-    cartoon_ink = True
-    separation = 1
-    filters.set_cartoon_ink(separation=separation)
-    blur_sharpen = 1.0
-    filters.set_blur_sharpen(amount=blur_sharpen)
-    bloom = False
-    filters.del_bloom()
-    base.render.set_render_mode_perspective(False, 1)
-
-
-def preset_2():
-    global render_mode_thickness
-    global cartoon_ink
-    global blur_sharpen
-    global bloom
-    render_mode_thickness = 2
-    base.render.set_render_mode_thickness(render_mode_thickness)
-    cartoon_ink = False
-    filters.del_cartoon_ink()
-    blur_sharpen = 1.0
-    filters.set_blur_sharpen(amount=blur_sharpen)
-    bloom = True
-    filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
-                      mintrigger=0.0,
-                      desat=0,
-                      intensity=1.0,
-                      size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
-    base.render.set_render_mode_perspective(False, 1)
-
-
-def preset_3():
-    global render_mode_thickness
-    global cartoon_ink
-    global blur_sharpen
-    global bloom
-    render_mode_thickness = 3
-    base.render.set_render_mode_thickness(render_mode_thickness)
-    cartoon_ink = False
-    filters.del_cartoon_ink()
-    blur_sharpen = 1.0
-    filters.set_blur_sharpen(amount=blur_sharpen)
-    bloom = True
-    filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
-                      mintrigger=0.0,
-                      desat=0,
-                      intensity=0.5,
-                      size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
-    base.render.set_render_mode_perspective(False, 1)
-
-
-def preset_4():
-    global render_mode_thickness
-    global cartoon_ink
-    global separation
-    global blur_sharpen
-    global bloom
-    render_mode_thickness = 40
-    base.render.set_render_mode_thickness(render_mode_thickness/1000)
-    cartoon_ink = True
-    separation = 1
-    filters.set_cartoon_ink(separation=separation)
-    blur_sharpen = 1.0
-    filters.set_blur_sharpen(amount=blur_sharpen)
-    bloom = 0.0
-    filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
-                      mintrigger=0.0,
-                      desat=0,
-                      intensity=bloom,
-                      size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
-    base.render.set_render_mode_perspective(True, 1)
-
 
 # Play music
 while music.status() != AudioSound.PLAYING:
     music.play()
 if VERBOSE:
     print('Music time:', music.getTime())
+# print('volume', music.get_volume())  # 0.0)
+# print(1)
+# print(float(not 1))
+# exit()
 
 # Set later tasks
-for range_time in range(16, 64, 1):
-    time = range_time * period
-    # print(time)
-    base.taskMgr.doMethodLater(time, beat_start, 'beat')
+# for range_time in range(16, 64, 1):
+#     time = range_time * period
+#     # print(time)
+#     base.taskMgr.doMethodLater(time, beat_start, 'beat')
 
 # Set max delta
 max_delta = 0
@@ -628,10 +565,11 @@ if VERBOSE:
     print('Starting sequence')
     print('Music time:', music.getTime())
 
+# On screen text object
+text_object = OnscreenText()
+
 # Accept events
 accept()
-
-# PStatClient.connect()
 
 # Run demo
 if VERBOSE:
