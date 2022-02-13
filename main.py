@@ -63,6 +63,13 @@ PRESET_4 = {
     'render_mode_perspective': True,
     'render_mode_thickness': 40,
 }
+PRESET_5 = {
+    'bloom': False, 'bloom_intensity': 0.0,
+    'blur_sharpen': True, 'blur_sharpen_amount': -1.5,
+    'cartoon_ink': True, 'cartoon_ink_separation': 1,
+    'render_mode_perspective': True,
+    'render_mode_thickness': 40,
+}
 
 
 def change_mode_or_filter(mode_or_filter, change):
@@ -172,7 +179,9 @@ def accept():
     base.accept('2', set_modes_and_filters, [PRESET_2])
     base.accept('3', set_modes_and_filters, [PRESET_3])
     base.accept('4', set_modes_and_filters, [PRESET_4])
+    base.accept('5', set_modes_and_filters, [PRESET_5])
     base.accept('s', start_steam)
+    base.accept('z', start_zoom)
 
 
 def main_task(task):
@@ -183,7 +192,7 @@ def main_task(task):
     # Onscreen text
     text = f'''\
 Yo FuCkErS!
-time: {str(round(music.getTime(), 2))}
+time: {str(round(music.get_time(), 2))}
 escape: sys.exit
 
 # Setting Volume
@@ -202,14 +211,14 @@ C: toggle cartoon ink (now: {current_modes_and_filters['cartoon_ink']})
 U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 )/(: inc/dec bloom intensity (now: {round(current_modes_and_filters['bloom_intensity'], 1)})
 >/<: inc/dec cartoon ink separation (now: {current_modes_and_filters['cartoon_ink_separation']})
-{{/}}: inc/dec blur/sharpen (now: {current_modes_and_filters['blur_sharpen_amount']})
+{{/}}: inc/dec blur/sharpen (now: {round(current_modes_and_filters['blur_sharpen_amount'], 1)})
 
 0: set preset 0 (`None`)
 1: set preset 1 (`Outdoor`)
 2: set preset 2 (`Indoor 2px`)
 3: set preset 3 (`Indoor 3px`)
 4: set preset 4 (`Outdoor Perspective`)
-5: set preset 5 (`???`)
+5: set preset 5 (`Sitkowy`)
 6: set preset 6 (`???`)
 7: set preset 7 (`???`)
 8: set preset 8 (`???`)
@@ -220,6 +229,7 @@ m: set random position (once)
 o: set random position (now: {pos_intervals})
 b: beat (once)
 s: steam (once)
+z: dolly zoom (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -290,10 +300,9 @@ s: steam (once)
     return Task.cont
 
 
-def move_to_random():
+def init_pos_interval(pos):
     # start_pos = base.cam.get_hpr()
     start_hpr = base.cam.get_hpr()
-    pos = (rn.randomRealUnit() * 4.79, rn.randomRealUnit() * 3.81, rn.randomReal(2.66 - 1.75))
     pos_dummy = base.render.attach_new_node("pos dummy")
     pos_dummy.set_pos(pos)
     pos_dummy.look_at(0, 0, 0)
@@ -302,20 +311,21 @@ def move_to_random():
         hpr[0] -= 360
     if hpr[0]-start_hpr[0] < -180:
         hpr[0] += 360
-    random_interval = LerpPosHprInterval(nodePath=base.cam,
-                                         duration=1,
-                                         pos=pos,
-                                         hpr=hpr,
-                                         blendType='easeInOut')
+    return LerpPosHprInterval(nodePath=base.cam, duration=1, pos=pos, hpr=hpr, blendType='easeInOut')
+
+
+def move_to_random():
+    pos = (rn.randomRealUnit() * 4.79, rn.randomRealUnit() * 3.81, rn.randomReal(2.66 - 1.75))
     # Sequence just to avoid warnings!
     random_sequence = Sequence()
-    random_sequence.append(random_interval)
+    random_sequence.append(init_pos_interval(pos))
     random_sequence.start()
 
 
 def init_steam():
     global current_modes_and_filters
     litter_size = 200
+    life_span = 4  # Default: 8
     particle_effect = ParticleEffect()
     particles = Particles('steam')
     # Particles parameters
@@ -323,11 +333,11 @@ def init_steam():
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(litter_size*60*8)
+    particles.setPoolSize(litter_size*60*life_span)
     particles.setBirthRate(1/60)
     particles.setLitterSize(litter_size)
     # Factory parameters
-    particles.factory.set_lifespan_base(8)
+    particles.factory.set_lifespan_base(life_span)
     particles.factory.set_terminal_velocity_base(400.0000)
     # Renderer parameters
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
@@ -350,6 +360,44 @@ def init_steam():
     return particle_effect
 
 
+def init_display():
+    global current_modes_and_filters
+    litter_size = 250  # 250
+    life_span = 8  # Default: 8
+    particle_effect = ParticleEffect()
+    particles = Particles('display')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
+    particles.set_emitter("BoxEmitter")
+    particles.setPoolSize(litter_size*60*life_span)
+    particles.setBirthRate(1/60)
+    particles.setLitterSize(litter_size)
+    # Factory parameters
+    particles.factory.set_lifespan_base(life_span)
+    particles.factory.set_terminal_velocity_base(400.0000)
+    # Renderer parameters
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
+    particles.renderer.set_user_alpha(0.45)
+    # Emitter parameters
+    particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
+    particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
+    particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
+    # Box parameters
+    particles.emitter.set_min_bound((+1.0, -0.5, -0.5))
+    particles.emitter.set_max_bound((+1.1, +0.5, +0.5))
+    particle_effect.add_particles(particles)
+    # Force
+    # force_group = ForceGroup('vertex')
+    # Force parameters
+    # linear_noise_force = LinearNoiseForce(0.1500, 0)
+    # linear_noise_force.setActive(True)
+    # force_group.addForce(linear_noise_force)
+    # particle_effect.add_force_group(force_group)
+    return particle_effect
+
+
 def start_steam():
     steam_interval = ParticleInterval(
         particleEffect=init_steam(),
@@ -361,6 +409,45 @@ def start_steam():
         name='steam'
     )
     steam_interval.start()
+
+
+def start_display():
+    display_particle_effect = init_display()
+    display_particle_effect.start(parent=model)
+
+
+def display():
+    pass
+
+
+def zoom_lerp_function_interval(t):
+    base.camLens.setFov(t)
+    distance = 1.0-5/(2*tan(0.5*t*2*pi/360))
+    # print(distance)
+    # distance=1-(t)/10
+    base.cam.set_x(distance)
+
+
+def start_zoom():
+    fov_min = 66
+    fov_max = 115
+    # Sequence just to avoid warnings!
+    zoom_sequence = Sequence()
+    # zoom_sequence.append(init_pos_interval((-2.89104, 0, 0)))
+    zoom_sequence.append(init_pos_interval((1.0-5/(2*tan(0.5*115*2*pi/360)), 0, 0)))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
+    zoom_sequence.start()
+    start_display()
+    # display_interval = LerpFunc(display, fromData=0, toData=1, duration=10)
 
 
 # Init ShowBase
@@ -472,7 +559,7 @@ for geom in point_cloud.node().modify_geoms():
 # model.reparentTo(base.render)
 
 # Set camera lens field of view
-base.camLens.setFov(100)
+base.camLens.setFov(115)
 # base.camLens.fov = 100
 
 # Set currents, lasts, deltas and weights
