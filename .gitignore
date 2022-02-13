@@ -6,3 +6,6 @@ models_other/Chrobrego_PC.ply
 models_other/duzy2.ply
 models_other/Modelar-2022-Jan-01.csv
 build
+build/macosx_10_9_x86_64/Kramsta.app/Contents/MacOS/Kramsta
+build/manylinux2010_x86_64/Kramsta
+build/win_amd64/Kramsta.exe
