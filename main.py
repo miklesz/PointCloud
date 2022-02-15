@@ -15,6 +15,7 @@ from direct.task import Task
 from panda3d.core import *
 # from panda3d.core import Filename
 from panda3d.physics import LinearNoiseForce
+from panda3d.physics import LinearJitterForce
 from direct.particles.ForceGroup import ForceGroup
 from direct.particles.Particles import Particles
 from panda3d.physics import BaseParticleEmitter, BaseParticleRenderer
@@ -28,48 +29,56 @@ current_modes_and_filters = {}
 # Constants
 VERBOSE = True
 # VERBOSE = False
-PRESET_0 = {
-    'bloom': False, 'bloom_intensity': 1.0,
-    'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
-    'cartoon_ink': False, 'cartoon_ink_separation': 1,
-    'render_mode_perspective': False,
-    'render_mode_thickness': 1,
-}
-PRESET_1 = {
-    'bloom': False, 'bloom_intensity': 1.0,
-    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
-    'cartoon_ink': True, 'cartoon_ink_separation': 2,
-    'render_mode_perspective': False,
-    'render_mode_thickness': 10,
-}
-PRESET_2 = {
-    'bloom': True, 'bloom_intensity': 1.0,
-    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
-    'cartoon_ink': False, 'cartoon_ink_separation': 1,
-    'render_mode_perspective': False,
-    'render_mode_thickness': 2,
-}
-PRESET_3 = {
-    'bloom': True, 'bloom_intensity': 0.5,
-    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
-    'cartoon_ink': False, 'cartoon_ink_separation': 1,
-    'render_mode_perspective': False,
-    'render_mode_thickness': 3,
-}
-PRESET_4 = {
-    'bloom': False, 'bloom_intensity': 0.0,
-    'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
-    'cartoon_ink': True, 'cartoon_ink_separation': 1,
-    'render_mode_perspective': True,
-    'render_mode_thickness': 40,
-}
-PRESET_5 = {
-    'bloom': False, 'bloom_intensity': 0.0,
-    'blur_sharpen': True, 'blur_sharpen_amount': -1.5,
-    'cartoon_ink': True, 'cartoon_ink_separation': 1,
-    'render_mode_perspective': True,
-    'render_mode_thickness': 40,
-}
+PRESETS = [
+    {
+        'preset': 0,
+        'bloom': False, 'bloom_intensity': 1.0,
+        'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': False, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 1
+    },
+    {
+        'preset': 1,
+        'bloom': False, 'bloom_intensity': 1.0,
+        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': True, 'cartoon_ink_separation': 2,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 10,
+    },
+    {
+        'preset': 2,
+        'bloom': True, 'bloom_intensity': 1.0,
+        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': False, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 2,
+    },
+    {
+        'preset': 3,
+        'bloom': True, 'bloom_intensity': 0.5,
+        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': False, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 3,
+    },
+    {
+        'preset': 4,
+        'bloom': False, 'bloom_intensity': 0.0,
+        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': True, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': True,
+        'render_mode_thickness': 40,
+    },
+    {
+        'preset': 5,
+        'bloom': False, 'bloom_intensity': 0.0,
+        'blur_sharpen': True, 'blur_sharpen_amount': -1.5,
+        'cartoon_ink': True, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': True,
+        'render_mode_thickness': 40,
+    },
+]
 
 
 def change_mode_or_filter(mode_or_filter, change):
@@ -77,6 +86,7 @@ def change_mode_or_filter(mode_or_filter, change):
         current_modes_and_filters[mode_or_filter] ^= True
     else:
         current_modes_and_filters[mode_or_filter] += change
+    current_modes_and_filters['preset'] = None
     set_modes_and_filters()
 
 
@@ -174,14 +184,15 @@ def accept():
     base.accept(']', change_mode_or_filter, ['render_mode_thickness', +1])
     base.accept('[', change_mode_or_filter, ['render_mode_thickness', -1])
     base.accept('p', change_mode_or_filter, ['render_mode_perspective', None])
-    base.accept('0', set_modes_and_filters, [PRESET_0])
-    base.accept('1', set_modes_and_filters, [PRESET_1])
-    base.accept('2', set_modes_and_filters, [PRESET_2])
-    base.accept('3', set_modes_and_filters, [PRESET_3])
-    base.accept('4', set_modes_and_filters, [PRESET_4])
-    base.accept('5', set_modes_and_filters, [PRESET_5])
+    base.accept('0', set_modes_and_filters, [PRESETS[0]])
+    base.accept('1', set_modes_and_filters, [PRESETS[1]])
+    base.accept('2', set_modes_and_filters, [PRESETS[2]])
+    base.accept('3', set_modes_and_filters, [PRESETS[3]])
+    base.accept('4', set_modes_and_filters, [PRESETS[4]])
+    base.accept('5', set_modes_and_filters, [PRESETS[5]])
     base.accept('s', start_steam)
     base.accept('z', start_zoom)
+    base.accept('d', dust_storm)
 
 
 def main_task(task):
@@ -213,6 +224,7 @@ U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 >/<: inc/dec cartoon ink separation (now: {current_modes_and_filters['cartoon_ink_separation']})
 {{/}}: inc/dec blur/sharpen (now: {round(current_modes_and_filters['blur_sharpen_amount'], 1)})
 
+# Presets (now: {current_modes_and_filters['preset']})
 0: set preset 0 (`None`)
 1: set preset 1 (`Outdoor`)
 2: set preset 2 (`Indoor 2px`)
@@ -230,6 +242,7 @@ o: set random position (now: {pos_intervals})
 b: beat (once)
 s: steam (once)
 z: dolly zoom (once)
+d: dust storm (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -239,7 +252,7 @@ z: dolly zoom (once)
                                pos=(-1.77, +.96),
                                fg=(1, 1, 0, 1),
                                bg=(0, 0, 0, .5),
-                               scale=0.05,
+                               scale=0.04,  # 0.05
                                align=TextNode.ALeft)
     # OnscreenText(text=text,
     #                            pos=(-1.77, +.96),
@@ -297,10 +310,15 @@ z: dolly zoom (once)
     #     print("Force added!")
     #     print(type(p))
 
+    # if (task.dt > 0.0):
+    #     print(1.0 / task.dt)
+
+    # print(task.dt)
+
     return Task.cont
 
 
-def init_pos_interval(pos):
+def init_pos_interval(pos, duration=1):
     # start_pos = base.cam.get_hpr()
     start_hpr = base.cam.get_hpr()
     pos_dummy = base.render.attach_new_node("pos dummy")
@@ -311,7 +329,7 @@ def init_pos_interval(pos):
         hpr[0] -= 360
     if hpr[0]-start_hpr[0] < -180:
         hpr[0] += 360
-    return LerpPosHprInterval(nodePath=base.cam, duration=1, pos=pos, hpr=hpr, blendType='easeInOut')
+    return LerpPosHprInterval(nodePath=base.cam, duration=duration, pos=pos, hpr=hpr, blendType='easeInOut')
 
 
 def move_to_random():
@@ -363,7 +381,8 @@ def init_steam():
 def init_display():
     global current_modes_and_filters
     litter_size = 250  # 250
-    life_span = 8  # Default: 8
+    grow_time = 2  # Default: 8
+    life_span = 10  # Default: 8
     particle_effect = ParticleEffect()
     particles = Particles('display')
     # Particles parameters
@@ -371,7 +390,7 @@ def init_display():
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(litter_size*60*life_span)
+    particles.setPoolSize(litter_size*60*grow_time)
     particles.setBirthRate(1/60)
     particles.setLitterSize(litter_size)
     # Factory parameters
@@ -379,7 +398,8 @@ def init_display():
     particles.factory.set_terminal_velocity_base(400.0000)
     # Renderer parameters
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
-    particles.renderer.set_user_alpha(0.45)
+    # particles.renderer.set_user_alpha(0.45)
+    particles.renderer.set_user_alpha(0.80)
     # Emitter parameters
     particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
@@ -389,12 +409,13 @@ def init_display():
     particles.emitter.set_max_bound((+1.1, +0.5, +0.5))
     particle_effect.add_particles(particles)
     # Force
-    # force_group = ForceGroup('vertex')
+    force_group = ForceGroup('zoom_random')
     # Force parameters
+    linear_jitter_force = LinearJitterForce(0.1500, 0)  # 0.1500
     # linear_noise_force = LinearNoiseForce(0.1500, 0)
-    # linear_noise_force.setActive(True)
-    # force_group.addForce(linear_noise_force)
-    # particle_effect.add_force_group(force_group)
+    linear_jitter_force.setActive(True)
+    force_group.addForce(linear_jitter_force)
+    particle_effect.add_force_group(force_group)
     return particle_effect
 
 
@@ -411,43 +432,110 @@ def start_steam():
     steam_interval.start()
 
 
-def start_display():
-    display_particle_effect = init_display()
+def start_display(display_particle_effect):
     display_particle_effect.start(parent=model)
+
+
+def soft_stop_display(display_particle_effect):
+    display_particle_effect.soft_stop()
+
+
+def force_display(display_particle_effect):
+    display_particle_effect.soft_stop()
+    force_group = ForceGroup('zoom')
+    linear_noise_force = LinearNoiseForce(0.1500, 0)
+    linear_noise_force.setActive(1)
+    force_group.addForce(linear_noise_force)
+    display_particle_effect.addForceGroup(force_group)
+    # print("Force added!")
+    # print(type(display_particle_effect))
 
 
 def display():
     pass
 
 
-def zoom_lerp_function_interval(t):
-    base.camLens.setFov(t)
-    distance = 1.0-5/(2*tan(0.5*t*2*pi/360))
-    # print(distance)
-    # distance=1-(t)/10
+def zoom_function(t):
+    fov_min = 66  # 66
+    fov_max = 115  # 115
+    fov = (fov_min-fov_max)*t+fov_max
+    width = 3.5+t*1.5
+    # width = 4
+    base.camLens.setFov(fov)
+    distance = 1.0-width/(2*tan(0.5*fov*2*pi/360))
     base.cam.set_x(distance)
+    # print(fov, distance, width)
+
+
+def fov_function(t):
+    fov_min = 66  # 66
+    fov_max = 115  # 115
+    fov = (fov_min-fov_max)*t+fov_max
+    base.camLens.setFov(fov)
+    # print(fov)
 
 
 def start_zoom():
-    fov_min = 66
-    fov_max = 115
+    # fov_min = 66
+    # fov_max = 115
     # Sequence just to avoid warnings!
+    display_particle_effect = init_display()
+    zoom_prepare_parallel = Parallel()
+    zoom_prepare_parallel.append(LerpFunc(fov_function, fromData=0, toData=1, duration=2, blendType='easeInOut'))
+    zoom_prepare_parallel.append(init_pos_interval((1.0-5/(2*tan(0.5*66*2*pi/360)), 0, 0), duration=2))
     zoom_sequence = Sequence()
-    # zoom_sequence.append(init_pos_interval((-2.89104, 0, 0)))
-    zoom_sequence.append(init_pos_interval((1.0-5/(2*tan(0.5*115*2*pi/360)), 0, 0)))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_max, toData=fov_min, duration=2, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_lerp_function_interval, fromData=fov_min, toData=fov_max, duration=2, blendType='easeInOut'))
+    zoom_sequence.append(zoom_prepare_parallel)
+    zoom_sequence.append(Func(start_display, display_particle_effect))
+    zoom_sequence.append(Wait(2))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=2, blendType='easeInOut'))
+    # zoom_sequence.append(Func(soft_stop_display, display_particle_effect))
+    zoom_sequence.append(Func(force_display, display_particle_effect))
+    # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
+    # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
+    # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
+    # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
+    # start_display()
     zoom_sequence.start()
-    start_display()
     # display_interval = LerpFunc(display, fromData=0, toData=1, duration=10)
+
+
+def set_fog_exp_density(t, fog):
+    fog.setExpDensity(t)
+
+
+def set_background_color(t, color, preset):
+    base.set_background_color(color[0]*t, color[1]*t, color[2]*t)
+    set_modes_and_filters(PRESETS[0])
+    set_modes_and_filters(PRESETS[preset])
+
+
+def dust_storm():
+    global current_modes_and_filters
+    preset = current_modes_and_filters['preset']
+    # print(preset, type(preset))
+    dust_color = (184/255, 151/255, 122/255)
+    # base.set_background_color(*dust_color)
+    fog = Fog("Fog")
+    fog.set_color(*dust_color)
+    fog.setExpDensity(.0)
+    base.render.set_fog(fog)
+    dust_storm_sequence = Sequence()
+    dust_storm_sequence.append(init_pos_interval((-2.89104, 0, 0), duration=2))
+    dust_storm_sequence.append(LerpFunctionInterval(
+        set_background_color,
+        fromData=0,
+        toData=1,
+        duration=2,
+        extraArgs=[dust_color, preset]
+    ))
+    dust_storm_sequence.append(LerpFunctionInterval(
+        set_fog_exp_density,
+        fromData=0,
+        toData=1,
+        duration=2,
+        extraArgs=[fog]
+    ))
+    dust_storm_sequence.start()
 
 
 # Init ShowBase
@@ -613,7 +701,7 @@ beat_count = 0
 
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
-set_modes_and_filters(PRESET_0)
+set_modes_and_filters(PRESETS[0])
 
 base.enableParticles()
 
