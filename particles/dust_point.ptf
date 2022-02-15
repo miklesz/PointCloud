@@ -1,0 +1,104 @@
+
+self.reset()
+self.setPos(0.000, 0.000, 0.000)
+self.setHpr(0.000, 0.000, 0.000)
+self.setScale(1.000, 1.000, 1.000)
+p0 = Particles.Particles('particles-1')
+# Particles parameters
+p0.setFactory("PointParticleFactory")
+# p0.setRenderer("SpriteParticleRenderer")
+p0.setRenderer("PointParticleRenderer")
+p0.renderer.setPointSize(3)
+
+# p0.setEmitter("SphereVolumeEmitter")
+p0.setEmitter("BoxEmitter")
+# p0.setEmitter("PointEmitter")
+
+# p0.setPoolSize(10000)
+p0.setPoolSize(20000)
+
+#p0.setBirthRate(0.0500)
+p0.setBirthRate(1/60)
+
+#p0.setLitterSize(10)
+p0.setLitterSize(25)
+
+p0.setLitterSpread(10)
+p0.setSystemLifespan(0.0000)
+p0.setLocalVelocityFlag(1)
+p0.setSystemGrowsOlderFlag(0)
+# Factory parameters
+p0.factory.setLifespanBase(1.0000)  # 2
+p0.factory.setLifespanSpread(0.2500)
+p0.factory.setMassBase(2.0000)
+p0.factory.setMassSpread(0.0100)
+p0.factory.setTerminalVelocityBase(400.0000)
+p0.factory.setTerminalVelocitySpread(0.0000)
+# Point factory parameters
+# Renderer parameters
+p0.renderer.setAlphaMode(BaseParticleRenderer.PRALPHAOUT)
+
+# p0.renderer.setUserAlpha(0.07)
+p0.renderer.setUserAlpha(1.00)
+
+# Sprite parameters
+# p0.renderer.setTexture(loader.loadTexture('dust.png'))
+# p0.renderer.setColor(LVector4(1.00, 1.00, 1.00, 1.00))
+# p0.renderer.setXScaleFlag(0)
+# p0.renderer.setYScaleFlag(0)
+# p0.renderer.setAnimAngleFlag(0)
+# p0.renderer.setInitialXScale(0.0100)
+# p0.renderer.setFinalXScale(0.0200)
+# p0.renderer.setInitialYScale(0.0100)
+# p0.renderer.setFinalYScale(0.0200)
+# p0.renderer.setNonanimatedTheta(0.0000)
+# p0.renderer.setAlphaBlendMethod(BaseParticleRenderer.PPBLENDLINEAR)
+# p0.renderer.setAlphaDisable(0)
+
+# Point parameters
+p0.renderer.setStartColor(LVector4(184/255, 151/255, 122/255, 1.00))
+
+# Emitter parameters
+# p0.emitter.setEmissionType(BaseParticleEmitter.ETRADIATE)
+p0.emitter.setEmissionType(BaseParticleEmitter.ET_EXPLICIT)
+p0.emitter.setAmplitude(1.0000)
+p0.emitter.setAmplitudeSpread(0.0000)
+p0.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 0.0000))
+p0.emitter.setExplicitLaunchVector(LVector3(0.0000, -0.0000, 1))
+p0.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
+
+# Sphere Volume parameters
+# p0.emitter.setRadius(0.1000)
+
+# Box parameters
+p0.emitter.setMinBound((-.02, -.02, 0))
+p0.emitter.setMaxBound((+.02, +.02, 0))
+
+# Point parameters
+# p0.emitter.setLocation((+0, +0, +0))
+
+self.addParticles(p0)
+f0 = ForceGroup.ForceGroup('gravity')
+
+force0 = LinearNoiseForce(2, 0)
+force0.setActive(1)
+f0.addForce(force0)
+# #
+force1 = LinearJitterForce(2, 0)
+force1.setActive(1)
+f0.addForce(force1)
+
+# force2 = AngularVectorForce(4.0000, 5.0000, 1.0000)
+# force2.setActive(1)
+# f0.addForce(force2)
+
+# force3 = LinearVectorForce(LVector3(0.0000, 0.0000, -1.0000), 0.0500, 0)
+# force3.setActive(1)
+# f0.addForce(force3)
+
+force4 = LinearCylinderVortexForce(1, 1, 7, 1, False)
+force4.setActive(1)
+f0.addForce(force4)
+
+# Force parameters
+self.addForceGroup(f0)
