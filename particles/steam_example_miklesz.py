@@ -21,6 +21,7 @@ from direct.gui.OnscreenText import OnscreenText
 from direct.filter.CommonFilters import CommonFilters
 import sys
 from direct.interval.IntervalGlobal import *
+from panda3d.physics import AngularEulerIntegrator
 
 HELP_TEXT = """
 1: Load Steam
@@ -40,19 +41,19 @@ class ParticleDemo(ShowBase):
         ShowBase.__init__(self)
 
         # Standard title and instruction text
-        self.title = OnscreenText(
-            text="Panda3D: Tutorial - Particles",
-            parent=base.a2dBottomCenter,
-            style=1, fg=(1, 1, 1, 1), pos=(0, 0.1), scale=.08)
-        self.escapeEvent = OnscreenText(
-            text=HELP_TEXT, parent=base.a2dTopLeft,
-            style=1, fg=(1, 1, 1, 1), pos=(0.06, -0.06),
-            align=TextNode.ALeft, scale=.05)
+        # self.title = OnscreenText(
+        #     text="Panda3D: Tutorial - Particles",
+        #     parent=base.a2dBottomCenter,
+        #     style=1, fg=(1, 1, 1, 1), pos=(0, 0.1), scale=.08)
+        # self.escapeEvent = OnscreenText(
+        #     text=HELP_TEXT, parent=base.a2dTopLeft,
+        #     style=1, fg=(1, 1, 1, 1), pos=(0.06, -0.06),
+        #     align=TextNode.ALeft, scale=.05)
 
         # More standard initialization
         self.accept('escape', sys.exit)
         self.accept('1', self.loadParticleConfig, ['steam.ptf'])
-        self.accept('2', self.loadParticleConfig, ['dust.ptf'])
+        self.accept('2', self.loadParticleConfig, ['dust_point.ptf'])
         self.accept('3', self.loadParticleConfig, ['fountain.ptf'])
         self.accept('4', self.loadParticleConfig, ['smoke.ptf'])
         self.accept('5', self.loadParticleConfig, ['smokering.ptf'])
@@ -61,8 +62,8 @@ class ParticleDemo(ShowBase):
         self.accept('8', self.loadParticleConfig, ['evaporation_point.ptf'])
 
         self.accept('escape', sys.exit)
-        base.disableMouse()
-        base.camera.setPos(0, -20, 10)
+        # base.disableMouse()
+        base.cam.setPos(0, -5, 2)
         base.camLens.setFov(25)
         base.setBackgroundColor(0, 0, 0)
 
@@ -73,15 +74,24 @@ class ParticleDemo(ShowBase):
         base.enableParticles()
         self.t = loader.loadModel("teapot")
         print(type(self.t.node()))
-        self.t.setPos(0, 10, 0)
+        # self.t.setPos(0, 10, 2)
         # self.t.set_scale(0.01)
-        self.t.reparentTo(render)
+        # self.t.reparentTo(render)
         self.setupLights()
         self.p = ParticleEffect()
-        self.loadParticleConfig('evaporation_collision.ptf')
+        self.loadParticleConfig('dust_point.ptf')
+        # self.loadParticleConfig('evaporation_collision.ptf')
         # self.render.setRenderModeThickness(10)
 
-        base.cam.look_at(self.t)
+        # Instantiate an AngleIntegrator()
+        angleInt = AngularEulerIntegrator()
+
+        # Attach the AngleIntegrator to the PhysicsManager
+        # base.physicsMgr.attachAngularIntegrator(angleInt)
+        base.physicsMgr.attachAngularIntegrator(angleInt)
+
+        # base.cam.look_at(self.t)
+        base.cam.look_at(0, 0, 0)
 
         # rotate_interval = LerpHprInterval(nodePath=self.t, duration=10, hpr=(0, 0, 0))
         # rotate_interval.loop()
@@ -104,10 +114,11 @@ class ParticleDemo(ShowBase):
         self.p.loadConfig(Filename(filename))
         # Sets particles to birth relative to the teapot, but to render at
         # toplevel
-        self.p.start(self.t)
+        # self.p.start(self.t)
+        self.p.start(base.render)
         # self.p.start(base.render)
         # self.p.setPos(3.000, 0.000, 2.250)
-        self.p.setPos(0.000, 0.000, 0.000)
+        self.p.setPos(0.000, 0.000, -.8)
 
     # Setup lighting
     def setupLights(self):
