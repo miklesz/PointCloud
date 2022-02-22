@@ -379,7 +379,7 @@ def init_steam():
 
 def init_display(min_x, min_z, max_x, max_z, xel_a):
     global current_modes_and_filters
-    litter_size = 3  # 250  # 10  # 20
+    litter_size = 1  # 250  # 10  # 20
     grow_time = 2  # Default: 8
     life_span = 10  # Default: 8
     particle_effect = ParticleEffect()
@@ -389,7 +389,7 @@ def init_display(min_x, min_z, max_x, max_z, xel_a):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(litter_size*60*grow_time)
+    particles.setPoolSize(litter_size*6*grow_time)
     particles.setBirthRate(1/60)
     particles.setLitterSize(litter_size)
     # Factory parameters
@@ -399,7 +399,7 @@ def init_display(min_x, min_z, max_x, max_z, xel_a):
     particles.renderer.set_start_color(xel_a)
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
     # particles.renderer.set_user_alpha(0.45)
-    particles.renderer.set_user_alpha(0.80)
+    # particles.renderer.set_user_alpha(0.80)
     # Emitter parameters
     particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
@@ -477,7 +477,7 @@ def fov_function(t):
 
 def start_zoom():
     my_image = PNMImage()
-    my_image.read("icon-16.png")
+    my_image.read("icons/icon-32.png")
 
     # fov_min = 66
     # fov_max = 115
@@ -587,7 +587,7 @@ music = base.loader.loadSfx("music/perka.ogg")
 # Set window
 fullscreen = False
 props = WindowProperties()
-props.setIconFilename('icon-256.png')
+props.setIconFilename('icons/icon-256.png')
 props.setTitle('Kramsta by Damage')
 base.win.request_properties(props)
 toggle_fullscreen()
