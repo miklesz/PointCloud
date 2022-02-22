@@ -1,4 +1,4 @@
-
+# Reference: https://discourse.panda3d.org/t/linearcylindervortexforce/28390/2?u=miklesz
 self.reset()
 self.setPos(0.000, 0.000, 0.000)
 self.setHpr(0.000, 0.000, 0.000)
