@@ -8,3 +8,16 @@ build/
 build/macosx_10_9_x86_64/Kramsta.app/Contents/MacOS/Kramsta
 build/manylinux2010_x86_64/Kramsta
 build/win_amd64/Kramsta.exe
+build/macosx_10_9_x86_64/Kramsta.app/Contents/MacOS/Kramsta
+build/macosx_10_9_x86_64/Kramsta.app/Contents/MacOS/Kramsta
+build/manylinux2010_x86_64/Kramsta
+*.exe
+entro/entro.py/1kintro_macosx.aiff
+entro/entro.py/entro.py
+entro/entro.py/entro.py.nfo
+build/win_amd64/Kramsta.exe
+entro/entro.py/entro_macosx.py
+entro/entro.py/entro_py_by_exile_studios
+entro/entro.py/entro_windows.py
+entro/entro.py/screenshot.png
+entro/scene.org.txt
