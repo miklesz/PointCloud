@@ -379,10 +379,7 @@ def init_steam():
 
 def init_display(min_x, min_z, max_x, max_z, xel_a):
     global current_modes_and_filters
-    # min_x, min_z, max_x, max_z = -0.5, -0.5, +0.5, +0.5
-    # min_x, min_z, max_x, max_z = -1, -1, +1, +1
-    # xel_a = (0.658824, 0.341176, 0.341176, 1)
-    litter_size = 10  # 250
+    litter_size = 3  # 250  # 10  # 20
     grow_time = 2  # Default: 8
     life_span = 10  # Default: 8
     particle_effect = ParticleEffect()
@@ -480,10 +477,7 @@ def fov_function(t):
 
 def start_zoom():
     my_image = PNMImage()
-    my_image.read("icon-8.png")
-    # print(my_image.get_xel_a(4, 4))
-    # print(my_image.get_x_size())
-    # print(my_image.get_read_x_size())
+    my_image.read("icon-16.png")
 
     # fov_min = 66
     # fov_max = 115
