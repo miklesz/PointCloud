@@ -17,6 +17,7 @@ setup(
             'include_patterns': [
                 'models/*',
                 'music/*',
+                'icons/*',
                 # 'particles/*'
             ],
             'gui_apps': {
@@ -25,7 +26,7 @@ setup(
             "icons": {
                 # The key needs to match the key used in gui_apps/console_apps.
                 # Alternatively, use "*" to set the icon for all apps.
-                "Kramsta": ["icon-256.png"],
+                "Kramsta": ["icons/icon-256.png", "icons/icon-32.png", "icons/icon-16.png", "icons/icon-8.png"],
             },
 
             # Set up output logging, important for GUI apps!
