@@ -131,10 +131,10 @@ def toggle_pos_intervals():
 
 def toggle_fullscreen():
     global fullscreen
-    # props.setUndecorated(True)
+    # props.setUndecorated(False)
     # props.set_fullscreen(True)
-    # print('size:', local_props.has_fixed_size())
     local_props = WindowProperties()
+    # print('size:', local_props.has_fixed_size())
     if fullscreen:
         local_props.set_size(1280, 720)
         local_props.setOrigin((-2, -2))
@@ -246,10 +246,9 @@ d: dust storm (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
-    # pos=(-1.60, +.96)
-    # pos=(-1.77, +.96)
     text_object = OnscreenText(text=text,
-                               pos=(-1.77, +.96),
+                               # pos=(-1.77, +.96),  # +.96
+                               pos=(-base.getAspectRatio(), +.97),  # +.96
                                fg=(1, 1, 0, 1),
                                bg=(0, 0, 0, .5),
                                scale=0.04,  # 0.05
@@ -378,9 +377,12 @@ def init_steam():
     return particle_effect
 
 
-def init_display():
+def init_display(min_x, min_z, max_x, max_z, xel_a):
     global current_modes_and_filters
-    litter_size = 250  # 250
+    # min_x, min_z, max_x, max_z = -0.5, -0.5, +0.5, +0.5
+    # min_x, min_z, max_x, max_z = -1, -1, +1, +1
+    # xel_a = (0.658824, 0.341176, 0.341176, 1)
+    litter_size = 10  # 250
     grow_time = 2  # Default: 8
     life_span = 10  # Default: 8
     particle_effect = ParticleEffect()
@@ -397,6 +399,7 @@ def init_display():
     particles.factory.set_lifespan_base(life_span)
     particles.factory.set_terminal_velocity_base(400.0000)
     # Renderer parameters
+    particles.renderer.set_start_color(xel_a)
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
     # particles.renderer.set_user_alpha(0.45)
     particles.renderer.set_user_alpha(0.80)
@@ -405,8 +408,8 @@ def init_display():
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((+1.0, -0.5, -0.5))
-    particles.emitter.set_max_bound((+1.1, +0.5, +0.5))
+    particles.emitter.set_min_bound((+1.0, min_x, min_z))
+    particles.emitter.set_max_bound((+1.0, max_x, max_z))
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('zoom_random')
@@ -476,20 +479,45 @@ def fov_function(t):
 
 
 def start_zoom():
+    my_image = PNMImage()
+    my_image.read("icon-8.png")
+    # print(my_image.get_xel_a(4, 4))
+    # print(my_image.get_x_size())
+    # print(my_image.get_read_x_size())
+
     # fov_min = 66
     # fov_max = 115
     # Sequence just to avoid warnings!
-    display_particle_effect = init_display()
     zoom_prepare_parallel = Parallel()
     zoom_prepare_parallel.append(LerpFunc(fov_function, fromData=0, toData=1, duration=2, blendType='easeInOut'))
     zoom_prepare_parallel.append(init_pos_interval((1.0-5/(2*tan(0.5*66*2*pi/360)), 0, 0), duration=2))
     zoom_sequence = Sequence()
     zoom_sequence.append(zoom_prepare_parallel)
-    zoom_sequence.append(Func(start_display, display_particle_effect))
+
+    display_particle_effects = []
+    for x in range(my_image.get_x_size()):
+        for z in range(my_image.get_y_size()):
+            min_x = x / my_image.get_x_size() * 2 - 1
+            min_z = z / my_image.get_y_size() * 2 - 1
+            max_x = (x+1) / my_image.get_x_size() * 2 - 1
+            max_z = (z+1) / my_image.get_y_size() * 2 - 1
+            xel_a = my_image.get_xel_a(x, z)
+            if xel_a[3] > .5:
+                display_particle_effects.append(init_display(min_x, min_z, max_x, max_z, xel_a))
+
+    print(len(display_particle_effects))
+    for display_particle_effect in display_particle_effects:
+        zoom_sequence.append(Func(start_display, display_particle_effect))
+
     zoom_sequence.append(Wait(2))
     zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=2, blendType='easeInOut'))
     # zoom_sequence.append(Func(soft_stop_display, display_particle_effect))
-    zoom_sequence.append(Func(force_display, display_particle_effect))
+
+    for display_particle_effect in display_particle_effects:
+        zoom_sequence.append(Func(force_display, display_particle_effect))
+    # zoom_sequence.append(Func(force_display, display_particle_effects[0]))
+    # zoom_sequence.append(Func(force_display, display_particle_effects[1]))
+
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
