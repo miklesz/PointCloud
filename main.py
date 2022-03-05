@@ -32,7 +32,9 @@ from panda3d.physics import BaseParticleEmitter, BaseParticleRenderer
 # from panda3d.physics import PointParticleFactory, SpriteParticleRenderer
 
 # Globals
-current_modes_and_filters = {}
+current_modes_and_filters = {
+    'color_scale': 0,
+}
 done = False
 
 # Constants
@@ -88,6 +90,15 @@ PRESETS = [
         'render_mode_thickness': 40,
     },
 ]
+COLOR_SCALES = (
+    ('Default', (127.5, 127.5, 127.5)),
+    ('Oxford Blue', (15, 35, 71)),
+    ('Rainbow Indigo', (28, 63, 110)),
+    ('Lapis Lazuli', (46, 103, 160)),
+    ('Carolina Blue', (90, 172, 207)),
+    ('Key Lime', (239, 252, 147)),
+    ('Dollar Bill', (128, 194, 113))
+)
 
 
 def change_mode_or_filter(mode_or_filter, change):
@@ -102,8 +113,11 @@ def change_mode_or_filter(mode_or_filter, change):
 def set_modes_and_filters(set_preset=None):
     global current_modes_and_filters
     if set_preset:
-        current_modes_and_filters = set_preset
+        # current_modes_and_filters = set_preset
+        for key in set_preset:
+            current_modes_and_filters[key] = set_preset[key]
     print(current_modes_and_filters)
+    # quit()
     if current_modes_and_filters['bloom']:
         filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
                           mintrigger=0.0,
@@ -125,6 +139,13 @@ def set_modes_and_filters(set_preset=None):
         base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness']/1000)
     else:
         base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+    # print(current_modes_and_filters['color_scale'])
+    base.render.setColorScale(
+        COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][1][0] / 255 * 2,
+        COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][1][1] / 255 * 2,
+        COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][1][2] / 255 * 2,
+        1,
+    )
 
 
 def toggle_pos_intervals():
@@ -203,6 +224,7 @@ def accept():
     base.accept('z', start_zoom)
     base.accept('d', dust_storm)
     base.accept('i', init_display_sequence)
+    base.accept('a', change_mode_or_filter, ['color_scale', +1])
 
 
 def main_task(task):
@@ -215,6 +237,9 @@ def main_task(task):
 Yo FuCkErS!
 time: {str(round(music.get_time(), 2))}
 escape: sys.exit
+
+# Setting Color Scales
+a: avatarize (now: {COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][0]})
 
 # Setting Volume
 v: toggle volume (now: {music.get_volume()})
@@ -818,6 +843,8 @@ for geom in point_cloud.node().modify_geoms():
 # model.setRenderModeThickness(10)
 # model.reparentTo(base.render)
 
+# model.setColorScale(15/255*2, 35/255*2, 71/255*2, 1)
+
 # Set camera lens field of view
 base.camLens.setFov(115)
 # base.camLens.fov = 100
@@ -870,6 +897,10 @@ for interval_index in range(64):
 # Append beat intervals
 beat_interval = LerpFunc(beat, fromData=0, toData=1, duration=period/4)
 beat_count = 0
+
+# print(current_modes_and_filters['color_scale'])
+# print(current_modes_and_filters)
+# quit()
 
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
