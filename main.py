@@ -2,6 +2,7 @@
 from math import *
 import platform
 import sys
+# import time
 
 # Related third party imports
 from direct.filter.CommonFilters import CommonFilters
@@ -12,8 +13,15 @@ from direct.interval.LerpInterval import LerpPosHprInterval
 from direct.particles.ParticleEffect import ParticleEffect
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
+
+# from panda3d.core import RigidBodyCombiner
+# from panda3d.core import NodePath
+# from panda3d.core import Vec3
+
 from panda3d.core import *
 # from panda3d.core import Filename
+# from panda3d.core import PNMImage
+
 from panda3d.physics import LinearNoiseForce
 from panda3d.physics import LinearJitterForce
 from direct.particles.ForceGroup import ForceGroup
@@ -25,6 +33,7 @@ from panda3d.physics import BaseParticleEmitter, BaseParticleRenderer
 
 # Globals
 current_modes_and_filters = {}
+done = False
 
 # Constants
 VERBOSE = True
@@ -90,10 +99,10 @@ def change_mode_or_filter(mode_or_filter, change):
     set_modes_and_filters()
 
 
-def set_modes_and_filters(preset=None):
+def set_modes_and_filters(set_preset=None):
     global current_modes_and_filters
-    if preset:
-        current_modes_and_filters = preset
+    if set_preset:
+        current_modes_and_filters = set_preset
     print(current_modes_and_filters)
     if current_modes_and_filters['bloom']:
         filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
@@ -193,6 +202,7 @@ def accept():
     base.accept('s', start_steam)
     base.accept('z', start_zoom)
     base.accept('d', dust_storm)
+    base.accept('i', init_display_sequence)
 
 
 def main_task(task):
@@ -243,6 +253,7 @@ b: beat (once)
 s: steam (once)
 z: dolly zoom (once)
 d: dust storm (once)
+i: display (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -261,8 +272,10 @@ d: dust storm (once)
     #                            align=TextNode.ALeft)
 
     # decay = 1
+
+    # Off so as not to pertain to a model temporarily that may not be there.
     scale_y = 1
-    model.setScale(1, scale_y, 1)
+    # model.setScale(1, scale_y, 1)
 
     pos = base.cam.getPos()
     currents[0] = pos[0]
@@ -380,8 +393,8 @@ def init_steam():
 def init_display(min_x, min_z, max_x, max_z, xel_a):
     global current_modes_and_filters
     litter_size = 1  # 250  # 10  # 20
-    grow_time = 2  # Default: 8
-    life_span = 10  # Default: 8
+    grow_time = 4  # Default: 8
+    life_span = 16  # Default: 8
     particle_effect = ParticleEffect()
     particles = Particles('display')
     # Particles parameters
@@ -389,7 +402,7 @@ def init_display(min_x, min_z, max_x, max_z, xel_a):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(litter_size*6*grow_time)
+    particles.setPoolSize(litter_size*11*grow_time)
     particles.setBirthRate(1/60)
     particles.setLitterSize(litter_size)
     # Factory parameters
@@ -405,17 +418,67 @@ def init_display(min_x, min_z, max_x, max_z, xel_a):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((+1.0, min_x, min_z))
-    particles.emitter.set_max_bound((+1.0, max_x, max_z))
+    particles.emitter.set_min_bound((min_x, +0.0, min_z))
+    particles.emitter.set_max_bound((max_x, +0.0, max_z))
     particle_effect.add_particles(particles)
+
     # Force
     force_group = ForceGroup('zoom_random')
     # Force parameters
-    linear_jitter_force = LinearJitterForce(0.1500, 0)  # 0.1500
-    # linear_noise_force = LinearNoiseForce(0.1500, 0)
-    linear_jitter_force.setActive(True)
-    force_group.addForce(linear_jitter_force)
+    force_group.addForce(LinearJitterForce(.02, 0))
     particle_effect.add_force_group(force_group)
+
+    return particle_effect
+
+
+def init_cube(x, y, z, xel_a, duration=8):
+    global current_modes_and_filters
+    # litter_size = round(abs(400_000*x*y*z))  # 250  # 10  # 20
+    # print(x, y, z, litter_size)
+    # life_span = 10  # Default: 8
+    litter_size = 50000  # 250  # 10  # 20
+    particle_effect = ParticleEffect(name='particle_cube')
+    particles = Particles('display')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
+    particles.set_emitter("BoxEmitter")
+    # particles.setPoolSize(litter_size*6*grow_time)
+    particles.setPoolSize(litter_size)
+    particles.setBirthRate(0)  # 1/60
+    particles.setLitterSize(litter_size)
+    # Factory parameters
+    particles.factory.set_lifespan_base(duration)
+    particles.factory.set_terminal_velocity_base(400.0000)
+    # Renderer parameters
+    particles.renderer.setStartColor(xel_a)
+    # particles.renderer.setEndColor((1, 1, 1, 1))
+    # particles.renderer.setBlendType(0)  # enumerator PP_ONE_COLOR = 0, PP_BLEND_LIFE = 1, PP_BLEND_VEL = 2
+    # particles.renderer.setBlendMethod(0)  # LINEAR, CUBIC
+    # particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_NONE)
+    # particles.renderer.setBlendMethod(BaseParticleRenderer.PP_NO_BLEND)  # LINEAR, CUBIC
+    # particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_USER)
+    particles.renderer.set_user_alpha(.80)
+    # particles.renderer.set_user_alpha(0.80)
+    # Emitter parameters
+    particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
+    particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
+    particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
+    # Box parameters
+    particles.emitter.set_min_bound((-x/2, -y/2, -z/2))
+    particles.emitter.set_max_bound((+x/2, +y/2, +z/2))
+    particle_effect.add_particles(particles)
+
+    # Force
+    # force_group = ForceGroup('zoom_random')
+    # Force parameters
+    # force = LinearJitterForce(1, 0)  # 0.1500 or 0.0750 - ADD THIS
+    # force_group.addForce(LinearNoiseForce(1, 0))
+    # force_group.addForce(LinearJitterForce(10, 0))  # 0.1500 or 0.0750 - ADD THIS
+    # particle_effect.add_force_group(force_group)
+
     return particle_effect
 
 
@@ -433,7 +496,7 @@ def start_steam():
 
 
 def start_display(display_particle_effect):
-    display_particle_effect.start(parent=model)
+    display_particle_effect.start(parent=base.render)
 
 
 def soft_stop_display(display_particle_effect):
@@ -441,18 +504,13 @@ def soft_stop_display(display_particle_effect):
 
 
 def force_display(display_particle_effect):
+    display_particle_effect.removeAllForces()
     display_particle_effect.soft_stop()
     force_group = ForceGroup('zoom')
-    linear_noise_force = LinearNoiseForce(0.1500, 0)
-    linear_noise_force.setActive(1)
-    force_group.addForce(linear_noise_force)
+    a = Randomizer().randomRealUnit()*.1
+    # print(a)
+    force_group.addForce(LinearNoiseForce(a, 0))  # 0.1500*2
     display_particle_effect.addForceGroup(force_group)
-    # print("Force added!")
-    # print(type(display_particle_effect))
-
-
-def display():
-    pass
 
 
 def zoom_function(t):
@@ -475,12 +533,70 @@ def fov_function(t):
     # print(fov)
 
 
-def start_zoom():
-    my_image = PNMImage()
-    my_image.read("icons/icon-32.png")
+def init_display_sequence():
+    # rbc = RigidBodyCombiner("rbc")
+    # rigid = NodePath(rbc)
+    # rigid.reparentTo(base.render)
 
+    # Remove point cloud
+    model.remove_node()
+    print(model)
+
+    # Read image
+    my_image = PNMImage(Filename("icons/icon-32.png"))
+
+    # Initialise sequence
+    zoom_sequence = Sequence()
+
+    # Append particle effects
+    display_particle_effects = []
+    for x in range(my_image.getXSize()):
+        for z in range(my_image.getYSize()):
+            min_x = x / my_image.getXSize() * 2 - 1
+            min_z = z / my_image.getYSize() * 2 - 1
+            max_x = (x+1) / my_image.getXSize() * 2 - 1
+            max_z = (z+1) / my_image.getYSize() * 2 - 1
+            xel_a = my_image.getXelA(x, z)
+            if xel_a[3] > .5:
+                display_particle_effects.append(init_display(min_x, min_z, max_x, max_z, xel_a))
+    print('len(display_particle_effects):', len(display_particle_effects))
+    # quit()
+
+    # Append functions
+    for display_particle_effect in display_particle_effects:
+        zoom_sequence.append(Func(start_display, display_particle_effect))
+
+    # Append wait
+    zoom_sequence.append(Wait(4))
+
+    # Append particle outs
+    for display_particle_effect in display_particle_effects:
+        zoom_sequence.append(Func(force_display, display_particle_effect))
+        # print(display_particle_effect.getParticlesDict())
+
+    # Start sequence
+    zoom_sequence.start()
+    # rbc.collect()
+
+    # time.sleep(5)
+    # base.render.ls()
+
+
+def dissolve(t, cube_object):
+    cube_object.removeAllForces()
+    force_group = ForceGroup()
+    force_group.addForce(LinearJitterForce(t*25, 0))
+    cube_object.addForceGroup(force_group)
+    # cube_object.setTransparency(TransparencyAttrib.M_alpha)
+    cube_object.setAlphaScale(1-t)
+    # cube_object.setColorScale(1, 1, 1, (1-t))
+
+
+def start_zoom():
     # fov_min = 66
     # fov_max = 115
+    duration = 1
+    rotation = 180
     # Sequence just to avoid warnings!
     zoom_prepare_parallel = Parallel()
     zoom_prepare_parallel.append(LerpFunc(fov_function, fromData=0, toData=1, duration=2, blendType='easeInOut'))
@@ -488,29 +604,59 @@ def start_zoom():
     zoom_sequence = Sequence()
     zoom_sequence.append(zoom_prepare_parallel)
 
-    display_particle_effects = []
-    for x in range(my_image.get_x_size()):
-        for z in range(my_image.get_y_size()):
-            min_x = x / my_image.get_x_size() * 2 - 1
-            min_z = z / my_image.get_y_size() * 2 - 1
-            max_x = (x+1) / my_image.get_x_size() * 2 - 1
-            max_z = (z+1) / my_image.get_y_size() * 2 - 1
-            xel_a = my_image.get_xel_a(x, z)
-            if xel_a[3] > .5:
-                display_particle_effects.append(init_display(min_x, min_z, max_x, max_z, xel_a))
+    # print(len(display_particle_effects))
+    # for display_particle_effect in display_particle_effects:
+    # zoom_sequence.append(Func(start_display, init_cube(1, 1, 1, (1, 0, 0, 1))))
+    for cube_number in range(16):
+        cube = init_cube(
+            Randomizer().randomReal(.5)+.5,
+            Randomizer().randomReal(.5)+.5,
+            Randomizer().randomReal(.5)+.5,
+            (Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, 1),
+            duration
+        )
+        cube_parallel = Parallel()
+        cube_parallel.append(LerpFunc(
+            function=dissolve,
+            fromData=0,
+            toData=1,
+            duration=duration,
+            blendType='easeIn',
+            extraArgs=[cube],
+        ))
+        cube_parallel.append(ParticleInterval(
+            particleEffect=cube,
+            parent=base.render,
+            worldRelative=False,
+            duration=duration,
+            cleanup=True,
+        ))
+        start_h = Randomizer().randomInt(360)
+        start_p = Randomizer().randomInt(360)
+        start_r = Randomizer().randomInt(360)
+        cube_parallel.append(LerpHprInterval(
+            nodePath=cube,
+            duration=duration,
+            hpr=(
+                start_h+Randomizer().randomRealUnit()*rotation,
+                start_p+Randomizer().randomRealUnit()*rotation,
+                start_r+Randomizer().randomRealUnit()*rotation,
+            ),
+            startHpr=(start_h, start_p, start_r),
+        ))
+        zoom_sequence.append(cube_parallel)
+        # print(cube.getParticlesDict())
+        # cube.analyze()
+        # cube.setTransparency(TransparencyAttrib.M_alpha)
+        # cube.setAlphaScale(0.2)
+        # cube.hide()
+        # cube.setScale(5)
 
-    print(len(display_particle_effects))
-    for display_particle_effect in display_particle_effects:
-        zoom_sequence.append(Func(start_display, display_particle_effect))
+    # zoom_sequence.append(Wait(2))
+    # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=2, blendType='easeInOut'))
 
-    zoom_sequence.append(Wait(2))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=2, blendType='easeInOut'))
-    # zoom_sequence.append(Func(soft_stop_display, display_particle_effect))
-
-    for display_particle_effect in display_particle_effects:
-        zoom_sequence.append(Func(force_display, display_particle_effect))
-    # zoom_sequence.append(Func(force_display, display_particle_effects[0]))
-    # zoom_sequence.append(Func(force_display, display_particle_effects[1]))
+    # for display_particle_effect in display_particle_effects:
+    #     zoom_sequence.append(Func(force_display, display_particle_effect))
 
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
@@ -518,6 +664,10 @@ def start_zoom():
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
     # start_display()
     zoom_sequence.start()
+    # base.render.analyze()
+    # display_particle_effects[0].analyze()
+    # model.analyze()
+    # point_cloud.analyze()
     # display_interval = LerpFunc(display, fromData=0, toData=1, duration=10)
 
 
@@ -525,16 +675,16 @@ def set_fog_exp_density(t, fog):
     fog.setExpDensity(t)
 
 
-def set_background_color(t, color, preset):
+def set_background_color(t, color, set_preset):
     base.set_background_color(color[0]*t, color[1]*t, color[2]*t)
     set_modes_and_filters(PRESETS[0])
-    set_modes_and_filters(PRESETS[preset])
+    set_modes_and_filters(PRESETS[set_preset])
 
 
 def dust_storm():
     global current_modes_and_filters
-    preset = current_modes_and_filters['preset']
-    # print(preset, type(preset))
+    set_preset = current_modes_and_filters['preset']
+    # print(set_preset, type(set_preset))
     dust_color = (184/255, 151/255, 122/255)
     # base.set_background_color(*dust_color)
     fog = Fog("Fog")
@@ -548,7 +698,7 @@ def dust_storm():
         fromData=0,
         toData=1,
         duration=2,
-        extraArgs=[dust_color, preset]
+        extraArgs=[dust_color, set_preset]
     ))
     dust_storm_sequence.append(LerpFunctionInterval(
         set_fog_exp_density,
@@ -723,11 +873,14 @@ beat_count = 0
 
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
-set_modes_and_filters(PRESETS[0])
+for preset in PRESETS[::-1]:
+    set_modes_and_filters(preset)
 
 base.enableParticles()
 
 base.cam.set_pos(0, -2, 0)
+
+# display_sequence = init_display_sequence()
 
 pos_intervals = False
 
