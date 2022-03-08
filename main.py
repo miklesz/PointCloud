@@ -30,6 +30,8 @@ from panda3d.physics import BaseParticleEmitter, BaseParticleRenderer
 # from panda3d.physics import DiscEmitter
 # from panda3d.physics import LinearJitterForce, LinearRandomForce
 # from panda3d.physics import PointParticleFactory, SpriteParticleRenderer
+from panda3d.physics import PointParticleRenderer
+from panda3d.physics import LinearVectorForce
 
 # Globals
 current_modes_and_filters = {
@@ -221,6 +223,8 @@ def accept():
     base.accept('4', set_modes_and_filters, [PRESETS[4]])
     base.accept('5', set_modes_and_filters, [PRESETS[5]])
     base.accept('s', start_steam)
+    base.accept('w', start_water)
+    base.accept('g', start_glow)
     base.accept('z', start_zoom)
     base.accept('d', dust_storm)
     base.accept('i', init_display_sequence)
@@ -276,9 +280,11 @@ m: set random position (once)
 o: set random position (now: {pos_intervals})
 b: beat (once)
 s: steam (once)
+w: water condensation (once)
 z: dolly zoom (once)
 d: dust storm (once)
 i: display (once)
+g: glowworms/fireflies (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -415,6 +421,67 @@ def init_steam():
     return particle_effect
 
 
+def init_water():
+    global current_modes_and_filters
+    litter_size = 300
+    life_span = 0.5000  # 0.5000
+    particle_effect = ParticleEffect()
+    particles = Particles('water')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
+    particles.set_emitter("BoxEmitter")
+    particles.setPoolSize(10000)  # litter_size*60*life_span
+    particles.setBirthRate(0.0200)  # 1/60
+    particles.setLitterSize(litter_size)
+    particles.setLitterSpread(100)
+    particles.setSystemLifespan(0.0000)
+    particles.setLocalVelocityFlag(1)
+    particles.setSystemGrowsOlderFlag(0)
+    # Factory parameters
+    particles.factory.set_lifespan_base(life_span)
+    particles.factory.setLifespanSpread(0.2500)
+    particles.factory.setMassBase(2.0000)
+    particles.factory.setMassSpread(0.0100)
+    particles.factory.set_terminal_velocity_base(400.0000)
+    particles.factory.setTerminalVelocitySpread(0.0000)
+    # Point factory parameters
+    # Renderer parameters
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
+    particles.renderer.set_user_alpha(0.45)
+    # Point parameters
+    particles.renderer.setStartColor(LVector4(0.25, 0.90, 1.00, 1.00))
+    particles.renderer.setEndColor(LVector4(1.00, 1.00, 1.00, 1.00))
+    particles.renderer.setBlendType(PointParticleRenderer.PPONECOLOR)
+    particles.renderer.setBlendMethod(BaseParticleRenderer.PPNOBLEND)
+    # Emitter parameters
+    particles.emitter.set_emission_type(BaseParticleEmitter.ETCUSTOM)
+    particles.emitter.setAmplitude(1.0000)
+    particles.emitter.setAmplitudeSpread(0.0000)
+    # particles.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 4.0000))
+    particles.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 0.0000))
+
+    # particles.emitter.setExplicitLaunchVector(LVector3(1.0000, 0.0000, 0.0000))
+    particles.emitter.setExplicitLaunchVector(LVector3(0.0000, 0.0000, 0.0000))
+
+    particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
+    # Box parameters
+    particles.emitter.set_min_bound((-2.89104, -2.71256, 0.879156))
+    particles.emitter.set_max_bound((2.76295, 2.03709, 0.879156))
+    particle_effect.add_particles(particles)
+    # Force
+    force_group = ForceGroup('gravity')
+    force0 = LinearVectorForce(LVector3(0.0000, 0.0000, -1.0000), 25.0000, 1)
+    force0.setActive(1)
+    force_group.addForce(force0)
+    force1 = LinearJitterForce(3.0000, 1)
+    force1.setActive(1)
+    force_group.addForce(force1)
+    particle_effect.addForceGroup(force_group)
+    return particle_effect
+
+
 def init_display(min_x, min_z, max_x, max_z, xel_a):
     global current_modes_and_filters
     litter_size = 1  # 250  # 10  # 20
@@ -507,6 +574,69 @@ def init_cube(x, y, z, xel_a, duration=8):
     return particle_effect
 
 
+def init_glow():
+    global current_modes_and_filters
+    litter_size = 2
+    life_span = 0.7  # 0.7000
+    particle_effect = ParticleEffect()
+    particles = Particles('water')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(current_modes_and_filters['render_mode_thickness'])
+    particles.set_emitter("BoxEmitter")
+    particles.setPoolSize(2000)  # litter_size*60*life_span
+    particles.setBirthRate(1/60)  # 1/60
+    particles.setLitterSize(litter_size)
+    # particles.setLitterSpread(1)
+    particles.setSystemLifespan(0.0000)
+    particles.setLocalVelocityFlag(1)
+    particles.setSystemGrowsOlderFlag(0)
+    # Factory parameters
+    particles.factory.set_lifespan_base(life_span)
+    particles.factory.setLifespanSpread(0.2500)
+    # particles.factory.setMassBase(2.0000)
+    # particles.factory.setMassSpread(0.0100)
+    # particles.factory.set_terminal_velocity_base(400.0000)
+    # particles.factory.setTerminalVelocitySpread(0.0000)
+    # Point factory parameters
+    # Renderer parameters
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_IN_OUT)
+    particles.renderer.set_user_alpha(1.00)
+    # particles.renderer.set_user_alpha(0.45)
+    # Point parameters
+    particles.renderer.setStartColor(LVector4(255/255, 227/255, 2/255, 1.00))
+    particles.renderer.setEndColor(LVector4(1.00, 1.00, 1.00, 1.00))
+    particles.renderer.setBlendType(PointParticleRenderer.PPONECOLOR)
+    particles.renderer.setBlendMethod(BaseParticleRenderer.PPNOBLEND)
+    # Emitter parameters
+    particles.emitter.set_emission_type(BaseParticleEmitter.ETCUSTOM)
+    particles.emitter.setAmplitude(1.0000)
+    particles.emitter.setAmplitudeSpread(0.0000)
+    # particles.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 4.0000))
+    particles.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 0.0000))
+
+    # particles.emitter.setExplicitLaunchVector(LVector3(1.0000, 0.0000, 0.0000))
+    particles.emitter.setExplicitLaunchVector(LVector3(0.0000, 0.0000, 0.0000))
+
+    particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
+    # Box parameters
+    particles.emitter.set_min_bound((-2.89104, -2.71256, -1.75318))
+    particles.emitter.set_max_bound((2.76295, 2.03709, 0.879156))
+    particle_effect.add_particles(particles)
+    # Force
+    force_group = ForceGroup('gravity')
+    # force0 = LinearVectorForce(LVector3(0.0000, 0.0000, -1.0000), 25.0000, 1)
+    # force0.setActive(1)
+    # force_group.addForce(force0)
+    force1 = LinearJitterForce(3.0000, 1)
+    # force1 = LinearNoiseForce(3.0000, 1)
+    force1.setActive(1)
+    force_group.addForce(force1)
+    particle_effect.addForceGroup(force_group)
+    return particle_effect
+
+
 def start_steam():
     steam_interval = ParticleInterval(
         particleEffect=init_steam(),
@@ -518,6 +648,32 @@ def start_steam():
         name='steam'
     )
     steam_interval.start()
+
+
+def start_water():
+    water_interval = ParticleInterval(
+        particleEffect=init_water(),
+        parent=model,
+        worldRelative=True,
+        duration=16,
+        softStopT=8,
+        cleanup=True,
+        name='water'
+    )
+    water_interval.start()
+
+
+def start_glow():
+    glow_interval = ParticleInterval(
+        particleEffect=init_glow(),
+        parent=model,
+        worldRelative=True,
+        duration=16,
+        softStopT=8,
+        cleanup=True,
+        name='glow'
+    )
+    glow_interval.start()
 
 
 def start_display(display_particle_effect):
