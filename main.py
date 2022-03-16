@@ -221,6 +221,7 @@ def accept():
     base.accept('d', dust_storm)
     base.accept('i', init_display_sequence)
     base.accept('a', change_mode_or_filter, ['color_scale', +1])
+    base.accept('t', accept_trainspotting)
 
 
 def main_task(task):
@@ -271,6 +272,7 @@ U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 m: set random position (once)
 o: set random position (now: {pos_intervals})
 b: beat (once)
+t: trainspotting (once)
 s: steam (once)
 w: water condensation (once)
 z: dolly zoom (once)
@@ -297,8 +299,10 @@ g: glowworms/fireflies (once)
     # decay = 1
 
     # Off so as not to pertain to a model temporarily that may not be there.
-    scale_y = 1
-    # model.setScale(1, scale_y, 1)
+    scale_y = .2
+    # model.set_scale(1, scale_y, 1)
+    # base.cam.set_scale(1, scale_y, 1)
+    # base.cam.set_scale(1, 1, 1)
 
     pos = base.cam.getPos()
     currents[0] = pos[0]
@@ -608,6 +612,35 @@ def set_background_color(t, color, set_preset):
     set_modes_and_filters(PRESETS[set_preset])
 
 
+def trainspotting_lerp_function(t):
+    base.cam.set_scale(1, 1-(t*.99), 1)
+
+
+def accept_trainspotting():
+    trainspotting_sequence = Sequence()
+    trainspotting_sequence.append(LerpPosInterval(
+        nodePath=base.cam,
+        pos=(0, .25, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
+    trainspotting_sequence.append(LerpFunctionInterval(
+        trainspotting_lerp_function,
+        fromData=0,
+        toData=1,
+        duration=4,
+        blendType='easeInOut',
+    ))
+    trainspotting_sequence.append(LerpFunctionInterval(
+        trainspotting_lerp_function,
+        fromData=1,
+        toData=0,
+        duration=4,
+        blendType='easeInOut',
+    ))
+    trainspotting_sequence.start()
+
+
 def dust_storm():
     global current_modes_and_filters
     set_preset = current_modes_and_filters['preset']
@@ -684,8 +717,7 @@ if VERBOSE:
     model.analyze()
 
 # Set frame rate meter
-# base.set_frame_rate_meter = True
-base.setFrameRateMeter(True)
+base.set_frame_rate_meter(True)
 
 # Point-Cloud
 point_cloud = model.find("**/+GeomNode")
