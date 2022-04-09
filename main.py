@@ -4,21 +4,12 @@ import platform
 import sys
 
 # Related third party imports
-# from direct.particles.ForceGroup import ForceGroup
-# from direct.particles.ParticleEffect import ParticleEffect
-# from panda3d.core import Filename
-# from panda3d.core import NodePath
-# from panda3d.core import PNMImage
-# from panda3d.core import RigidBodyCombiner
-# from panda3d.core import Vec3
-# from panda3d.physics import DiscEmitter
-# from panda3d.physics import LinearJitterForce, LinearRandomForce
-# from panda3d.physics import PointParticleFactory, SpriteParticleRenderer
 from direct.filter.CommonFilters import CommonFilters
 from direct.gui.OnscreenText import OnscreenText
 from direct.interval.IntervalGlobal import *
 from direct.interval.LerpInterval import LerpPosHprInterval
 from direct.showbase.ShowBase import ShowBase
+from direct.showutil.Rope import Rope
 from direct.task import Task
 from panda3d.core import *
 
@@ -30,6 +21,10 @@ current_modes_and_filters = {
     'color_scale': 0,
 }
 done = False
+# pos_hpr_amplitudes = [.005, .005, .005, .5, .5, .5]
+pos_hpr_amplitudes = [.010 * (Randomizer().randomRealUnit() / 25 + 1) for a in range(3)] + \
+                     [.500 * (Randomizer().randomRealUnit() / 25 + 1) for b in range(3)]
+pos_hpr_offsets = [Randomizer().randomReal(2*pi) for i in range(6)]
 
 # Constants
 VERBOSE = True
@@ -179,6 +174,11 @@ def beat(t):
     base.camLens.setFov(fov)
     # print('beat', t)
 
+    # blur = 1 - cos(t * 30) * (1 - t)
+    # print(blur)
+    # current_modes_and_filters['blur_sharpen_amount'] = blur
+    # set_modes_and_filters()
+
 
 # def beat_start(task):
 #     global beat_count
@@ -215,13 +215,23 @@ def accept():
     base.accept('4', set_modes_and_filters, [PRESETS[4]])
     base.accept('5', set_modes_and_filters, [PRESETS[5]])
     base.accept('s', start_steam)
-    base.accept('w', start_water)
+    base.accept('w', accept_water)
     base.accept('g', start_glow)
     base.accept('z', start_zoom)
     base.accept('d', dust_storm)
     base.accept('i', init_display_sequence)
     base.accept('a', change_mode_or_filter, ['color_scale', +1])
     base.accept('t', accept_trainspotting)
+    base.accept('h', accept_handshaking)
+    base.accept('r', accept_roping)
+    base.accept('arrow_left', accept_yaw, [+2])
+    base.accept('arrow_right', accept_yaw, [-2])
+    base.accept('arrow_left-repeat', accept_yaw, [+2])
+    base.accept('arrow_right-repeat', accept_yaw, [-2])
+    base.accept('arrow_up', accept_pitch, [+2])
+    base.accept('arrow_down', accept_pitch, [-2])
+    base.accept('arrow_up-repeat', accept_pitch, [+2])
+    base.accept('arrow_down-repeat', accept_pitch, [-2])
 
 
 def main_task(task):
@@ -268,9 +278,13 @@ U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 8: set preset 8 (`???`)
 9: set preset 9 (`???`)
 
-# Effects
+# Motion
 m: set random position (once)
 o: set random position (now: {pos_intervals})
+r: roping (once)
+<-/-> yaw
+
+# Effects
 b: beat (once)
 t: trainspotting (once)
 s: steam (once)
@@ -279,6 +293,7 @@ z: dolly zoom (once)
 d: dust storm (once)
 i: display (once)
 g: glowworms/fireflies (once)
+h: handshaking (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -287,7 +302,7 @@ g: glowworms/fireflies (once)
                                pos=(-base.getAspectRatio(), +.97),  # +.96
                                fg=(1, 1, 0, 1),
                                bg=(0, 0, 0, .5),
-                               scale=0.04,  # 0.05
+                               scale=0.038,  # 0.05
                                align=TextNode.ALeft)
     # OnscreenText(text=text,
     #                            pos=(-1.77, +.96),
@@ -304,11 +319,11 @@ g: glowworms/fireflies (once)
     # base.cam.set_scale(1, scale_y, 1)
     # base.cam.set_scale(1, 1, 1)
 
-    pos = base.cam.getPos()
+    pos = spectator.getPos()
     currents[0] = pos[0]
     currents[1] = pos[1]
     currents[2] = pos[2]
-    hpr = base.cam.getHpr()
+    hpr = spectator.getHpr()
     currents[3] = hpr[0]
     currents[4] = hpr[1]
     currents[5] = hpr[2]
@@ -328,7 +343,9 @@ g: glowworms/fireflies (once)
     if delta > max_delta:
         max_delta = delta
 
-    # filters.setBlurSharpen(1 - delta)
+    # Tu stare, prymitywne włączanie motion blur
+    # print(delta)
+    # filters.setBlurSharpen(1 - delta*4)
 
     lasts = currents[:]
 
@@ -357,9 +374,17 @@ g: glowworms/fireflies (once)
     return Task.cont
 
 
+def accept_yaw(yaw):
+    spectator.set_h(spectator.get_h()+yaw)
+
+
+def accept_pitch(pitch):
+    spectator.set_p(spectator.get_p()+pitch)
+
+
 def init_pos_interval(pos, duration=1):
     # start_pos = base.cam.get_hpr()
-    start_hpr = base.cam.get_hpr()
+    start_hpr = spectator.get_hpr()
     pos_dummy = base.render.attach_new_node("pos dummy")
     pos_dummy.set_pos(pos)
     pos_dummy.look_at(0, 0, 0)
@@ -368,7 +393,7 @@ def init_pos_interval(pos, duration=1):
         hpr[0] -= 360
     if hpr[0]-start_hpr[0] < -180:
         hpr[0] += 360
-    return LerpPosHprInterval(nodePath=base.cam, duration=duration, pos=pos, hpr=hpr, blendType='easeInOut')
+    return LerpPosHprInterval(nodePath=spectator, duration=duration, pos=pos, hpr=hpr, blendType='easeInOut')
 
 
 def move_to_random():
@@ -382,7 +407,7 @@ def move_to_random():
 def start_steam():
     steam_interval = ParticleInterval(
         particleEffect=init_steam_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=model,
+        parent=office_model,
         worldRelative=True,
         duration=16,
         softStopT=8,
@@ -392,23 +417,83 @@ def start_steam():
     steam_interval.start()
 
 
-def start_water():
+def roping_function(t, points, looks):
+    i = int(len(points)*t)-1
+    if i<0:
+        i=0
+    # print(i)
+    spectator.set_pos(points[i])
+    spectator.lookAt(looks[i])
+    # spectator.lookAt(0, 0, 0)
+
+
+def accept_roping():
+    # r = Rope()
+    # vertices = [
+    #     (
+    #         None,
+    #         (
+    #             Randomizer().randomRealUnit() * 4.79,
+    #             Randomizer().randomRealUnit() * 3.81,
+    #             Randomizer().randomReal(2.66 - 1.75),
+    #         )
+    #     )
+    #     for i in range(4)
+    # ]
+    # vertices.insert(0, (None, tuple(spectator.get_pos())))
+    # vertices.append((None, tuple(spectator.get_pos())))
+    # print(vertices)
+    # # r.setup(4, vertices)
+    # r.setup(4, [(None, (0, -2, 0)),
+    #             (None, (0, -2, 2.5)),
+    #             (None, (1, 2, -1.24)),
+    #             (None, (2, 0, +1.24)),
+    #             (None, (1, -2, 0)),
+    #             (None, (-2, 2, -1.24)),
+    #             (None, (0, -2, 0))])
+    # r.setPos(0, 0, 0)
+    # r.reparentTo(base.render)
+    # r.ropeNode.setNumSubdiv(50)
+    points = r.getPoints(len(vertices)*2*120)
+    looks = l.getPoints(len(vertices)*2*120)
+    roping_sequence = Sequence()
+    roping_sequence.append(LerpFunc(
+        function=roping_function,
+        fromData=0,
+        toData=1,
+        duration=len(vertices)*2,
+        extraArgs=[points, looks],
+    ))
+    roping_sequence.start()
+
+
+def accept_water():
+    # water_parallel = Parallel()
     water_interval = ParticleInterval(
         particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=model,
+        parent=office_model,
         worldRelative=True,
         duration=16,
         softStopT=8,
         cleanup=True,
         name='water'
     )
+    splash_interval = ParticleInterval(
+        particleEffect=init_splash_particle_effect(current_modes_and_filters['render_mode_thickness']),
+        parent=office_model,
+        worldRelative=True,
+        duration=1,
+        cleanup=True,
+        name='splash'
+    )
     water_interval.start()
+    # splash_interval.start()
 
 
 def start_glow():
     glow_interval = ParticleInterval(
         particleEffect=init_glow_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=model,
+        parent=office_model,
         worldRelative=True,
         duration=16,
         softStopT=8,
@@ -444,7 +529,7 @@ def zoom_function(t):
     # width = 4
     base.camLens.setFov(fov)
     distance = 1.0-width/(2*tan(0.5*fov*2*pi/360))
-    base.cam.set_x(distance)
+    spectator.set_x(distance)
     # print(fov, distance, width)
 
 
@@ -462,8 +547,8 @@ def init_display_sequence():
     # rigid.reparentTo(base.render)
 
     # Remove point cloud
-    model.remove_node()
-    print(model)
+    office_model.remove_node()
+    print(office_model)
 
     # Read image
     my_image = PNMImage(Filename("icons/icon-32.png"))
@@ -619,7 +704,7 @@ def trainspotting_lerp_function(t):
 def accept_trainspotting():
     trainspotting_sequence = Sequence()
     trainspotting_sequence.append(LerpPosInterval(
-        nodePath=base.cam,
+        nodePath=spectator,
         pos=(0, .25, 0),
         duration=2,
         blendType='easeInOut',
@@ -639,6 +724,28 @@ def accept_trainspotting():
         blendType='easeInOut',
     ))
     trainspotting_sequence.start()
+
+
+def handshaking_lerp_function(t):
+    global pos_hpr_amplitudes
+    global pos_hpr_offsets
+    args = []
+    for i in range(6):
+        pos_hpr_amplitudes[i] *= Randomizer().randomRealUnit() / 25 + 1  # 20?
+        pos_hpr_offsets[i] *= Randomizer().randomRealUnit() / 25 + 1  # 30?
+        args.append(sin(pi * t + pos_hpr_offsets[i]) * pos_hpr_amplitudes[i])
+    base.cam.set_pos_hpr(*args)
+
+
+def accept_handshaking():
+    handshaking_sequence = Sequence()
+    handshaking_sequence.append(LerpFunctionInterval(
+        handshaking_lerp_function,
+        fromData=0,
+        toData=64,
+        duration=64,
+    ))
+    handshaking_sequence.start()
 
 
 def dust_storm():
@@ -687,7 +794,6 @@ if VERBOSE:
     print('base.win.gsg.supports_basic_shaders:', base.win.gsg.supports_basic_shaders)
     # exit()
 
-# print PandaSystem.getVersionString()
 if VERBOSE:
     print("PandaSystem.version_string:", PandaSystem.version_string)
 
@@ -705,26 +811,48 @@ toggle_fullscreen()
 # Setting background color
 base.setBackgroundColor(0, 0, 0)
 
-# Load model
-model = base.loader.loadModel("models/office.ply")
-# model = base.loader.loadModel("models/DNA.egg")
-# model = base.loader.loadModel("models/scene.gltf")
-# model = base.loader.loadModel("models_other/ball.dae")
-model.reparentTo(base.render)
-if VERBOSE:
-    model.ls()
-    print('base.model.getTightBounds():', model.getTightBounds())
-    model.analyze()
+# Load hall model and make point-cloud
+hall_model = base.loader.loadModel("models/hall/textured_output.obj")
+hall_model.set_pos_hpr(0, 0, 0, 0, 90, -100)
+hall_model.reparentTo(base.render)
+hall_cloud = hall_model.find("**/+GeomNode")
+for geom in hall_cloud.node().modify_geoms():
+    geom.make_points_in_place()
+
+# Load office model and make point-cloud
+office_model = base.loader.loadModel("models/office.ply")
+office_model.set_pos_hpr(-3.4, 2.4, .4, 99, 0, 0)
+office_model.reparentTo(base.render)
+office_cloud = office_model.find("**/+GeomNode")
+for geom in office_cloud.node().modify_geoms():
+    geom.make_points_in_place()
+
+# Load Fran model and make point-cloud
+fran_model = base.loader.loadModel("models/fran/textured_output.obj")
+fran_model.set_pos_hpr(-2.7, -1.6, 0, 0, 90, 90)
+fran_model.reparentTo(base.render)
+fran_cloud = fran_model.find("**/+GeomNode")
+for geom in fran_cloud.node().modify_geoms():
+    geom.make_points_in_place()
+
+# Load bedroom model and make point-cloud
+bedroom_model = base.loader.loadModel("models/bedroom/textured_output.obj")
+bedroom_model.set_pos_hpr(3.0, 3.9, 0, 0, 90, -83)
+bedroom_model.reparentTo(base.render)
+bedroom_cloud = bedroom_model.find("**/+GeomNode")
+for geom in bedroom_cloud.node().modify_geoms():
+    geom.make_points_in_place()
 
 # Set frame rate meter
 base.set_frame_rate_meter(True)
 
-# Point-Cloud
-point_cloud = model.find("**/+GeomNode")
+# print('base.model.getTightBounds():', office_model.getTightBounds())
 
-print(len(point_cloud.node().modify_geoms()))
-for geom in point_cloud.node().modify_geoms():
-    geom.make_points_in_place()
+
+if VERBOSE:
+    base.render.ls()
+    base.render.analyze()
+
 # if VERBOSE:
 #     print('type(point_cloud):', type(point_cloud))
 # if VERBOSE:
@@ -787,7 +915,7 @@ base.camLens.setFov(115)
 currents = [0, 0, 0, 0, 0, 0, 1, base.camLens.getFov()[0]]
 lasts = [0, 0, 0, 0, 0, 0, 1, base.camLens.getFov()[0]]
 deltas = [0, 0, 0, 0, 0, 0, 0, 0]
-weights = [.2, .2, .2, .2, .2, .2, 50, .1]
+weights = [1, 1, 1, .2, .2, .2, 50, .1]
 # delta = 0
 
 # Set period
@@ -796,11 +924,49 @@ period = 120/125
 # def get_pos_interval():
 #     pass
 
+# Set spectator
+spectator = base.render.attach_new_node('spectator')
+spectator.reparent_to(base.render)
+base.camera.reparent_to(spectator)
+# spectator.set_y(-2)
+
+spectator.set_z(+6)
+spectator.set_p(-90)
+
+look_color = (1, .5, 1, 1)
+with open('models/mopaths.csv') as file_object:
+    csv_lines = file_object.readlines()
+vertices = []
+look_vertices = []
+for csv_line in csv_lines[1:]:
+    cols = csv_line.split(',')
+    vertices.append((None, (float(cols[3]), float(cols[4]), float(cols[5]))))
+    look_vertices.append({'point': (float(cols[6]), float(cols[7]), float(cols[8])), 'color': look_color})
+
+r = Rope()
+r.setup(4, vertices)
+r.ropeNode.setThickness(2)
+r.ropeNode.setNumSubdiv(2*120)
+r.setPos(0, 0, 0)
+r.reparentTo(base.render)
+r.recompute()
+
+l = Rope()
+l.setup(4, look_vertices)
+l.ropeNode.setUseVertexColor(1)
+l.ropeNode.setThickness(2)
+l.ropeNode.setNumSubdiv(2*120)
+l.setPos(0, 0, 0)
+l.reparentTo(base.render)
+l.recompute()
+
+# points = r.getPoints(5 * 120 * 100)
+
 # Append position intervals
 dummy = base.render.attachNewNode("dummy")
 sequence = Sequence()
 rn = Randomizer()
-old_hpr = base.cam.getHpr()
+old_hpr = spectator.getHpr()
 for interval_index in range(64):
     pos1 = (rn.randomRealUnit() * 4.79, rn.randomRealUnit() * 3.81, rn.randomReal(2.66 - 1.75))
     dummy.setPos(pos1)
@@ -820,8 +986,8 @@ for interval_index in range(64):
 
     # print('old_hpr:', old_hpr, 'new_hpr:', new_hpr, 'overfull:', overfull)
     old_hpr = new_hpr
-    interval = LerpPosHprInterval(nodePath=base.cam,
-                                  duration=period*8,
+    interval = LerpPosHprInterval(nodePath=spectator,
+                                  duration=period*4,
                                   pos=pos1,
                                   hpr=new_hpr,
                                   blendType='easeOut')  # period
@@ -842,8 +1008,6 @@ for preset in PRESETS[::-1]:
     set_modes_and_filters(preset)
 
 base.enableParticles()
-
-base.cam.set_pos(0, -2, 0)
 
 # display_sequence = init_display_sequence()
 

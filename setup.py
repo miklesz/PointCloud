@@ -15,7 +15,7 @@ setup(
     options = {
         'build_apps': {
             'include_patterns': [
-                'models/*',
+                'models/**',
                 'music/*',
                 'icons/*',
                 # 'particles/*'
