@@ -405,22 +405,30 @@ def move_to_random():
 
 
 def start_steam():
-    steam_interval = ParticleInterval(
-        particleEffect=init_steam_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=office_model,
-        worldRelative=True,
-        duration=16,
-        softStopT=8,
-        cleanup=True,
-        name='steam'
-    )
-    steam_interval.start()
+    steam_sequence = Sequence()
+    steam_sequence.append(LerpPosHprInterval(
+        nodePath=spectator,
+        pos=(-2, 2, .1),
+        hpr=(90, 0, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
+    # steam_sequence.append(ParticleInterval(
+    #     particleEffect=init_steam_particle_effect(current_modes_and_filters['render_mode_thickness']),
+    #     parent=office_model,
+    #     worldRelative=True,
+    #     duration=16,
+    #     softStopT=8,
+    #     cleanup=True,
+    #     name='steam'
+    # ))
+    steam_sequence.start()
 
 
 def roping_function(t, points, looks):
     i = int(len(points)*t)-1
-    if i<0:
-        i=0
+    if i < 0:
+        i = 0
     # print(i)
     spectator.set_pos(points[i])
     spectator.lookAt(looks[i])
@@ -428,32 +436,6 @@ def roping_function(t, points, looks):
 
 
 def accept_roping():
-    # r = Rope()
-    # vertices = [
-    #     (
-    #         None,
-    #         (
-    #             Randomizer().randomRealUnit() * 4.79,
-    #             Randomizer().randomRealUnit() * 3.81,
-    #             Randomizer().randomReal(2.66 - 1.75),
-    #         )
-    #     )
-    #     for i in range(4)
-    # ]
-    # vertices.insert(0, (None, tuple(spectator.get_pos())))
-    # vertices.append((None, tuple(spectator.get_pos())))
-    # print(vertices)
-    # # r.setup(4, vertices)
-    # r.setup(4, [(None, (0, -2, 0)),
-    #             (None, (0, -2, 2.5)),
-    #             (None, (1, 2, -1.24)),
-    #             (None, (2, 0, +1.24)),
-    #             (None, (1, -2, 0)),
-    #             (None, (-2, 2, -1.24)),
-    #             (None, (0, -2, 0))])
-    # r.setPos(0, 0, 0)
-    # r.reparentTo(base.render)
-    # r.ropeNode.setNumSubdiv(50)
     points = r.getPoints(len(vertices)*2*120)
     looks = l.getPoints(len(vertices)*2*120)
     roping_sequence = Sequence()
@@ -469,38 +451,54 @@ def accept_roping():
 
 def accept_water():
     # water_parallel = Parallel()
-    water_interval = ParticleInterval(
-        particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=office_model,
-        worldRelative=True,
-        duration=16,
-        softStopT=8,
-        cleanup=True,
-        name='water'
-    )
-    splash_interval = ParticleInterval(
-        particleEffect=init_splash_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=office_model,
-        worldRelative=True,
-        duration=1,
-        cleanup=True,
-        name='splash'
-    )
-    water_interval.start()
+    water_sequence = Sequence()
+    water_sequence.append(LerpPosHprInterval(
+        nodePath=spectator,
+        pos=(-2, 2, .1),
+        hpr=(90, 0, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
+    # water_sequence.append(ParticleInterval(
+    #     particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
+    #     parent=office_model,
+    #     worldRelative=True,
+    #     duration=16,
+    #     softStopT=8,
+    #     cleanup=True,
+    #     name='water'
+    # ))
+    # splash_interval = ParticleInterval(
+    #     particleEffect=init_splash_particle_effect(current_modes_and_filters['render_mode_thickness']),
+    #     parent=office_model,
+    #     worldRelative=True,
+    #     duration=1,
+    #     cleanup=True,
+    #     name='splash'
+    # )
+    water_sequence.start()
     # splash_interval.start()
 
 
 def start_glow():
-    glow_interval = ParticleInterval(
-        particleEffect=init_glow_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=office_model,
-        worldRelative=True,
-        duration=16,
-        softStopT=8,
-        cleanup=True,
-        name='glow'
-    )
-    glow_interval.start()
+    glow_sequence = Sequence()
+    glow_sequence.append(LerpPosHprInterval(
+        nodePath=spectator,
+        pos=(-2, 2, .1),
+        hpr=(90, 0, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
+    # glow_sequence.append(ParticleInterval(
+    #     particleEffect=init_glow_particle_effect(current_modes_and_filters['render_mode_thickness']),
+    #     parent=office_model,
+    #     worldRelative=True,
+    #     duration=16,
+    #     softStopT=8,
+    #     cleanup=True,
+    #     name='glow'
+    # ))
+    glow_sequence.start()
 
 
 def start_display(display_particle_effect):
@@ -547,14 +545,21 @@ def init_display_sequence():
     # rigid.reparentTo(base.render)
 
     # Remove point cloud
-    office_model.remove_node()
-    print(office_model)
+    # office_model.remove_node()
+    # print(office_model)
 
     # Read image
     my_image = PNMImage(Filename("icons/icon-32.png"))
 
     # Initialise sequence
     zoom_sequence = Sequence()
+    zoom_sequence.append(LerpPosHprInterval(
+        nodePath=spectator,
+        pos=(-2, 2, .1),
+        hpr=(90, 0, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
 
     # Append particle effects
     display_particle_effects = []
@@ -703,9 +708,10 @@ def trainspotting_lerp_function(t):
 
 def accept_trainspotting():
     trainspotting_sequence = Sequence()
-    trainspotting_sequence.append(LerpPosInterval(
+    trainspotting_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
-        pos=(0, .25, 0),
+        pos=(-2, 2, .1),
+        hpr=(90, 0, 0),
         duration=2,
         blendType='easeInOut',
     ))
@@ -798,7 +804,8 @@ if VERBOSE:
     print("PandaSystem.version_string:", PandaSystem.version_string)
 
 # Load music
-music = base.loader.loadSfx("music/perka.ogg")
+# music = base.loader.loadSfx("music/perka.ogg")
+music = base.loader.loadSfx("music/kramsta.ogg")
 
 # Set window
 fullscreen = False
@@ -811,37 +818,33 @@ toggle_fullscreen()
 # Setting background color
 base.setBackgroundColor(0, 0, 0)
 
-# Load hall model and make point-cloud
-hall_model = base.loader.loadModel("models/hall/textured_output.obj")
-hall_model.set_pos_hpr(0, 0, 0, 0, 90, -100)
-hall_model.reparentTo(base.render)
-hall_cloud = hall_model.find("**/+GeomNode")
-for geom in hall_cloud.node().modify_geoms():
-    geom.make_points_in_place()
+# Load models and make point-clouds
+models = []
+clouds = []
+model_dict = {
+    'podium': {'ext': 'obj', 'pos_hpr': (0, -20, 0, 0, 90, 0)},
+    'sign': {'ext': 'obj', 'pos_hpr': (30, -10, 0, 0, 90, 0)},
+    'bar_rtab_': {'ext': 'obj', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    'entrance': {'ext': 'obj', 'pos_hpr': (10, 0, 0, 0, 90, 0)},
+    'room_1': {'ext': 'obj', 'pos_hpr': (-10, 0, 0, 0, 90, 0)},
+    'room_2': {'ext': 'obj', 'pos_hpr': (10, 10, 0, 0, 90, 0)},
+    'room_3': {'ext': 'obj', 'pos_hpr': (0, 10, 0, 0, 90, 0)},
+    'wc': {'ext': 'obj', 'pos_hpr': (-10, 10, 0, 0, 90, 0)},
+    'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
+    'hall_dae': {'ext': 'dae', 'pos_hpr': (0, 20, 0, 0, 90, 0)},
+    'compo': {'ext': 'obj', 'pos_hpr': (-20, 0, 0, 0, 90, 0)},
+    'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
+}
 
-# Load office model and make point-cloud
-office_model = base.loader.loadModel("models/office.ply")
-office_model.set_pos_hpr(-3.4, 2.4, .4, 99, 0, 0)
-office_model.reparentTo(base.render)
-office_cloud = office_model.find("**/+GeomNode")
-for geom in office_cloud.node().modify_geoms():
-    geom.make_points_in_place()
-
-# Load Fran model and make point-cloud
-fran_model = base.loader.loadModel("models/fran/textured_output.obj")
-fran_model.set_pos_hpr(-2.7, -1.6, 0, 0, 90, 90)
-fran_model.reparentTo(base.render)
-fran_cloud = fran_model.find("**/+GeomNode")
-for geom in fran_cloud.node().modify_geoms():
-    geom.make_points_in_place()
-
-# Load bedroom model and make point-cloud
-bedroom_model = base.loader.loadModel("models/bedroom/textured_output.obj")
-bedroom_model.set_pos_hpr(3.0, 3.9, 0, 0, 90, -83)
-bedroom_model.reparentTo(base.render)
-bedroom_cloud = bedroom_model.find("**/+GeomNode")
-for geom in bedroom_cloud.node().modify_geoms():
-    geom.make_points_in_place()
+for model_key in model_dict:
+    print(model_key, model_dict[model_key])
+    ext = model_dict[model_key]['ext']
+    model_dict[model_key]['model'] = base.loader.loadModel(f'models/{model_key}/textured_output.{ext}')
+    model_dict[model_key]['model'].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
+    model_dict[model_key]['model'].reparentTo(base.render)
+    model_dict[model_key]['cloud'] = model_dict[model_key]['model'].find("**/+GeomNode")
+    for geom in model_dict[model_key]['cloud'].node().modify_geoms():
+        geom.make_points_in_place()
 
 # Set frame rate meter
 base.set_frame_rate_meter(True)
@@ -930,7 +933,7 @@ spectator.reparent_to(base.render)
 base.camera.reparent_to(spectator)
 # spectator.set_y(-2)
 
-spectator.set_z(+6)
+spectator.set_z(+7)
 spectator.set_p(-90)
 
 look_color = (1, .5, 1, 1)
