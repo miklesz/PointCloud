@@ -101,6 +101,7 @@ def change_mode_or_filter(mode_or_filter, change):
 
 def set_modes_and_filters(set_preset=None):
     global current_modes_and_filters
+    global model_dict
     if set_preset:
         # current_modes_and_filters = set_preset
         for key in set_preset:
@@ -108,11 +109,14 @@ def set_modes_and_filters(set_preset=None):
     print(current_modes_and_filters)
     # quit()
     if current_modes_and_filters['bloom']:
-        filters.set_bloom(blend=(0.3, 0.4, 0.3, 1.0),
-                          mintrigger=0.0,
-                          desat=0,
-                          intensity=current_modes_and_filters['bloom_intensity'],
-                          size="large")  # blend=(0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
+        filters.set_bloom(
+            blend=(0.3, 0.4, 0.3, 0.0),
+            mintrigger=0.0,
+            maxtrigger=1.0,
+            desat=0,
+            intensity=current_modes_and_filters['bloom_intensity'],
+            size="large"
+        )  # blend=(0.3,0.4,0.3,0.0), (0.3,0.4,0.3,0.0), (0.0,0.0,0.0,1.0)
     else:
         filters.del_bloom()
     if current_modes_and_filters['blur_sharpen']:
@@ -126,8 +130,12 @@ def set_modes_and_filters(set_preset=None):
     base.render.set_render_mode_perspective(current_modes_and_filters['render_mode_perspective'], 1)
     if current_modes_and_filters['render_mode_perspective']:
         base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness']/1000)
+        for model in model_dict:
+            model_dict[model]['model'].set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
     else:
         base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+        for model in model_dict:
+            model_dict[model]['model'].set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
     # print(current_modes_and_filters['color_scale'])
     base.render.setColorScale(
         COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][1][0] / 255 * 2,
@@ -235,6 +243,7 @@ def accept():
 
 
 def main_task(task):
+    # print('I am main_task')
     global lasts
     global max_delta
     global text_object
@@ -297,19 +306,13 @@ h: handshaking (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
-    text_object = OnscreenText(text=text,
+    text_object = OnscreenText(text=text,  # text
                                # pos=(-1.77, +.96),  # +.96
                                pos=(-base.getAspectRatio(), +.97),  # +.96
                                fg=(1, 1, 0, 1),
                                bg=(0, 0, 0, .5),
                                scale=0.038,  # 0.05
                                align=TextNode.ALeft)
-    # OnscreenText(text=text,
-    #                            pos=(-1.77, +.96),
-    #                            fg=(1, 1, 0, 1),
-    #                            bg=(0, 0, 0, .5),
-    #                            scale=0.05,
-    #                            align=TextNode.ALeft)
 
     # decay = 1
 
@@ -425,7 +428,9 @@ def start_steam():
     steam_sequence.start()
 
 
-def roping_function(t, points, looks):
+def roping_function(t):
+    global points
+    global looks
     i = int(len(points)*t)-1
     if i < 0:
         i = 0
@@ -435,18 +440,41 @@ def roping_function(t, points, looks):
     # spectator.lookAt(0, 0, 0)
 
 
+def model_function(model, add):
+    global model_dict
+    print(f'add = {add}')
+    if add:
+        model_dict[model]['model'].reparentTo(base.render)
+        print(f'model_dict[model][\'{model}\'].reparentTo(base.render)')
+    else:
+        model_dict[model]['model'].removeNode()
+        print(f'model_dict[model][\'{model}\'].detachNode()')
+
+
 def accept_roping():
-    points = r.getPoints(len(vertices)*2*120)
-    looks = l.getPoints(len(vertices)*2*120)
+    # points = r.getPoints(len(vertices)*2*120)
+    # looks = rope_look.getPoints(len(vertices) * 2 * 120)
+    demo_parallel = Parallel()
+    models_sequence = Sequence()
+    with open('models/mopaths.csv') as fo:
+        lines = fo.readlines()
+    for line in lines[1:]:
+        fields = line.split(',')
+        if fields[9]:
+            models_sequence.append(Func(model_function, fields[9], int(fields[10])))
+        models_sequence.append(Wait(1))
+    print(models_sequence)
     roping_sequence = Sequence()
     roping_sequence.append(LerpFunc(
         function=roping_function,
         fromData=0,
         toData=1,
-        duration=len(vertices)*2,
-        extraArgs=[points, looks],
+        duration=len(vertices)*1,
+        # extraArgs=[points, looks],
     ))
-    roping_sequence.start()
+    demo_parallel.append(models_sequence)
+    demo_parallel.append(roping_sequence)
+    demo_parallel.start()
 
 
 def accept_water():
@@ -783,6 +811,38 @@ def dust_storm():
     dust_storm_sequence.start()
 
 
+def init_function():
+    # global bar
+    pass
+
+
+def init_task(task):
+    # Add some text
+    # bk_text = "This is my Demo"
+    # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
+    #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
+    #                           mayChange=1)
+    # from time import sleep
+    # sleep(1)
+
+    print('pre interval start')
+    init_interval = Func(init_function)
+    init_sequence = Sequence()
+    init_sequence.append(Wait(2/60))
+    # init_sequence.append(Wait(5))
+    init_sequence.append(init_interval)
+    init_sequence.append(Wait(20))
+    init_sequence.append(init_interval)
+    # init_sequence.append(init_interval)
+    init_sequence.start()
+    init_function()
+    print('post interval start')
+
+    # textObject.setText(bk_text)
+
+    return Task.done
+
+
 # Init ShowBase
 base = ShowBase()
 
@@ -804,8 +864,7 @@ if VERBOSE:
     print("PandaSystem.version_string:", PandaSystem.version_string)
 
 # Load music
-# music = base.loader.loadSfx("music/perka.ogg")
-music = base.loader.loadSfx("music/kramsta.ogg")
+music = base.loader.loadSfx("music/muzapreview.ogg")
 
 # Set window
 fullscreen = False
@@ -818,101 +877,14 @@ toggle_fullscreen()
 # Setting background color
 base.setBackgroundColor(0, 0, 0)
 
-# Load models and make point-clouds
-models = []
-clouds = []
-model_dict = {
-    'podium': {'ext': 'obj', 'pos_hpr': (0, -20, 0, 0, 90, 0)},
-    'sign': {'ext': 'obj', 'pos_hpr': (30, -10, 0, 0, 90, 0)},
-    'bar_rtab_': {'ext': 'obj', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
-    'entrance': {'ext': 'obj', 'pos_hpr': (10, 0, 0, 0, 90, 0)},
-    'room_1': {'ext': 'obj', 'pos_hpr': (-10, 0, 0, 0, 90, 0)},
-    'room_2': {'ext': 'obj', 'pos_hpr': (10, 10, 0, 0, 90, 0)},
-    'room_3': {'ext': 'obj', 'pos_hpr': (0, 10, 0, 0, 90, 0)},
-    'wc': {'ext': 'obj', 'pos_hpr': (-10, 10, 0, 0, 90, 0)},
-    'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
-    'hall_dae': {'ext': 'dae', 'pos_hpr': (0, 20, 0, 0, 90, 0)},
-    'compo': {'ext': 'obj', 'pos_hpr': (-20, 0, 0, 0, 90, 0)},
-    'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
-}
-
-for model_key in model_dict:
-    print(model_key, model_dict[model_key])
-    ext = model_dict[model_key]['ext']
-    model_dict[model_key]['model'] = base.loader.loadModel(f'models/{model_key}/textured_output.{ext}')
-    model_dict[model_key]['model'].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
-    model_dict[model_key]['model'].reparentTo(base.render)
-    model_dict[model_key]['cloud'] = model_dict[model_key]['model'].find("**/+GeomNode")
-    for geom in model_dict[model_key]['cloud'].node().modify_geoms():
-        geom.make_points_in_place()
-
 # Set frame rate meter
 base.set_frame_rate_meter(True)
 
-# print('base.model.getTightBounds():', office_model.getTightBounds())
-
-
-if VERBOSE:
-    base.render.ls()
-    base.render.analyze()
-
-# if VERBOSE:
-#     print('type(point_cloud):', type(point_cloud))
-# if VERBOSE:
-#     point_cloud.ls()
-#     print('base.model.getTightBounds():', point_cloud.getTightBounds())
-#     point_cloud.analyze()
-# # quit()
-#
-# del point_cloud
-# del model
-
-# def create_points():
-#
-#     # Define GeomVertexArrayFormats for the various vertex attributes.
-#
-#     array = GeomVertexArrayFormat()
-#     array.add_column(InternalName.make("vertex"), 3, Geom.NT_float32, Geom.C_point)
-#     array.add_column(InternalName.make("color"), 4, Geom.NT_uint8, Geom.C_color)
-#     array.add_column(InternalName.make("index"), 1, Geom.NT_int32, Geom.C_index)
-#
-#     vertex_format = GeomVertexFormat()
-#     vertex_format.add_array(array)
-#     vertex_format = GeomVertexFormat.register_format(vertex_format)
-#
-#     vertex_data = GeomVertexData("point_data", vertex_format, Geom.UH_static)
-#     vertex_data.set_num_rows(8)
-#
-#     pos_writer = GeomVertexWriter(vertex_data, "vertex")
-#     index_writer = GeomVertexWriter(vertex_data, "index")
-#
-#     index = 0
-#
-#     # create 8 points as if they were the corner vertices of a cube
-#     for z in (-1., 1.):
-#         for x, y in ((-1., -1.), (-1., 1.), (1., 1.), (1., -1.)):
-#             pos_writer.add_data3(x, y, z)
-#             index_writer.add_data1i(index)
-#             index += 1
-#
-#     prim = GeomPoints(Geom.UH_static)
-#     prim.add_next_vertices(8)
-#     geom = Geom(vertex_data)
-#     geom.add_primitive(prim)
-#     node = GeomNode("points_geom_node")
-#     node.add_geom(geom)
-#
-#     return node
-#
-# model = base.render.attach_new_node(create_points())
-# model.setRenderModeThickness(10)
-# model.reparentTo(base.render)
-
-# model.setColorScale(15/255*2, 35/255*2, 71/255*2, 1)
-
 # Set camera lens field of view
-base.camLens.setFov(115)
+# base.camLens.setFov(115)
+base.camLens.setFov(90)
 # base.camLens.fov = 100
+base.camLens.setNear(.1)
 
 # Set currents, lasts, deltas and weights
 currents = [0, 0, 0, 0, 0, 0, 1, base.camLens.getFov()[0]]
@@ -933,8 +905,10 @@ spectator.reparent_to(base.render)
 base.camera.reparent_to(spectator)
 # spectator.set_y(-2)
 
-spectator.set_z(+7)
-spectator.set_p(-90)
+# spectator.set_pos_hpr(0, 0, 0, 0, 0, 0)
+
+# spectator.set_pos_hpr(0, 0, 0, -110, 0, 0)
+# spectator.set_pos_hpr(0, -.8, 0, 0, 0, 0)
 
 look_color = (1, .5, 1, 1)
 with open('models/mopaths.csv') as file_object:
@@ -954,14 +928,14 @@ r.setPos(0, 0, 0)
 r.reparentTo(base.render)
 r.recompute()
 
-l = Rope()
-l.setup(4, look_vertices)
-l.ropeNode.setUseVertexColor(1)
-l.ropeNode.setThickness(2)
-l.ropeNode.setNumSubdiv(2*120)
-l.setPos(0, 0, 0)
-l.reparentTo(base.render)
-l.recompute()
+rope_look = Rope()
+rope_look.setup(4, look_vertices)
+rope_look.ropeNode.setUseVertexColor(1)
+rope_look.ropeNode.setThickness(2)
+rope_look.ropeNode.setNumSubdiv(2 * 120)
+rope_look.setPos(0, 0, 0)
+rope_look.reparentTo(base.render)
+rope_look.recompute()
 
 # points = r.getPoints(5 * 120 * 100)
 
@@ -1005,16 +979,57 @@ beat_count = 0
 # print(current_modes_and_filters)
 # quit()
 
+# display_sequence = init_display_sequence()
+
+pos_intervals = False
+
+# Load models and make point-clouds
+model_dict = {
+    'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
+    'bar': {'name': 'bar_200k', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
+    'hall_low': {'name': 'hall_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+
+    # 'podium': {'ext': 'obj', 'pos_hpr': (0, -20, 0, 0, 90, 0)},
+    # 'sign': {'ext': 'obj', 'pos_hpr': (30, -10, 0, 0, 90, 0)},
+    # 'entrance': {'ext': 'obj', 'pos_hpr': (10, 0, 0, 0, 90, 0)},
+    # 'room_1': {'ext': 'obj', 'pos_hpr': (-10, 0, 0, 0, 90, 0)},
+    # 'room_3': {'ext': 'obj', 'pos_hpr': (0, 10, 0, 0, 90, 0)},
+    # 'wc': {'ext': 'obj', 'pos_hpr': (-10, 10, 0, 0, 90, 0)},
+    # 'wc': {'ext': 'obj', 'pos_hpr': (0, 0, 0, 0, 90, 0)},
+    # 'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
+    # 'hall_dae': {'ext': 'dae', 'pos_hpr': (0, 20, 0, 0, 90, 0)},
+    # 'compo': {'ext': 'obj', 'pos_hpr': (-20, 0, 0, 0, 90, 0)},
+    # 'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
+    #  'point_cloud': {'ext': 'obj', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+}
+for model_key in model_dict:
+    print(model_key, model_dict[model_key])
+    name = model_dict[model_key]['name']
+    model_dict[model_key]['model'] = base.loader.loadModel(f'models/{name}.bam')
+    model_dict[model_key]['model'].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
+    model_dict[model_key]['model'].reparentTo(base.render)
+if VERBOSE:
+    base.render.ls()
+    base.render.analyze()
+
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
 for preset in PRESETS[::-1]:
     set_modes_and_filters(preset)
+    # pass
+
+points = r.getPoints(len(vertices) * 120)
+looks = rope_look.getPoints(len(vertices) * 120)
+# spectator.set_pos(points[0])
+# spectator.lookAt(looks[0])
+spectator.set_pos_hpr(0, 0, 5, 0, -90, 0)
+# spectator.set_pos_hpr(0, 0, 0, 0, 0, 0)
+
+# model_dict['room_2']['model'].detachNode()
+model_dict['bar']['model'].detachNode()
+model_dict['hall_low']['model'].detachNode()
 
 base.enableParticles()
-
-# display_sequence = init_display_sequence()
-
-pos_intervals = False
 
 # Play music
 while music.status() != AudioSound.PLAYING:
@@ -1035,11 +1050,24 @@ if VERBOSE:
 # Set max delta
 max_delta = 0
 
+# Create a bar
+# bar = DirectWaitBar(value=0, pos=(0, 0, 0))
+
+# bk_text = "This is my Demo"
+# textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
+#                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
+#                           mayChange=1)
+# from time import sleep
+# sleep(5)
+# exit()
+
 # Add and start main task
 if VERBOSE:
     print('Adding main task')
     print('Music time:', music.getTime())
-base.taskMgr.add(main_task, "main_task")
+# base.taskMgr.add(init_task, "init_task")
+# base.taskMgr.add(main_task, "main_task")
+
 
 # Start sequence
 # sequence.start()
@@ -1057,4 +1085,12 @@ accept()
 if VERBOSE:
     print('Running demo')
     print('Music time:', music.getTime())
+
+
+# init_interval = Func(init_function)
+# init_interval.start()
+
+# model_dict['bar']['model'].setRenderModeThickness(10)
+# base.render.setRenderModeThickness(10)
+
 base.run()
