@@ -8,7 +8,7 @@ from panda3d.core import *
 
 # Constants
 K_VERTICES = 200
-NAME = 'hall'
+NAME = 'room_1'
 RTAB = False
 
 # Init ShowBase
@@ -39,30 +39,30 @@ def create_points():
     index_writer = GeomVertexWriter(vertex_data, "index")
     color_writer = GeomVertexWriter(vertex_data, 'color')
 
-    # with open(f'models_other/{NAME}.ply') as f:
-    #     lines = f.readlines()
-    # skip = lines.index('end_header\n')+1
-    # lines = lines[skip:]
-    # points = []
-    # for line in lines:
-    #     fields = line.split()
-    #     x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
-    #     theta = radians(-169)
-    #     x, y = x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta)
-    #     if RTAB:
-    #         r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
-    #     else:
-    #         r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
-    #     points.append([x, y, z, r, g, b, a])
-    #
+    with open(f'models_other/{NAME}.ply') as f:
+        lines = f.readlines()
+    skip = lines.index('end_header\n')+1
+    lines = lines[skip:]
+    points = []
+    for line in lines:
+        fields = line.split()
+        x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
+        theta = radians(-169)
+        x, y = x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta)
+        if RTAB:
+            r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
+        else:
+            r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
+        points.append([x, y, z, r, g, b, a])
+
     # with open('points', 'wb') as f2:
     #     pickle.dump(points, f2)
 
-    with open('points', 'rb') as f2:
-        points = pickle.load(f2)
+    # with open('points', 'rb') as f2:
+    #     points = pickle.load(f2)
 
     # Przedpokój przy WC
-    points = [point for point in points if point[2] < -0.1 and point[0] > 0.2]
+    # points = [point for point in points if point[2] < -0.1 and point[0] > 0.2]
 
     print(f'len(points) = {len(points)}')
     factor = len(points)/(K_VERTICES * 1000)
@@ -109,7 +109,7 @@ model.reparentTo(base.render)
 # base.cam.setPosHpr(0, 0, 0, 180, 0, 0)
 
 # base.run()
-model.writeBamFile(f'models/{NAME}_low_{K_VERTICES}k.bam')
+model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
 
 # model.ls()
 # model.analyze()
