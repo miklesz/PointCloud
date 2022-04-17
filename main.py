@@ -452,28 +452,7 @@ def model_function(model, add):
 
 
 def accept_roping():
-    # points = r.getPoints(len(vertices)*2*120)
-    # looks = rope_look.getPoints(len(vertices) * 2 * 120)
-    demo_parallel = Parallel()
-    models_sequence = Sequence()
-    with open('models/mopaths.csv') as fo:
-        lines = fo.readlines()
-    for line in lines[1:]:
-        fields = line.split(',')
-        if fields[9]:
-            models_sequence.append(Func(model_function, fields[9], int(fields[10])))
-        models_sequence.append(Wait(1))
-    print(models_sequence)
-    roping_sequence = Sequence()
-    roping_sequence.append(LerpFunc(
-        function=roping_function,
-        fromData=0,
-        toData=1,
-        duration=len(vertices)*1,
-        # extraArgs=[points, looks],
-    ))
-    demo_parallel.append(models_sequence)
-    demo_parallel.append(roping_sequence)
+    global demo_parallel
     demo_parallel.start()
 
 
@@ -911,19 +890,26 @@ base.camera.reparent_to(spectator)
 # spectator.set_pos_hpr(0, -.8, 0, 0, 0, 0)
 
 look_color = (1, .5, 1, 1)
+demo_parallel = Parallel()
+models_sequence = Sequence()
+roping_sequence = Sequence()
 with open('models/mopaths.csv') as file_object:
     csv_lines = file_object.readlines()
 vertices = []
 look_vertices = []
-for csv_line in csv_lines[1:]:
+for csv_line in csv_lines[1+0:]:
     cols = csv_line.split(',')
     vertices.append((None, (float(cols[3]), float(cols[4]), float(cols[5]))))
     look_vertices.append({'point': (float(cols[6]), float(cols[7]), float(cols[8])), 'color': look_color})
+    if cols[9]:
+        models_sequence.append(Func(model_function, cols[9], int(cols[10])))
+    models_sequence.append(Wait(1))
+print(models_sequence)
 
 r = Rope()
 r.setup(4, vertices)
 r.ropeNode.setThickness(2)
-r.ropeNode.setNumSubdiv(2*120)
+r.ropeNode.setNumSubdiv(1 * 120)
 r.setPos(0, 0, 0)
 r.reparentTo(base.render)
 r.recompute()
@@ -932,10 +918,20 @@ rope_look = Rope()
 rope_look.setup(4, look_vertices)
 rope_look.ropeNode.setUseVertexColor(1)
 rope_look.ropeNode.setThickness(2)
-rope_look.ropeNode.setNumSubdiv(2 * 120)
+rope_look.ropeNode.setNumSubdiv(1 * 120)
 rope_look.setPos(0, 0, 0)
 rope_look.reparentTo(base.render)
 rope_look.recompute()
+
+roping_sequence.append(LerpFunc(
+    function=roping_function,
+    fromData=0,
+    toData=1,
+    duration=len(vertices) * 1,
+    # extraArgs=[points, looks],
+))
+demo_parallel.append(models_sequence)
+demo_parallel.append(roping_sequence)
 
 # points = r.getPoints(5 * 120 * 100)
 
@@ -985,22 +981,20 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
+    'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
     'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
+    'room_3': {'name': 'room_3_200k', 'pos_hpr': (-5.3, 4.15, -.1, -97.5, 0, 0)},
     'bar': {'name': 'bar_200k', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
     'hall_low': {'name': 'hall_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'wc': {'name': 'wc_200k', 'pos_hpr': (-4.0, -3.7, 0, -100, 0, 0)},
 
     # 'podium': {'ext': 'obj', 'pos_hpr': (0, -20, 0, 0, 90, 0)},
     # 'sign': {'ext': 'obj', 'pos_hpr': (30, -10, 0, 0, 90, 0)},
     # 'entrance': {'ext': 'obj', 'pos_hpr': (10, 0, 0, 0, 90, 0)},
-    # 'room_1': {'ext': 'obj', 'pos_hpr': (-10, 0, 0, 0, 90, 0)},
-    # 'room_3': {'ext': 'obj', 'pos_hpr': (0, 10, 0, 0, 90, 0)},
-    # 'wc': {'ext': 'obj', 'pos_hpr': (-10, 10, 0, 0, 90, 0)},
-    # 'wc': {'ext': 'obj', 'pos_hpr': (0, 0, 0, 0, 90, 0)},
     # 'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
     # 'hall_dae': {'ext': 'dae', 'pos_hpr': (0, 20, 0, 0, 90, 0)},
     # 'compo': {'ext': 'obj', 'pos_hpr': (-20, 0, 0, 0, 90, 0)},
     # 'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
-    #  'point_cloud': {'ext': 'obj', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
 }
 for model_key in model_dict:
     print(model_key, model_dict[model_key])
@@ -1008,9 +1002,6 @@ for model_key in model_dict:
     model_dict[model_key]['model'] = base.loader.loadModel(f'models/{name}.bam')
     model_dict[model_key]['model'].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
     model_dict[model_key]['model'].reparentTo(base.render)
-if VERBOSE:
-    base.render.ls()
-    base.render.analyze()
 
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
@@ -1020,14 +1011,21 @@ for preset in PRESETS[::-1]:
 
 points = r.getPoints(len(vertices) * 120)
 looks = rope_look.getPoints(len(vertices) * 120)
-# spectator.set_pos(points[0])
-# spectator.lookAt(looks[0])
-spectator.set_pos_hpr(0, 0, 5, 0, -90, 0)
+spectator.set_pos(points[0])
+spectator.lookAt(looks[0])
+# spectator.set_pos_hpr(0, 0, 5, 0, -90, 0)
 # spectator.set_pos_hpr(0, 0, 0, 0, 0, 0)
 
-# model_dict['room_2']['model'].detachNode()
+# model_dict['room_1']['model'].detachNode()
+model_dict['room_2']['model'].detachNode()
+model_dict['room_3']['model'].detachNode()
 model_dict['bar']['model'].detachNode()
 model_dict['hall_low']['model'].detachNode()
+model_dict['wc']['model'].detachNode()
+
+if VERBOSE:
+    base.render.ls()
+    base.render.analyze()
 
 base.enableParticles()
 
