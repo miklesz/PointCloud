@@ -49,7 +49,7 @@ def create_points():
     for line in lines:
         fields = line.split()
         x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
-        theta = radians(-169)
+        theta = radians(114)
         x, y = x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta)
         if RTAB:
             r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
@@ -63,8 +63,32 @@ def create_points():
     # with open('points', 'rb') as f2:
     #     points = pickle.load(f2)
 
-    # Przedpokój przy WC
-    # points = [point for point in points if point[2] < -0.1 and point[0] > 0.2]
+    # points = [point for point in points if 0.35 < point[1] < 0.85]
+    new_points = []
+    for point in points:
+        gray = 0.299 * point[3] + 0.587 * point[4] + 0.114 * point[5]
+        if 0.38 < point[1] < 0.81 and 0.17 < point[2] < 0.51 and gray > .5:
+            point[3] = 73/255
+            point[4] = 92/255
+            point[5] = 113/255
+            # point[3] = 91 / 255
+            # point[4] = 113 / 255
+            # point[5] = 137 / 255
+        # else:
+        new_points.append(point)
+
+    # Read image
+    my_image = PNMImage(Filename("models_other/kramsta_narrow.png"))
+    for x in range(my_image.getXSize()):
+        for y in range(my_image.getYSize()):
+            xel_a = my_image.getXelA(x, y)
+            print(xel_a)
+            gray = 0.299 * xel_a[0] + 0.587 * xel_a[1] + 0.114 * xel_a[2]
+            if gray > .5:
+                # new_points.append([0, 0.38+x/100 , 0.51-y/100, xel_a[0], xel_a[1], xel_a[2], 1])
+                # new_points.append([+.1, 0.38 + x / 1000, 0.51 - y / 1000, xel_a[0]/255, 1, 1, 1])
+                new_points.append([+.07, 0.38+x/380*(.81-.38), 0.51-0.02-+y/380*(.81-.38), xel_a[0], xel_a[1], xel_a[2], 1])
+    points = new_points
 
     # Schody dolne
     # points = [point for point in points if point[0] < 0.2]
@@ -108,10 +132,10 @@ def create_points():
 
 # model = base.loader.loadModel(f 'models/bar.bam')
 model = base.render.attach_new_node(create_points())
-model.setRenderModeThickness(3)
+model.setRenderModeThickness(4)
 model.reparentTo(base.render)
 # base.cam.setPosHpr(0, 0, 20, 0, -90, 0)
-base.cam.setPosHpr(0, 0, 0, 90, 0, 0)
+base.cam.setPosHpr(1.5, .5, .3, 90-30, 0, 0)
 
 base.run()
 # model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
