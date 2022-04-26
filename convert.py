@@ -7,11 +7,15 @@ from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
 
 # Constants
-# K_VERTICES = 2000
-K_VERTICES = 926
-# NAME = 'stairs_low'
-NAME = 'sign'
+K_VERTICES = 1000
+# K_VERTICES = int(12419935/1000)
+NAME = 'garden_large'
 RTAB = False
+ANGLE = 21
+
+theta = radians(ANGLE)
+cos_t = cos(theta)
+sin_t = sin(theta)
 
 # Init ShowBase
 base = ShowBase()
@@ -24,6 +28,7 @@ base = ShowBase()
 
 
 def create_points():
+    global theta, cos_t, sin_t
     # Define GeomVertexArrayFormats for the various vertex attributes.
     array = GeomVertexArrayFormat()
     array.addColumn(InternalName.make("vertex"), 3, Geom.NT_float32, Geom.C_point)
@@ -41,38 +46,55 @@ def create_points():
     index_writer = GeomVertexWriter(vertex_data, "index")
     color_writer = GeomVertexWriter(vertex_data, 'color')
 
-    with open(f'models_other/{NAME}.ply') as f:
-        lines = f.readlines()
-    skip = lines.index('end_header\n')+1
-    lines = lines[skip:]
-    points = []
-    for line in lines:
-        fields = line.split()
-        x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
-        theta = radians(-169)
-        x, y = x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta)
-        if RTAB:
-            r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
-        else:
-            r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
-        points.append([x, y, z, r, g, b, a])
-
+    # print('Reading lines')
+    # with open(f'models_other/{NAME}.ply') as f:
+    #     lines = f.readlines()
+    # print(f'Read {len(lines)} lines')
+    # skip = lines.index('end_header\n')+1
+    # lines = lines[skip:]
+    # points = []
+    # print('Appending points')
+    # for line in lines:
+    #     fields = line.split()
+    #     x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
+    #     if RTAB:
+    #         r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
+    #     else:
+    #         r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
+    #     points.append([x, y, z, r, g, b, a])
+    #
+    # print('Dumping points')
     # with open('points', 'wb') as f2:
     #     pickle.dump(points, f2)
 
-    # with open('points', 'rb') as f2:
-    #     points = pickle.load(f2)
+    print('Loading points')
+    with open('points', 'rb') as f2:
+        points = pickle.load(f2)
+
+    if theta:
+        print('Rotating points')
+        for i in range(len(points)):
+            points[i][0], points[i][1] = points[i][0]*cos_t-points[i][1]*sin_t, points[i][0]*sin_t+points[i][1]*cos_t
 
     # Przedpokój przy WC
     # points = [point for point in points if point[2] < -0.1 and point[0] > 0.2]
 
     # Schody dolne
-    # points = [point for point in points if point[0] < 0.2]
+    # points = [point for point in points if point[0] <= 0.2 and point[1] > -0.4]
+    # points = [point for point in points if not (point[0] > -2.0 and point[2] > -0.1)]
+
+    # Schody górne
+    # points = [point for point in points if point[1] <= -0.4 and point[0] < -2.2]
+
+    # Rejestracja
+    # points = [point for point in points if point[0] >= -2.2 and point[2] >= -0.1]
+    # points = [point for point in points if not (point[0] < -1.8 and point[1] > 0.5 and point[2] < 0.1)]
 
     print(f'len(points) = {len(points)}')
     factor = len(points)/(K_VERTICES * 1000)
     print(f'factor = {factor}')
 
+    print('Constructing object')
     for vertex in range(K_VERTICES * 1000):
         x, y, z, r, g, b, a = points[int(vertex*factor)]
         pos_writer.addData3(x, y, z)
@@ -110,53 +132,17 @@ def create_points():
 model = base.render.attach_new_node(create_points())
 model.setRenderModeThickness(3)
 model.reparentTo(base.render)
-# base.cam.setPosHpr(0, 0, 20, 0, -90, 0)
-base.cam.setPosHpr(0, 0, 0, 90, 0, 0)
 
+# Poziomy podłogi
+print(model.get_tight_bounds())
+# Poziom -.5: -3.1658000
+# Poziom 0: -1.1648100
+# Poziom +.5: -0.0899634
+
+# Set frame rate meter
+base.set_frame_rate_meter(True)
+
+model.setHpr(0, 90, 0)
 base.run()
-# model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
 
-
-
-
-
-
-
-
-
-
-# model.ls()
-# model.analyze()
-
-# point_cloud = model.find("**/+GeomNode")
-# for geom in point_cloud.node().modify_geoms():
-#     geom.make_points_in_place()
-
-# for c in model.findAllMatches("**/+GeomNode"):
-#     gn = c.node()
-#     for i in range(gn.getNumGeoms()):
-#         state = gn.getGeomState(i)
-#         state = state.removeAttrib(TextureAttrib.getClassType())
-#         gn.setGeomState(i, state)
-
-# do some fancy calculations on the normals, or texture coordinates that you
-# don't want to do at runtime
-
-# Save your new custom Panda
-# model.writeBamFile(f 'models/{model_key}.bam')
-
-# point_cloud = model_dict[model_key]['model'].find("**/+GeomNode")
-# for geom in point_cloud.node().modify_geoms():
-#     print(geom)
-#     geom.make_points_in_place()
-# point_cloud.reparentTo(base.render)
-# del model_dict[model_key]['model']
-# del point_cloud
-#
-# model_dict[model_key]['cloud'] = model_dict[model_key]['model'].find("**/+GeomNode")
-# for geom in model_dict[model_key]['cloud'].node().modify_geoms():
-#     geom.make_points_in_place()
-
-# point_cloud.writeBamFile(f 'models/{model_key}/textured_output.bam')
-# point_cloud.writeBamFile(f 'models/bar_ply/textured_output.bam')
-# model.writeBamFile(f 'models/bar.bam')
+model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
