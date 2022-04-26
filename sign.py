@@ -8,7 +8,7 @@ from panda3d.core import *
 
 # Constants
 # K_VERTICES = 2000
-K_VERTICES = 926
+K_VERTICES = 200
 # NAME = 'stairs_low'
 NAME = 'sign'
 RTAB = False
@@ -135,10 +135,10 @@ model = base.render.attach_new_node(create_points())
 model.setRenderModeThickness(4)
 model.reparentTo(base.render)
 # base.cam.setPosHpr(0, 0, 20, 0, -90, 0)
-base.cam.setPosHpr(1.5, .5, .3, 90-30, 0, 0)
+base.cam.setPosHpr(1.5, .5, .3, 90, 0, 0)
 
-base.run()
-# model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
+# base.run()
+model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
 
 
 

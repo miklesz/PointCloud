@@ -13,6 +13,8 @@ from direct.showutil.Rope import Rope
 from direct.task import Task
 from panda3d.core import *
 
+# from panda3d_logos.splashes import RainbowSplash
+
 # Local application/library specific imports
 from particles import *
 
@@ -41,7 +43,7 @@ PRESETS = [
     {
         'preset': 1,
         'bloom': False, 'bloom_intensity': 1.0,
-        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
         'cartoon_ink': True, 'cartoon_ink_separation': 2,
         'render_mode_perspective': False,
         'render_mode_thickness': 10,
@@ -49,7 +51,7 @@ PRESETS = [
     {
         'preset': 2,
         'bloom': True, 'bloom_intensity': 1.0,
-        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
         'cartoon_ink': False, 'cartoon_ink_separation': 1,
         'render_mode_perspective': False,
         'render_mode_thickness': 2,
@@ -57,7 +59,7 @@ PRESETS = [
     {
         'preset': 3,
         'bloom': True, 'bloom_intensity': 0.5,
-        'blur_sharpen': True, 'blur_sharpen_amount': 1.0,
+        'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
         'cartoon_ink': False, 'cartoon_ink_separation': 1,
         'render_mode_perspective': False,
         'render_mode_thickness': 3,
@@ -78,6 +80,22 @@ PRESETS = [
         'render_mode_perspective': True,
         'render_mode_thickness': 40,
     },
+    {
+        'preset': 6,
+        'bloom': False, 'bloom_intensity': 0.0,
+        'blur_sharpen': True, 'blur_sharpen_amount': -1.5,
+        'cartoon_ink': True, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 10,
+    },
+    {
+        'preset': 7,
+        'bloom': False, 'bloom_intensity': 1.0,
+        'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': True, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 10,
+    },
 ]
 COLOR_SCALES = (
     ('Default', (127.5, 127.5, 127.5)),
@@ -91,17 +109,18 @@ COLOR_SCALES = (
 
 
 def change_mode_or_filter(mode_or_filter, change):
+    global current_modes_and_filters
     if change is None:
         current_modes_and_filters[mode_or_filter] ^= True
     else:
         current_modes_and_filters[mode_or_filter] += change
-    current_modes_and_filters['preset'] = None
+    current_modes_and_filters['preset'] = 0  # None
     set_modes_and_filters()
 
 
 def set_modes_and_filters(set_preset=None):
     global current_modes_and_filters
-    global model_dict
+    global models
     if set_preset:
         # current_modes_and_filters = set_preset
         for key in set_preset:
@@ -130,12 +149,14 @@ def set_modes_and_filters(set_preset=None):
     base.render.set_render_mode_perspective(current_modes_and_filters['render_mode_perspective'], 1)
     if current_modes_and_filters['render_mode_perspective']:
         base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness']/1000)
-        for model in model_dict:
-            model_dict[model]['model'].set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+        for model in models:
+            models[model].set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+            models[model].set_render_mode_perspective(current_modes_and_filters['render_mode_perspective'], 1)
     else:
         base.render.set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
-        for model in model_dict:
-            model_dict[model]['model'].set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+        for model in models:
+            models[model].set_render_mode_thickness(current_modes_and_filters['render_mode_thickness'])
+            models[model].set_render_mode_perspective(current_modes_and_filters['render_mode_perspective'], 1)
     # print(current_modes_and_filters['color_scale'])
     base.render.setColorScale(
         COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][1][0] / 255 * 2,
@@ -222,6 +243,8 @@ def accept():
     base.accept('3', set_modes_and_filters, [PRESETS[3]])
     base.accept('4', set_modes_and_filters, [PRESETS[4]])
     base.accept('5', set_modes_and_filters, [PRESETS[5]])
+    base.accept('6', set_modes_and_filters, [PRESETS[6]])
+    base.accept('7', set_modes_and_filters, [PRESETS[7]])
     base.accept('s', start_steam)
     base.accept('w', accept_water)
     base.accept('g', start_glow)
@@ -232,6 +255,7 @@ def accept():
     base.accept('t', accept_trainspotting)
     base.accept('h', accept_handshaking)
     base.accept('r', accept_roping)
+    base.accept('c', accept_cubes)
     base.accept('arrow_left', accept_yaw, [+2])
     base.accept('arrow_right', accept_yaw, [-2])
     base.accept('arrow_left-repeat', accept_yaw, [+2])
@@ -277,13 +301,13 @@ U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 
 # Presets (now: {current_modes_and_filters['preset']})
 0: set preset 0 (`None`)
-1: set preset 1 (`Outdoor`)
+1: set preset 1 (`Outdoor Thick`)
 2: set preset 2 (`Indoor 2px`)
 3: set preset 3 (`Indoor 3px`)
 4: set preset 4 (`Outdoor Perspective`)
 5: set preset 5 (`Sitkowy`)
-6: set preset 6 (`???`)
-7: set preset 7 (`???`)
+6: set preset 6 (`Mikleszowy`)
+7: set preset 7 (`Outdoor Thin`)
 8: set preset 8 (`???`)
 9: set preset 9 (`???`)
 
@@ -303,6 +327,7 @@ d: dust storm (once)
 i: display (once)
 g: glowworms/fireflies (once)
 h: handshaking (once)
+c: cubes (once)
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -311,7 +336,7 @@ h: handshaking (once)
                                pos=(-base.getAspectRatio(), +.97),  # +.96
                                fg=(1, 1, 0, 1),
                                bg=(0, 0, 0, .5),
-                               scale=0.038,  # 0.05
+                               scale=0.037,  # 0.05
                                align=TextNode.ALeft)
 
     # decay = 1
@@ -408,23 +433,29 @@ def move_to_random():
 
 
 def start_steam():
+    r.removeNode()
+    rope_look.removeNode()
+    models['room_1'].reparent_to(base.render)
+    models['room_2'].reparent_to(base.render)
+    models['room_3'].reparent_to(base.render)
+    # print(models['room_1'].getTightBounds())
     steam_sequence = Sequence()
     steam_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
-        pos=(-2, 2, .1),
+        pos=(7.5, 3.5, 0),
         hpr=(90, 0, 0),
         duration=2,
         blendType='easeInOut',
     ))
-    # steam_sequence.append(ParticleInterval(
-    #     particleEffect=init_steam_particle_effect(current_modes_and_filters['render_mode_thickness']),
-    #     parent=office_model,
-    #     worldRelative=True,
-    #     duration=16,
-    #     softStopT=8,
-    #     cleanup=True,
-    #     name='steam'
-    # ))
+    steam_sequence.append(ParticleInterval(
+        particleEffect=init_steam_particle_effect(current_modes_and_filters['render_mode_thickness']),
+        parent=base.render,
+        worldRelative=True,
+        duration=16,
+        softStopT=8,
+        cleanup=True,
+        name='steam'
+    ))
     steam_sequence.start()
 
 
@@ -441,43 +472,51 @@ def roping_function(t):
 
 
 def model_function(model, add):
-    global model_dict
-    print(f'add = {add}')
+    global models
     if add:
-        model_dict[model]['model'].reparentTo(base.render)
         print(f'model_dict[model][\'{model}\'].reparentTo(base.render)')
+        models[model].reparentTo(base.render)
     else:
-        model_dict[model]['model'].removeNode()
-        print(f'model_dict[model][\'{model}\'].detachNode()')
+        print(f'model_dict[model][\'{model}\'].removeNode()')
+        models[model].removeNode()
+        del models[model]
 
 
 def accept_roping():
     global demo_parallel
+    r.removeNode()
+    rope_look.removeNode()
     demo_parallel.start()
 
 
 def accept_water():
+    r.removeNode()
+    rope_look.removeNode()
+    models['room_1'].reparent_to(base.render)
+    models['room_2'].reparent_to(base.render)
+    models['room_3'].reparent_to(base.render)
+    # print(models['room_1'].getTightBounds())
     # water_parallel = Parallel()
     water_sequence = Sequence()
     water_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
-        pos=(-2, 2, .1),
+        pos=(7.5, 3.5, 0),
         hpr=(90, 0, 0),
         duration=2,
         blendType='easeInOut',
     ))
-    # water_sequence.append(ParticleInterval(
-    #     particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
-    #     parent=office_model,
-    #     worldRelative=True,
-    #     duration=16,
-    #     softStopT=8,
-    #     cleanup=True,
-    #     name='water'
-    # ))
+    water_sequence.append(ParticleInterval(
+        particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
+        parent=base.render,
+        worldRelative=True,
+        duration=16,
+        softStopT=8,
+        cleanup=True,
+        name='water'
+    ))
     # splash_interval = ParticleInterval(
     #     particleEffect=init_splash_particle_effect(current_modes_and_filters['render_mode_thickness']),
-    #     parent=office_model,
+    #     parent=base.render,
     #     worldRelative=True,
     #     duration=1,
     #     cleanup=True,
@@ -488,23 +527,29 @@ def accept_water():
 
 
 def start_glow():
+    r.removeNode()
+    rope_look.removeNode()
+    models['room_1'].reparent_to(base.render)
+    models['room_2'].reparent_to(base.render)
+    models['room_3'].reparent_to(base.render)
+    # print(models['room_1'].getTightBounds())
     glow_sequence = Sequence()
     glow_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
-        pos=(-2, 2, .1),
+        pos=(7.5, 3.5, 0),
         hpr=(90, 0, 0),
         duration=2,
         blendType='easeInOut',
     ))
-    # glow_sequence.append(ParticleInterval(
-    #     particleEffect=init_glow_particle_effect(current_modes_and_filters['render_mode_thickness']),
-    #     parent=office_model,
-    #     worldRelative=True,
-    #     duration=16,
-    #     softStopT=8,
-    #     cleanup=True,
-    #     name='glow'
-    # ))
+    glow_sequence.append(ParticleInterval(
+        particleEffect=init_glow_particle_effect(current_modes_and_filters['render_mode_thickness']),
+        parent=base.render,
+        worldRelative=True,
+        duration=16,
+        softStopT=8,
+        cleanup=True,
+        name='glow'
+    ))
     glow_sequence.start()
 
 
@@ -527,13 +572,13 @@ def force_display(display_particle_effect):
 
 
 def zoom_function(t):
-    fov_min = 66  # 66
+    fov_min = 20  # 66
     fov_max = 115  # 115
     fov = (fov_min-fov_max)*t+fov_max
-    width = 3.5+t*1.5
-    # width = 4
+    # width = 7.5+t*2.5
+    width = 4
     base.camLens.setFov(fov)
-    distance = 1.0-width/(2*tan(0.5*fov*2*pi/360))
+    distance = 7.5+width/(2*tan(0.5*fov*2*pi/360))
     spectator.set_x(distance)
     # print(fov, distance, width)
 
@@ -547,6 +592,19 @@ def fov_function(t):
 
 
 def init_display_sequence():
+    r.removeNode()
+    rope_look.removeNode()
+
+    # spectator.setPosHpr(0, 0, 0, 0, 0, 0)
+    # splash = RainbowSplash()
+    # interval = splash.setup()  # This'll change the scene graph, in
+    # # particular reparent the cam!
+    # # interval is a Panda3D interval you can .start() it now
+    # interval.start()
+    # # splash.teardown()  # To de-litter your state.
+    # # exit()
+    # return
+
     # rbc = RigidBodyCombiner("rbc")
     # rigid = NodePath(rbc)
     # rigid.reparentTo(base.render)
@@ -563,6 +621,7 @@ def init_display_sequence():
     zoom_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
         pos=(-2, 2, .1),
+        # pos=(20, -8, .1),
         hpr=(90, 0, 0),
         duration=2,
         blendType='easeInOut',
@@ -620,6 +679,11 @@ def dissolve(t, cube_object):
 
 
 def start_zoom():
+    r.removeNode()
+    rope_look.removeNode()
+    models['room_1'].reparent_to(base.render)
+    models['room_2'].reparent_to(base.render)
+    models['room_3'].reparent_to(base.render)
     # fov_min = 66
     # fov_max = 115
     duration = 1
@@ -627,9 +691,98 @@ def start_zoom():
     # Sequence just to avoid warnings!
     zoom_prepare_parallel = Parallel()
     zoom_prepare_parallel.append(LerpFunc(fov_function, fromData=0, toData=1, duration=2, blendType='easeInOut'))
-    zoom_prepare_parallel.append(init_pos_interval((1.0-5/(2*tan(0.5*66*2*pi/360)), 0, 0), duration=2))
+    # zoom_prepare_parallel.append(init_pos_interval((1.0-5/(2*tan(0.5*66*2*pi/360)), 0, 0), duration=2))
+    zoom_prepare_parallel.append(LerpPosHprInterval(
+        nodePath=spectator,
+        pos=(7.5, 3.5, 0),
+        hpr=(90, 0, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
     zoom_sequence = Sequence()
     zoom_sequence.append(zoom_prepare_parallel)
+
+    # # print(len(display_particle_effects))
+    # # for display_particle_effect in display_particle_effects:
+    # # zoom_sequence.append(Func(start_display, init_cube(1, 1, 1, (1, 0, 0, 1))))
+    # for cube_number in range(16):
+    #     cube = init_cube_particle_effect(
+    #         current_modes_and_filters['render_mode_thickness'],
+    #         Randomizer().randomReal(.5)+.5,
+    #         Randomizer().randomReal(.5)+.5,
+    #         Randomizer().randomReal(.5)+.5,
+    #         (Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, 1),
+    #         duration
+    #     )
+    #     cube_parallel = Parallel()
+    #     cube_parallel.append(LerpFunc(
+    #         function=dissolve,
+    #         fromData=0,
+    #         toData=1,
+    #         duration=duration,
+    #         blendType='easeIn',
+    #         extraArgs=[cube],
+    #     ))
+    #     cube_parallel.append(ParticleInterval(
+    #         particleEffect=cube,
+    #         parent=base.render,
+    #         worldRelative=False,
+    #         duration=duration,
+    #         cleanup=True,
+    #     ))
+    #     start_h = Randomizer().randomInt(360)
+    #     start_p = Randomizer().randomInt(360)
+    #     start_r = Randomizer().randomInt(360)
+    #     cube_parallel.append(LerpHprInterval(
+    #         nodePath=cube,
+    #         duration=duration,
+    #         hpr=(
+    #             start_h+Randomizer().randomRealUnit()*rotation,
+    #             start_p+Randomizer().randomRealUnit()*rotation,
+    #             start_r+Randomizer().randomRealUnit()*rotation,
+    #         ),
+    #         startHpr=(start_h, start_p, start_r),
+    #     ))
+    #     zoom_sequence.append(cube_parallel)
+    #     # print(cube.getParticlesDict())
+    #     # cube.analyze()
+    #     # cube.setTransparency(TransparencyAttrib.M_alpha)
+    #     # cube.setAlphaScale(0.2)
+    #     # cube.hide()
+    #     # cube.setScale(5)
+
+    # zoom_sequence.append(Wait(2))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
+    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
+    # start_display()
+    zoom_sequence.start()
+    # base.render.analyze()
+    # display_particle_effects[0].analyze()
+    # model.analyze()
+    # point_cloud.analyze()
+    # display_interval = LerpFunc(display, fromData=0, toData=1, duration=10)
+
+
+def accept_cubes():
+    r.removeNode()
+    rope_look.removeNode()
+    models['room_1'].reparent_to(base.render)
+    # fov_min = 66
+    # fov_max = 115
+    duration = 1
+    rotation = 180
+    cube_sequence = Sequence()
+    cube_sequence.append(LerpPosHprInterval(
+        nodePath=spectator,
+        pos=(7.5, 3.5, 0),
+        hpr=(90, 0, 0),
+        duration=2,
+        blendType='easeInOut',
+    ))
 
     # print(len(display_particle_effects))
     # for display_particle_effect in display_particle_effects:
@@ -654,7 +807,7 @@ def start_zoom():
         ))
         cube_parallel.append(ParticleInterval(
             particleEffect=cube,
-            parent=base.render,
+            parent=models['room_1'],
             worldRelative=False,
             duration=duration,
             cleanup=True,
@@ -672,7 +825,7 @@ def start_zoom():
             ),
             startHpr=(start_h, start_p, start_r),
         ))
-        zoom_sequence.append(cube_parallel)
+        cube_sequence.append(cube_parallel)
         # print(cube.getParticlesDict())
         # cube.analyze()
         # cube.setTransparency(TransparencyAttrib.M_alpha)
@@ -691,7 +844,7 @@ def start_zoom():
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
     # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
     # start_display()
-    zoom_sequence.start()
+    cube_sequence.start()
     # base.render.analyze()
     # display_particle_effects[0].analyze()
     # model.analyze()
@@ -714,10 +867,16 @@ def trainspotting_lerp_function(t):
 
 
 def accept_trainspotting():
+    r.removeNode()
+    rope_look.removeNode()
+    # models['room_1'].reparent_to(base.render)
+    # models['room_2'].reparent_to(base.render)
+    # models['room_3'].reparent_to(base.render)
+    models['wc'].reparent_to(base.render)
     trainspotting_sequence = Sequence()
     trainspotting_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
-        pos=(-2, 2, .1),
+        pos=(-4, -3.5, .35),
         hpr=(90, 0, 0),
         duration=2,
         blendType='easeInOut',
@@ -795,31 +954,31 @@ def init_function():
     pass
 
 
-def init_task(task):
-    # Add some text
-    # bk_text = "This is my Demo"
-    # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
-    #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
-    #                           mayChange=1)
-    # from time import sleep
-    # sleep(1)
-
-    print('pre interval start')
-    init_interval = Func(init_function)
-    init_sequence = Sequence()
-    init_sequence.append(Wait(2/60))
-    # init_sequence.append(Wait(5))
-    init_sequence.append(init_interval)
-    init_sequence.append(Wait(20))
-    init_sequence.append(init_interval)
-    # init_sequence.append(init_interval)
-    init_sequence.start()
-    init_function()
-    print('post interval start')
-
-    # textObject.setText(bk_text)
-
-    return Task.done
+# def init_task(task):
+#     # Add some text
+#     # bk_text = "This is my Demo"
+#     # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
+#     #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
+#     #                           mayChange=1)
+#     # from time import sleep
+#     # sleep(1)
+#
+#     print('pre interval start')
+#     init_interval = Func(init_function)
+#     init_sequence = Sequence()
+#     init_sequence.append(Wait(2/60))
+#     # init_sequence.append(Wait(5))
+#     init_sequence.append(init_interval)
+#     init_sequence.append(Wait(20))
+#     init_sequence.append(init_interval)
+#     # init_sequence.append(init_interval)
+#     init_sequence.start()
+#     init_function()
+#     print('post interval start')
+#
+#     # textObject.setText(bk_text)
+#
+#     return Task.done
 
 
 # Init ShowBase
@@ -842,8 +1001,11 @@ if VERBOSE:
 if VERBOSE:
     print("PandaSystem.version_string:", PandaSystem.version_string)
 
+# if VERBOSE:
+#     print("Thread.isThreadingSupported:", Thread.isThreadingSupported())
+
 # Load music
-music = base.loader.loadSfx("music/muzapreview.ogg")
+music = base.loader.loadSfx("music/Kramsta1.ogg")
 
 # Set window
 fullscreen = False
@@ -893,7 +1055,7 @@ look_color = (1, .5, 1, 1)
 demo_parallel = Parallel()
 models_sequence = Sequence()
 roping_sequence = Sequence()
-with open('models/mopaths.csv') as file_object:
+with open('models/mopath.csv') as file_object:
     csv_lines = file_object.readlines()
 vertices = []
 look_vertices = []
@@ -981,47 +1143,63 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
+    'sign': {'name': 'sign_200k', 'pos_hpr': (-10.0, +10, 0, 0, 0, 0)},
+
     'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
     'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
     'room_3': {'name': 'room_3_200k', 'pos_hpr': (-5.3, 4.15, -.1, -97.5, 0, 0)},
     'bar': {'name': 'bar_200k', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
     'hall_low': {'name': 'hall_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'wc': {'name': 'wc_200k', 'pos_hpr': (-4.0, -3.7, 0, -100, 0, 0)},
-
-    # 'podium': {'ext': 'obj', 'pos_hpr': (0, -20, 0, 0, 90, 0)},
-    # 'sign': {'ext': 'obj', 'pos_hpr': (30, -10, 0, 0, 90, 0)},
-    # 'entrance': {'ext': 'obj', 'pos_hpr': (10, 0, 0, 0, 90, 0)},
+    'stairs_low': {'name': 'stairs_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'stairs_hi': {'name': 'stairs_hi_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'register': {'name': 'register_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
+    'entrance': {'name': 'entrance_200k', 'pos_hpr': (12.0, 4.8, 1.8, -109, 0, 0)},
+    'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
     # 'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
-    # 'hall_dae': {'ext': 'dae', 'pos_hpr': (0, 20, 0, 0, 90, 0)},
-    # 'compo': {'ext': 'obj', 'pos_hpr': (-20, 0, 0, 0, 90, 0)},
     # 'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
 }
+
+models = {}
+
 for model_key in model_dict:
     print(model_key, model_dict[model_key])
     name = model_dict[model_key]['name']
-    model_dict[model_key]['model'] = base.loader.loadModel(f'models/{name}.bam')
-    model_dict[model_key]['model'].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
-    model_dict[model_key]['model'].reparentTo(base.render)
+    models[model_key] = base.loader.loadModel(f'models/{name}.bam')
+    models[model_key].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
+    models[model_key].reparentTo(base.render)
+
 
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
 for preset in PRESETS[::-1]:
     set_modes_and_filters(preset)
     # pass
+# print("DONE!")
+
 
 points = r.getPoints(len(vertices) * 120)
 looks = rope_look.getPoints(len(vertices) * 120)
 spectator.set_pos(points[0])
 spectator.lookAt(looks[0])
-# spectator.set_pos_hpr(0, 0, 5, 0, -90, 0)
-# spectator.set_pos_hpr(0, 0, 0, 0, 0, 0)
+# spectator.set_pos_hpr(0, 0, 6, 0, -90, 0)
+# spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
 
-# model_dict['room_1']['model'].detachNode()
-model_dict['room_2']['model'].detachNode()
-model_dict['room_3']['model'].detachNode()
-model_dict['bar']['model'].detachNode()
-model_dict['hall_low']['model'].detachNode()
-model_dict['wc']['model'].detachNode()
+models['sign'].detachNode()
+
+models['entrance'].detachNode()
+models['room_1'].detachNode()
+models['room_2'].detachNode()
+models['room_3'].detachNode()
+models['bar'].detachNode()
+models['hall_low'].detachNode()
+models['wc'].detachNode()
+models['stairs_low'].detachNode()
+models['stairs_hi'].detachNode()
+models['register'].detachNode()
+# models['podium'].detachNode()
+models['compo'].detachNode()
 
 if VERBOSE:
     base.render.ls()
@@ -1032,6 +1210,7 @@ base.enableParticles()
 # Play music
 while music.status() != AudioSound.PLAYING:
     music.play()
+    # pass
 if VERBOSE:
     print('Music time:', music.getTime())
 # print('volume', music.get_volume())  # 0.0)
@@ -1064,7 +1243,7 @@ if VERBOSE:
     print('Adding main task')
     print('Music time:', music.getTime())
 # base.taskMgr.add(init_task, "init_task")
-# base.taskMgr.add(main_task, "main_task")
+base.taskMgr.add(main_task, "main_task")
 
 
 # Start sequence

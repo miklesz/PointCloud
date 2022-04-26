@@ -149,8 +149,8 @@ def init_glow_particle_effect(point_size):
 
     particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((-2.89104, -2.71256, -1.75318))
-    particles.emitter.set_max_bound((2.76295, 2.03709, 0.879156))
+    particles.emitter.set_min_bound((2.5, 1.5, -1.5195))
+    particles.emitter.set_max_bound((7, 6, 1.61991))
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('gravity')
@@ -256,8 +256,8 @@ def init_steam_particle_effect(point_size):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.3800))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((-2.89104, -2.71256, -1.75318))
-    particles.emitter.set_max_bound((2.76295, 2.03709, -1.75318))
+    particles.emitter.set_min_bound((2.5, 1.5, -1.5195))
+    particles.emitter.set_max_bound((7, 6, -1.5195))
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('vertex')
@@ -314,8 +314,8 @@ def init_water_particle_effect(point_size):
 
     particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((-2.89104, -2.71256, 0.879156))
-    particles.emitter.set_max_bound((2.76295, 2.03709, 0.879156))
+    particles.emitter.set_min_bound((2.5, 1.5, 1.61991))
+    particles.emitter.set_max_bound((7, 6, 1.61991))
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('gravity')
