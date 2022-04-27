@@ -1187,8 +1187,8 @@ spectator.lookAt(looks[0])
 # spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
 
 models['sign'].detachNode()
-
-models['entrance'].detachNode()
+# models['podium'].detachNode()
+# models['entrance'].detachNode()
 models['room_1'].detachNode()
 models['room_2'].detachNode()
 models['room_3'].detachNode()
@@ -1198,7 +1198,6 @@ models['wc'].detachNode()
 models['stairs_low'].detachNode()
 models['stairs_hi'].detachNode()
 models['register'].detachNode()
-# models['podium'].detachNode()
 models['compo'].detachNode()
 
 if VERBOSE:
