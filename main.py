@@ -1143,7 +1143,12 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
-    'sign': {'name': 'sign_200k', 'pos_hpr': (-10.0, +10, 0, 0, 0, 0)},
+    'sign': {'name': 'sign_200k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
+
+    'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
+
+    'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
+    'entrance': {'name': 'entrance_200k', 'pos_hpr': (12.0, 4.8, 1.8, -109, 0, 0)},
 
     'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
     'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
@@ -1155,8 +1160,6 @@ model_dict = {
     'stairs_hi': {'name': 'stairs_hi_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'register': {'name': 'register_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
-    'entrance': {'name': 'entrance_200k', 'pos_hpr': (12.0, 4.8, 1.8, -109, 0, 0)},
-    'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
     # 'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
     # 'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
 }
@@ -1170,6 +1173,8 @@ for model_key in model_dict:
     models[model_key].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
     models[model_key].reparentTo(base.render)
 
+# print('podium: ', models['podium'].getTightBounds())
+# print('garden: ', models['garden'].getTightBounds())
 
 # Render modes and common filters
 filters = CommonFilters(base.win, base.cam)
@@ -1184,9 +1189,9 @@ looks = rope_look.getPoints(len(vertices) * 120)
 spectator.set_pos(points[0])
 spectator.lookAt(looks[0])
 # spectator.set_pos_hpr(0, 0, 6, 0, -90, 0)
-# spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
+# spectator.set_pos_hpr(0, 0, 0, 180, 0, 0)
 
-models['sign'].detachNode()
+# models['sign'].detachNode()
 # models['podium'].detachNode()
 # models['entrance'].detachNode()
 models['room_1'].detachNode()

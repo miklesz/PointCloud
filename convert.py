@@ -9,9 +9,13 @@ from panda3d.core import *
 # Constants
 K_VERTICES = 1000
 # K_VERTICES = int(12419935/1000)
-NAME = 'garden_large'
 RTAB = False
-ANGLE = 21
+
+NAME = 'garden'
+ANGLE = -84  # garden: -84
+
+# NAME = 'garden_large'
+# ANGLE = 21.5  # garden_large: 21 (trochę leci w prawo), 22 (trochę leci w lewo)
 
 theta = radians(ANGLE)
 cos_t = cos(theta)
@@ -64,17 +68,19 @@ def create_points():
     #     points.append([x, y, z, r, g, b, a])
     #
     # print('Dumping points')
-    # with open('points', 'wb') as f2:
+    # with open(f'{NAME}', 'wb') as f2:
     #     pickle.dump(points, f2)
 
     print('Loading points')
-    with open('points', 'rb') as f2:
+    with open(f'{NAME}', 'rb') as f2:
         points = pickle.load(f2)
 
     if theta:
         print('Rotating points')
         for i in range(len(points)):
             points[i][0], points[i][1] = points[i][0]*cos_t-points[i][1]*sin_t, points[i][0]*sin_t+points[i][1]*cos_t
+
+    print('Excluding points (if applicable)')
 
     # Przedpokój przy WC
     # points = [point for point in points if point[2] < -0.1 and point[0] > 0.2]
@@ -89,6 +95,13 @@ def create_points():
     # Rejestracja
     # points = [point for point in points if point[0] >= -2.2 and point[2] >= -0.1]
     # points = [point for point in points if not (point[0] < -1.8 and point[1] > 0.5 and point[2] < 0.1)]
+
+    # garden_large
+    # points = [point for point in points if point[1] < 4]
+
+    # garden
+    points = [point for point in points if point[1] >= -8.7]
+    # points = [point for point in points if point[1] < -8.7]
 
     print(f'len(points) = {len(points)}')
     factor = len(points)/(K_VERTICES * 1000)
@@ -142,7 +155,7 @@ print(model.get_tight_bounds())
 # Set frame rate meter
 base.set_frame_rate_meter(True)
 
-model.setHpr(0, 90, 0)
-base.run()
+# model.setHpr(0, 90, 0)
+# base.run()
 
 model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
