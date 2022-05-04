@@ -11,11 +11,11 @@ K_VERTICES = 1000
 # K_VERTICES = int(12419935/1000)
 RTAB = False
 
-NAME = 'garden'
-ANGLE = -84  # garden: -84
+# NAME = 'garden'
+# ANGLE = -84  # garden: -84
 
-# NAME = 'garden_large'
-# ANGLE = 21.5  # garden_large: 21 (trochę leci w prawo), 22 (trochę leci w lewo)
+NAME = 'garden_large'
+ANGLE = 21.5  # garden_large: 21 (trochę leci w prawo), 22 (trochę leci w lewo)
 
 theta = radians(ANGLE)
 cos_t = cos(theta)
@@ -97,11 +97,10 @@ def create_points():
     # points = [point for point in points if not (point[0] < -1.8 and point[1] > 0.5 and point[2] < 0.1)]
 
     # garden_large
-    # points = [point for point in points if point[1] < 4]
+    points = [point for point in points if point[1] < 2.5]
 
     # garden
-    points = [point for point in points if point[1] >= -8.7]
-    # points = [point for point in points if point[1] < -8.7]
+    # points = [point for point in points if point[1] >= -8.7]
 
     print(f'len(points) = {len(points)}')
     factor = len(points)/(K_VERTICES * 1000)

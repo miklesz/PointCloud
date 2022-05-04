@@ -1143,13 +1143,16 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
+    'party_all': {'name': 'party_all_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+    'party_3some': {'name': 'party_3some_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+    'pano': {'name': 'pano_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+    'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+
     'sign': {'name': 'sign_200k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
-
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
-
+    'garden_large': {'name': 'garden_large_1000k', 'pos_hpr': (18, -10.7, .5, 0, 0, 0)},
     'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
     'entrance': {'name': 'entrance_200k', 'pos_hpr': (12.0, 4.8, 1.8, -109, 0, 0)},
-
     'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
     'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
     'room_3': {'name': 'room_3_200k', 'pos_hpr': (-5.3, 4.15, -.1, -97.5, 0, 0)},
@@ -1160,8 +1163,6 @@ model_dict = {
     'stairs_hi': {'name': 'stairs_hi_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'register': {'name': 'register_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
-    # 'garden': {'ext': 'obj', 'pos_hpr': (20, 20, 0, 0, 90, 0)},
-    # 'garden_large': {'ext': 'obj', 'pos_hpr': (-30, -30, 0, 0, 90, 0)},
 }
 
 models = {}
@@ -1186,14 +1187,21 @@ for preset in PRESETS[::-1]:
 
 points = r.getPoints(len(vertices) * 120)
 looks = rope_look.getPoints(len(vertices) * 120)
-spectator.set_pos(points[0])
-spectator.lookAt(looks[0])
-# spectator.set_pos_hpr(0, 0, 6, 0, -90, 0)
-# spectator.set_pos_hpr(0, 0, 0, 180, 0, 0)
+# spectator.set_pos(points[0])
+# spectator.lookAt(looks[0])
+# spectator.set_pos_hpr(0, 0, 6, -90, -90, 0)
+# spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
+# spectator.set_pos_hpr(18.5, 9.6, 2.8, 0, -90, 0)
+spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
 
-# models['sign'].detachNode()
-# models['podium'].detachNode()
-# models['entrance'].detachNode()
+models['party_3some'].detachNode()
+models['pano'].detachNode()
+models['villa_0'].detachNode()
+models['sign'].detachNode()
+models['garden'].detachNode()
+models['garden_large'].detachNode()
+models['podium'].detachNode()
+models['entrance'].detachNode()
 models['room_1'].detachNode()
 models['room_2'].detachNode()
 models['room_3'].detachNode()
