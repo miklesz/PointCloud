@@ -1,2 +1,5 @@
 Panda3D
 MIDIFile
+queuelib
+requests
+urllib3

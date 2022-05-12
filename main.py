@@ -1,7 +1,11 @@
 # Standard library imports
 from math import *
 import platform
+# noinspection PyUnresolvedReferences
+import queue
+import requests
 import sys
+import urllib3
 
 # Related third party imports
 from direct.filter.CommonFilters import CommonFilters
@@ -12,8 +16,6 @@ from direct.showbase.ShowBase import ShowBase
 from direct.showutil.Rope import Rope
 from direct.task import Task
 from panda3d.core import *
-
-# from panda3d_logos.splashes import RainbowSplash
 
 # Local application/library specific imports
 from particles import *
@@ -29,8 +31,16 @@ pos_hpr_amplitudes = [.010 * (Randomizer().randomRealUnit() / 25 + 1) for a in r
 pos_hpr_offsets = [Randomizer().randomReal(2*pi) for i in range(6)]
 
 # Constants
-VERBOSE = True
-# VERBOSE = False
+COLOR_SCALES = (
+    ('Default', (127.5, 127.5, 127.5)),
+    ('Oxford Blue', (15, 35, 71)),
+    ('Rainbow Indigo', (28, 63, 110)),
+    ('Lapis Lazuli', (46, 103, 160)),
+    ('Carolina Blue', (90, 172, 207)),
+    ('Key Lime', (239, 252, 147)),
+    ('Dollar Bill', (128, 194, 113))
+)
+DOWNLOAD = True  # True/False
 PRESETS = [
     {
         'preset': 0,
@@ -97,15 +107,7 @@ PRESETS = [
         'render_mode_thickness': 10,
     },
 ]
-COLOR_SCALES = (
-    ('Default', (127.5, 127.5, 127.5)),
-    ('Oxford Blue', (15, 35, 71)),
-    ('Rainbow Indigo', (28, 63, 110)),
-    ('Lapis Lazuli', (46, 103, 160)),
-    ('Carolina Blue', (90, 172, 207)),
-    ('Key Lime', (239, 252, 147)),
-    ('Dollar Bill', (128, 194, 113))
-)
+VERBOSE = True  # False
 
 
 def change_mode_or_filter(mode_or_filter, change):
@@ -597,7 +599,7 @@ def init_display_sequence():
 
     # spectator.setPosHpr(0, 0, 0, 0, 0, 0)
     # splash = RainbowSplash()
-    # interval = splash.setup()  # This'll change the scene graph, in
+    # interval = splash.setup()  # This will change the scene graph, in
     # # particular reparent the cam!
     # # interval is a Panda3D interval you can .start() it now
     # interval.start()
@@ -1005,7 +1007,7 @@ if VERBOSE:
 #     print("Thread.isThreadingSupported:", Thread.isThreadingSupported())
 
 # Load music
-music = base.loader.loadSfx("music/Kramsta1.ogg")
+music = base.loader.loadSfx("music/Kramsta by Damage (beta3).ogg")
 
 # Set window
 fullscreen = False
@@ -1051,11 +1053,21 @@ base.camera.reparent_to(spectator)
 # spectator.set_pos_hpr(0, 0, 0, -110, 0, 0)
 # spectator.set_pos_hpr(0, -.8, 0, 0, 0, 0)
 
+if DOWNLOAD:
+    # noinspection PyUnresolvedReferences
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    url = 'http'+'://events.leszcz.uk'
+    r = requests.get(url, allow_redirects=True, verify=False)
+    open('models/events.csv', 'wb').write(r.content)
+    url = 'http'+'://camera.leszcz.uk'
+    r = requests.get(url, allow_redirects=True, verify=False)
+    open('models/camera.csv', 'wb').write(r.content)
+
 look_color = (1, .5, 1, 1)
 demo_parallel = Parallel()
 models_sequence = Sequence()
 roping_sequence = Sequence()
-with open('models/mopath.csv') as file_object:
+with open('models/camera.csv') as file_object:
     csv_lines = file_object.readlines()
 vertices = []
 look_vertices = []
@@ -1143,10 +1155,11 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
-    'party_all': {'name': 'party_all_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+    # 'party_all': {'name': 'party_all_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'party_3some': {'name': 'party_3some_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'pano': {'name': 'pano_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+    'signboard': {'name': 'signboard_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
 
     'sign': {'name': 'sign_200k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
@@ -1197,10 +1210,11 @@ spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
 models['party_3some'].detachNode()
 models['pano'].detachNode()
 models['villa_0'].detachNode()
-models['sign'].detachNode()
-models['garden'].detachNode()
-models['garden_large'].detachNode()
-models['podium'].detachNode()
+models['signboard'].detachNode()
+# models['sign'].detachNode()
+# models['garden'].detachNode()
+# models['garden_large'].detachNode()
+# models['podium'].detachNode()
 models['entrance'].detachNode()
 models['room_1'].detachNode()
 models['room_2'].detachNode()

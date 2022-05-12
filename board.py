@@ -14,7 +14,8 @@ K_VERTICES = 1000
 # NAME = 'villa_0'
 # NAME = 'pano'
 # NAME = 'party_all'
-NAME = 'party_3some'
+# NAME = 'party_3some'
+NAME = 'signboard'
 RTAB = False
 
 # Init ShowBase

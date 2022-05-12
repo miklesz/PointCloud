@@ -22,6 +22,7 @@ setup(
             ],
             # 'console_apps': {
             #     'Kramsta': 'main.py',
+            # },
             'gui_apps': {
                 'Kramsta': 'main.py',
             },
@@ -33,6 +34,7 @@ setup(
 
             # Set up output logging, important for GUI apps!
             # 'log_filename': 'output.log',
+            # 'log_filename': '/tmp/kramsta.txt',
             'log_filename': 'kramsta.txt',
             'log_append': False,
 
