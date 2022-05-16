@@ -10,12 +10,12 @@ from panda3d.core import *
 # K_VERTICES = 2000
 K_VERTICES = 1000
 # NAME = 'stairs_low'
-# NAME = 'lead'
+NAME = 'lead'
 # NAME = 'villa_0'
 # NAME = 'pano'
 # NAME = 'party_all'
 # NAME = 'party_3some'
-NAME = 'signboard'
+# NAME = 'signboard'
 RTAB = False
 
 # Init ShowBase

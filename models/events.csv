@@ -1,0 +1,6 @@
+min,:,s,.,ms,delay [s],function,arguments,comment
+0,:,00,.,000,0.000,set_modes_and_filters,PRESETS[1],
+0,:,06,.,000,6.000,models['lead'].reparent_to,base.render,
+1,:,26,.,000,86.000,models['garden'].reparent_to,base.render,
+1,:,26,.,000,86.000,models['sign'].reparent_to,base.render,Ogródek
+1,:,02,.,100,62.100,print,3,

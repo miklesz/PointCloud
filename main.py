@@ -597,32 +597,16 @@ def init_display_sequence():
     r.removeNode()
     rope_look.removeNode()
 
-    # spectator.setPosHpr(0, 0, 0, 0, 0, 0)
-    # splash = RainbowSplash()
-    # interval = splash.setup()  # This will change the scene graph, in
-    # # particular reparent the cam!
-    # # interval is a Panda3D interval you can .start() it now
-    # interval.start()
-    # # splash.teardown()  # To de-litter your state.
-    # # exit()
-    # return
-
-    # rbc = RigidBodyCombiner("rbc")
-    # rigid = NodePath(rbc)
-    # rigid.reparentTo(base.render)
-
-    # Remove point cloud
-    # office_model.remove_node()
-    # print(office_model)
-
     # Read image
-    my_image = PNMImage(Filename("icons/icon-32.png"))
+    # my_image = PNMImage(Filename("icons/icon-32.png"))
+    my_image = PNMImage(Filename("models/lead_32x18.png"))
+    # my_image = PNMImage(Filename("models/lead_64x36.png"))
 
     # Initialise sequence
     zoom_sequence = Sequence()
     zoom_sequence.append(LerpPosHprInterval(
         nodePath=spectator,
-        pos=(-2, 2, .1),
+        pos=(0, 0, .1),
         # pos=(20, -8, .1),
         hpr=(90, 0, 0),
         duration=2,
@@ -631,14 +615,22 @@ def init_display_sequence():
 
     # Append particle effects
     display_particle_effects = []
+    print(my_image.getXSize(), my_image.getYSize())
+    tile_size = 1.920/my_image.getXSize()
     for x in range(my_image.getXSize()):
         for z in range(my_image.getYSize()):
-            min_x = x / my_image.getXSize() * 2 - 1
-            min_z = z / my_image.getYSize() * 2 - 1
-            max_x = (x+1) / my_image.getXSize() * 2 - 1
-            max_z = (z+1) / my_image.getYSize() * 2 - 1
+            # min_x = x / my_image.getXSize() * 2 - 1
+            # min_z = z / my_image.getYSize() * 2 - 1
+            # max_x = (x+1) / my_image.getXSize() * 2 - 1
+            # max_z = (z+1) / my_image.getYSize() * 2 - 1
+            min_x = (x-(my_image.getXSize()/2))*tile_size
+            min_z = -(z-(my_image.getYSize()/2))*tile_size
+            max_x = ((x+1)-(my_image.getXSize()/2))*tile_size
+            max_z = -((z+1)-(my_image.getYSize()/2))*tile_size
+            # print(min_x, min_z, max_x, max_z)
             xel_a = my_image.getXelA(x, z)
-            if xel_a[3] > .5:
+            # print(xel_a[3])
+            if xel_a[3] >= 0:
                 display_particle_effects.append(init_display_particle_effect(
                     current_modes_and_filters['render_mode_thickness'],
                     min_x,
@@ -1006,9 +998,6 @@ if VERBOSE:
 # if VERBOSE:
 #     print("Thread.isThreadingSupported:", Thread.isThreadingSupported())
 
-# Load music
-music = base.loader.loadSfx("music/Kramsta by Damage (beta3).ogg")
-
 # Set window
 fullscreen = False
 props = WindowProperties()
@@ -1065,7 +1054,7 @@ if DOWNLOAD:
 
 look_color = (1, .5, 1, 1)
 demo_parallel = Parallel()
-models_sequence = Sequence()
+# models_sequence = Sequence()
 roping_sequence = Sequence()
 with open('models/camera.csv') as file_object:
     csv_lines = file_object.readlines()
@@ -1075,10 +1064,10 @@ for csv_line in csv_lines[1+0:]:
     cols = csv_line.split(',')
     vertices.append((None, (float(cols[3]), float(cols[4]), float(cols[5]))))
     look_vertices.append({'point': (float(cols[6]), float(cols[7]), float(cols[8])), 'color': look_color})
-    if cols[9]:
-        models_sequence.append(Func(model_function, cols[9], int(cols[10])))
-    models_sequence.append(Wait(1))
-print(models_sequence)
+#     if cols[9]:
+#         models_sequence.append(Func(model_function, cols[9], int(cols[10])))
+#     models_sequence.append(Wait(1))
+# print(models_sequence)
 
 r = Rope()
 r.setup(4, vertices)
@@ -1104,7 +1093,7 @@ roping_sequence.append(LerpFunc(
     duration=len(vertices) * 1,
     # extraArgs=[points, looks],
 ))
-demo_parallel.append(models_sequence)
+# demo_parallel.append(models_sequence)
 demo_parallel.append(roping_sequence)
 
 # points = r.getPoints(5 * 120 * 100)
@@ -1155,13 +1144,14 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
+    'lead': {'name': 'lead_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     # 'party_all': {'name': 'party_all_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'party_3some': {'name': 'party_3some_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'pano': {'name': 'pano_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
     'signboard': {'name': 'signboard_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
 
-    'sign': {'name': 'sign_200k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
+    'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
     'garden_large': {'name': 'garden_large_1000k', 'pos_hpr': (18, -10.7, .5, 0, 0, 0)},
     'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
@@ -1207,6 +1197,7 @@ looks = rope_look.getPoints(len(vertices) * 120)
 # spectator.set_pos_hpr(18.5, 9.6, 2.8, 0, -90, 0)
 spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
 
+models['lead'].detachNode()
 models['party_3some'].detachNode()
 models['pano'].detachNode()
 models['villa_0'].detachNode()
@@ -1215,7 +1206,7 @@ models['signboard'].detachNode()
 # models['garden'].detachNode()
 # models['garden_large'].detachNode()
 # models['podium'].detachNode()
-models['entrance'].detachNode()
+# models['entrance'].detachNode()
 models['room_1'].detachNode()
 models['room_2'].detachNode()
 models['room_3'].detachNode()
@@ -1224,7 +1215,7 @@ models['hall_low'].detachNode()
 models['wc'].detachNode()
 models['stairs_low'].detachNode()
 models['stairs_hi'].detachNode()
-models['register'].detachNode()
+# models['register'].detachNode()
 models['compo'].detachNode()
 
 if VERBOSE:
@@ -1233,67 +1224,40 @@ if VERBOSE:
 
 base.enableParticles()
 
-# Play music
-while music.status() != AudioSound.PLAYING:
-    music.play()
-    # pass
-if VERBOSE:
-    print('Music time:', music.getTime())
-# print('volume', music.get_volume())  # 0.0)
-# print(1)
-# print(float(not 1))
-# exit()
+# Sound interval
+music = base.loader.loadSfx("music/Kramsta by Damage (beta3).ogg")  # Load music
+demo_parallel.append(SoundInterval(music))
 
-# Set later tasks
-# for range_time in range(16, 64, 1):
-#     time = range_time * period
-#     # print(time)
-#     base.taskMgr.doMethodLater(time, beat_start, 'beat')
+# Events
+# demo_parallel.append(Sequence(Wait(1),Func(models['room_1'].reparent_to(base.render))))
+# demo_parallel.append(Sequence(Wait(5),Func(models['room_1'].reparent_to,base.render)))
+# demo_parallel.append(Sequence(Wait(1),Func(eval("models['sign'].reparent_to"),eval("base.render"))))
+with open('models/events.csv') as file_object:
+    csv_lines = file_object.readlines()
+for csv_line in csv_lines[1:]:
+    cols = csv_line.split(',')
+    print(cols[5], cols[6], cols[7])
+    demo_parallel.append(Sequence(Wait(float(cols[5])),Func(eval(cols[6]),eval(cols[7]))))
+
+#     if cols[9]:
+#         models_sequence.append(Func(model_function, cols[9], int(cols[10])))
+#     models_sequence.append(Wait(1))
+# print(models_sequence)
+
+
+
 
 # Set max delta
 max_delta = 0
 
-# Create a bar
-# bar = DirectWaitBar(value=0, pos=(0, 0, 0))
-
-# bk_text = "This is my Demo"
-# textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
-#                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
-#                           mayChange=1)
-# from time import sleep
-# sleep(5)
-# exit()
-
 # Add and start main task
-if VERBOSE:
-    print('Adding main task')
-    print('Music time:', music.getTime())
 # base.taskMgr.add(init_task, "init_task")
 base.taskMgr.add(main_task, "main_task")
-
-
-# Start sequence
-# sequence.start()
-if VERBOSE:
-    print('Starting sequence')
-    print('Music time:', music.getTime())
 
 # On screen text object
 text_object = OnscreenText()
 
 # Accept events
 accept()
-
-# Run demo
-if VERBOSE:
-    print('Running demo')
-    print('Music time:', music.getTime())
-
-
-# init_interval = Func(init_function)
-# init_interval.start()
-
-# model_dict['bar']['model'].setRenderModeThickness(10)
-# base.render.setRenderModeThickness(10)
 
 base.run()

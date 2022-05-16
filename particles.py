@@ -65,7 +65,7 @@ def init_cube_particle_effect(point_size, x, y, z, xel_a, duration=8):
 
 def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     litter_size = 1  # 250  # 10  # 20
-    grow_time = 4  # Default: 8
+    grow_time = 4  # Default: 8, moje 4:
     life_span = 16  # Default: 8
     particle_effect = ParticleEffect()
     particles = Particles('display')
@@ -74,7 +74,7 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(point_size)
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(litter_size*11*grow_time)
+    particles.setPoolSize(litter_size*11*grow_time)  # 11
     particles.setBirthRate(1/60)
     particles.setLitterSize(litter_size)
     # Factory parameters
@@ -90,8 +90,8 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((-4.0, min_x+2, min_z))
-    particles.emitter.set_max_bound((-4.0, max_x+2, max_z))
+    particles.emitter.set_min_bound((-1.0, min_x, min_z))
+    particles.emitter.set_max_bound((-1.0, max_x, max_z))
     particle_effect.add_particles(particles)
 
     # Force

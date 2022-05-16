@@ -8,7 +8,7 @@ from panda3d.core import *
 
 # Constants
 # K_VERTICES = 2000
-K_VERTICES = 200
+K_VERTICES = 1000
 # NAME = 'stairs_low'
 NAME = 'sign'
 RTAB = False
