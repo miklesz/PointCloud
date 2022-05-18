@@ -10,8 +10,11 @@ from panda3d.core import *
 # K_VERTICES = 2000
 K_VERTICES = 1000
 # NAME = 'stairs_low'
-NAME = 'lead'
+# NAME = 'lead'
 # NAME = 'villa_0'
+NAME = 'villa_1'
+# NAME = 'villa_garden'
+# NAME = 'villa_street'
 # NAME = 'pano'
 # NAME = 'party_all'
 # NAME = 'party_3some'
@@ -97,8 +100,10 @@ def create_points():
         im_y = rand.randomInt(y_size)
         # print(im_x, im_y)
         xel_a = my_image.getXelA(im_x, im_y)
+        # print(xel_a)
         pos_writer.addData3(im_x/1000-1.920/2, 0, -im_y/1000+1.080/2)
-        color_writer.addData4(xel_a[0], xel_a[1], xel_a[2], xel_a[3])
+        # color_writer.addData4(xel_a[0], xel_a[1], xel_a[2], xel_a[3])
+        color_writer.addData4(xel_a[0], xel_a[1], xel_a[2], 1)
         index_writer.addData1i(vertex)
 
 

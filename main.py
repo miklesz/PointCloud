@@ -1,5 +1,6 @@
 # Standard library imports
 from math import *
+import pathlib  # Testing!
 import platform
 # noinspection PyUnresolvedReferences
 import queue
@@ -16,6 +17,7 @@ from direct.showbase.ShowBase import ShowBase
 from direct.showutil.Rope import Rope
 from direct.task import Task
 from panda3d.core import *
+# from direct.stdpy.file import *
 
 # Local application/library specific imports
 from particles import *
@@ -257,6 +259,7 @@ def accept():
     base.accept('t', accept_trainspotting)
     base.accept('h', accept_handshaking)
     base.accept('r', accept_roping)
+    base.accept('space', accept_roping)
     base.accept('c', accept_cubes)
     base.accept('arrow_left', accept_yaw, [+2])
     base.accept('arrow_right', accept_yaw, [-2])
@@ -279,6 +282,7 @@ def main_task(task):
 Yo FuCkErS!
 time: {str(round(music.get_time(), 2))}
 escape: sys.exit
+space: start/stop demo
 
 # Setting Color Scales
 a: avatarize (now: {COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][0]})
@@ -316,7 +320,6 @@ U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 # Motion
 m: set random position (once)
 o: set random position (now: {pos_intervals})
-r: roping (once)
 <-/-> yaw
 
 # Effects
@@ -488,7 +491,18 @@ def accept_roping():
     global demo_parallel
     r.removeNode()
     rope_look.removeNode()
-    demo_parallel.start()
+    # if demo_parallel.isStopped():
+    #     demo_parallel.start()
+    #     print('demo_parallel.start()')
+    #     print(f'demo_parallel.getDuration() = {demo_parallel.getDuration()}')
+    if demo_parallel.isPlaying():
+        demo_parallel.pause()
+        print('demo_parallel.pause()')
+    else:
+        demo_parallel.resume()
+        print('demo_parallel.resume()')
+    # demo_parallel.setT(100)
+    # interval.getDuration()
 
 
 def accept_water():
@@ -564,7 +578,7 @@ def soft_stop_display(display_particle_effect):
 
 
 def force_display(display_particle_effect):
-    display_particle_effect.removeAllForces()
+    # display_particle_effect.removeAllForces()
     display_particle_effect.soft_stop()
     force_group = ForceGroup('zoom')
     a = Randomizer().randomRealUnit()*.1
@@ -596,70 +610,17 @@ def fov_function(t):
 def init_display_sequence():
     r.removeNode()
     rope_look.removeNode()
+    # print("Filename:", Filename("models/lead_32x18.png"))
+    # my_new_image = PNMImage(Filename("models/lead_32x18.png"))  # Read image
+    # print('my_new_image:', my_new_image)
+    #
+    # my_new_object = base.loader.loadModel('models/lead_1000k.bam')
+    # print('my_new_object:', my_new_object)
 
-    # Read image
-    # my_image = PNMImage(Filename("icons/icon-32.png"))
-    my_image = PNMImage(Filename("models/lead_32x18.png"))
-    # my_image = PNMImage(Filename("models/lead_64x36.png"))
-
-    # Initialise sequence
-    zoom_sequence = Sequence()
-    zoom_sequence.append(LerpPosHprInterval(
-        nodePath=spectator,
-        pos=(0, 0, .1),
-        # pos=(20, -8, .1),
-        hpr=(90, 0, 0),
-        duration=2,
-        blendType='easeInOut',
-    ))
-
-    # Append particle effects
-    display_particle_effects = []
-    print(my_image.getXSize(), my_image.getYSize())
-    tile_size = 1.920/my_image.getXSize()
-    for x in range(my_image.getXSize()):
-        for z in range(my_image.getYSize()):
-            # min_x = x / my_image.getXSize() * 2 - 1
-            # min_z = z / my_image.getYSize() * 2 - 1
-            # max_x = (x+1) / my_image.getXSize() * 2 - 1
-            # max_z = (z+1) / my_image.getYSize() * 2 - 1
-            min_x = (x-(my_image.getXSize()/2))*tile_size
-            min_z = -(z-(my_image.getYSize()/2))*tile_size
-            max_x = ((x+1)-(my_image.getXSize()/2))*tile_size
-            max_z = -((z+1)-(my_image.getYSize()/2))*tile_size
-            # print(min_x, min_z, max_x, max_z)
-            xel_a = my_image.getXelA(x, z)
-            # print(xel_a[3])
-            if xel_a[3] >= 0:
-                display_particle_effects.append(init_display_particle_effect(
-                    current_modes_and_filters['render_mode_thickness'],
-                    min_x,
-                    min_z,
-                    max_x,
-                    max_z,
-                    xel_a
-                ))
-    print('len(display_particle_effects):', len(display_particle_effects))
-    # quit()
-
-    # Append functions
-    for display_particle_effect in display_particle_effects:
-        zoom_sequence.append(Func(start_display, display_particle_effect))
-
-    # Append wait
-    zoom_sequence.append(Wait(4))
-
-    # Append particle outs
-    for display_particle_effect in display_particle_effects:
-        zoom_sequence.append(Func(force_display, display_particle_effect))
-        # print(display_particle_effect.getParticlesDict())
-
-    # Start sequence
-    zoom_sequence.start()
-    # rbc.collect()
-
-    # time.sleep(5)
-    # base.render.ls()
+    # fn = Filename("models/lead_32x18.png")
+    # fn.makeAbsolute()
+    # print(fn)
+    display_sequence.start()
 
 
 def dissolve(t, cube_object):
@@ -949,28 +910,29 @@ def init_function():
 
 
 # def init_task(task):
-#     # Add some text
-#     # bk_text = "This is my Demo"
-#     # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
-#     #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
-#     #                           mayChange=1)
-#     # from time import sleep
-#     # sleep(1)
-#
-#     print('pre interval start')
-#     init_interval = Func(init_function)
-#     init_sequence = Sequence()
-#     init_sequence.append(Wait(2/60))
-#     # init_sequence.append(Wait(5))
-#     init_sequence.append(init_interval)
-#     init_sequence.append(Wait(20))
-#     init_sequence.append(init_interval)
-#     # init_sequence.append(init_interval)
-#     init_sequence.start()
-#     init_function()
-#     print('post interval start')
-#
-#     # textObject.setText(bk_text)
+# #     # Add some text
+# #     # bk_text = "This is my Demo"
+# #     # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
+# #     #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
+# #     #                           mayChange=1)
+# #     # from time import sleep
+# #     # sleep(1)
+# #
+# #     print('pre interval start')
+# #     init_interval = Func(init_function)
+# #     init_sequence = Sequence()
+# #     init_sequence.append(Wait(2/60))
+# #     # init_sequence.append(Wait(5))
+# #     init_sequence.append(init_interval)
+# #     init_sequence.append(Wait(20))
+# #     init_sequence.append(init_interval)
+# #     # init_sequence.append(init_interval)
+# #     init_sequence.start()
+# #     init_function()
+# #     print('post interval start')
+# #
+# #     # textObject.setText(bk_text)
+# #
 #
 #     return Task.done
 
@@ -1042,21 +1004,28 @@ base.camera.reparent_to(spectator)
 # spectator.set_pos_hpr(0, 0, 0, -110, 0, 0)
 # spectator.set_pos_hpr(0, -.8, 0, 0, 0, 0)
 
+path = sys.path[0]
+if path.endswith('Contents/MacOS/../Frameworks'):
+    path = str(pathlib.Path().absolute())
+print('path:', path)
+
 if DOWNLOAD:
     # noinspection PyUnresolvedReferences
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    url = 'http'+'://events.leszcz.uk'
-    r = requests.get(url, allow_redirects=True, verify=False)
-    open('models/events.csv', 'wb').write(r.content)
+
     url = 'http'+'://camera.leszcz.uk'
     r = requests.get(url, allow_redirects=True, verify=False)
-    open('models/camera.csv', 'wb').write(r.content)
+    open(path+'/models/camera.csv', 'wb').write(r.content)
+
+    url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
+    r = requests.get(url, allow_redirects=True, verify=False)
+    open(path+'/models/events.tsv', 'wb').write(r.content)
 
 look_color = (1, .5, 1, 1)
 demo_parallel = Parallel()
 # models_sequence = Sequence()
 roping_sequence = Sequence()
-with open('models/camera.csv') as file_object:
+with open(path+'/models/camera.csv') as file_object:
     csv_lines = file_object.readlines()
 vertices = []
 look_vertices = []
@@ -1144,12 +1113,14 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
-    'lead': {'name': 'lead_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
-    # 'party_all': {'name': 'party_all_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
-    'party_3some': {'name': 'party_3some_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
-    'pano': {'name': 'pano_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
-    'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
-    'signboard': {'name': 'signboard_1000k', 'pos_hpr': (17.7, 9.6, 2.8, 90, 0, 0)},
+    'lead': {'name': 'lead_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'party_3some': {'name': 'party_3some_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'pano': {'name': 'pano_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'villa_1': {'name': 'villa_1_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'villa_garden': {'name': 'villa_garden_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'villa_street': {'name': 'villa_street_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'signboard': {'name': 'signboard_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
 
     'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
@@ -1190,33 +1161,36 @@ for preset in PRESETS[::-1]:
 
 points = r.getPoints(len(vertices) * 120)
 looks = rope_look.getPoints(len(vertices) * 120)
-# spectator.set_pos(points[0])
-# spectator.lookAt(looks[0])
+spectator.set_pos(points[0])
+spectator.lookAt(looks[0])
 # spectator.set_pos_hpr(0, 0, 6, -90, -90, 0)
 # spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
 # spectator.set_pos_hpr(18.5, 9.6, 2.8, 0, -90, 0)
-spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
+# spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
 
-models['lead'].detachNode()
-models['party_3some'].detachNode()
-models['pano'].detachNode()
-models['villa_0'].detachNode()
-models['signboard'].detachNode()
+for key in models.keys():
+    models[key].detachNode()
+
+# models['lead'].detachNode()
+# models['party_3some'].detachNode()
+# models['pano'].detachNode()
+# models['villa_0'].detachNode()
+# models['signboard'].detachNode()
 # models['sign'].detachNode()
 # models['garden'].detachNode()
 # models['garden_large'].detachNode()
 # models['podium'].detachNode()
 # models['entrance'].detachNode()
-models['room_1'].detachNode()
-models['room_2'].detachNode()
-models['room_3'].detachNode()
-models['bar'].detachNode()
-models['hall_low'].detachNode()
-models['wc'].detachNode()
-models['stairs_low'].detachNode()
-models['stairs_hi'].detachNode()
+# models['room_1'].detachNode()
+# models['room_2'].detachNode()
+# models['room_3'].detachNode()
+# models['bar'].detachNode()
+# models['hall_low'].detachNode()
+# models['wc'].detachNode()
+# models['stairs_low'].detachNode()
+# models['stairs_hi'].detachNode()
 # models['register'].detachNode()
-models['compo'].detachNode()
+# models['compo'].detachNode()
 
 if VERBOSE:
     base.render.ls()
@@ -1224,28 +1198,79 @@ if VERBOSE:
 
 base.enableParticles()
 
+# Init display_sequence
+my_image_path = 'models/lead_32x18.png'
+if path.startswith('/'):
+    my_image_path = path+'/'+my_image_path
+print('my_image_path:', my_image_path)
+my_image = PNMImage(my_image_path)  # Read image (opt: 64x36)
+
+# my_image_path = path+'/models/lead_32x18.png'
+# if my_image_path[1:].startswith(':\\'):
+#     print("Replacing Windows path!")
+#     # my_image_path = my_image_path.replace('/', '\\')
+#     my_image_path = my_image_path.replace('/', '\\')
+#
+# my_image = PNMImage(my_image_path)  # Read image (opt: 64x36)
+
+# my_pnm_image = PNMImage('models/lead_32x18.png')
+
+# my_image = base.loader.loadTexture('models/lead_32x18.png')
+# print(my_image, type(my_image))
+#
+# my_pnm_image=PNMImage()
+# tex=my_image.getTexture()
+# tex.store(my_pnm_image)
+# print(my_pnm_image, type(my_pnm_image))
+
+# exit()
+
+display_sequence = Sequence()  # Initialise sequence
+display_particle_effects = []  # Append particle effects
+tile_size = 1.920 / my_image.getXSize()
+for x in range(my_image.getXSize()):
+    for z in range(my_image.getYSize()):
+        min_x = (x - (my_image.getXSize() / 2)) * tile_size
+        min_z = -(z - (my_image.getYSize() / 2)) * tile_size
+        max_x = ((x + 1) - (my_image.getXSize() / 2)) * tile_size
+        max_z = -((z + 1) - (my_image.getYSize() / 2)) * tile_size
+        xel_a = my_image.getXelA(x, z)
+        if xel_a[3] >= 0:
+            display_particle_effects.append(init_display_particle_effect(
+                # current_modes_and_filters['render_mode_thickness'],
+                PRESETS[1]['render_mode_thickness'],
+                min_x,
+                min_z,
+                max_x,
+                max_z,
+                xel_a
+            ))
+print('len(display_particle_effects):', len(display_particle_effects))
+for display_particle_effect in display_particle_effects:  # Append functions
+    display_sequence.append(Func(start_display, display_particle_effect))
+display_sequence.append(Wait(5))  # Append wait
+for display_particle_effect in display_particle_effects:  # Append particle outs
+    display_sequence.append(Func(force_display, display_particle_effect))
+
 # Sound interval
 music = base.loader.loadSfx("music/Kramsta by Damage (beta3).ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 # Events
-# demo_parallel.append(Sequence(Wait(1),Func(models['room_1'].reparent_to(base.render))))
-# demo_parallel.append(Sequence(Wait(5),Func(models['room_1'].reparent_to,base.render)))
-# demo_parallel.append(Sequence(Wait(1),Func(eval("models['sign'].reparent_to"),eval("base.render"))))
-with open('models/events.csv') as file_object:
+with open(path+'/models/events.tsv') as file_object:
     csv_lines = file_object.readlines()
 for csv_line in csv_lines[1:]:
-    cols = csv_line.split(',')
-    print(cols[5], cols[6], cols[7])
-    demo_parallel.append(Sequence(Wait(float(cols[5])),Func(eval(cols[6]),eval(cols[7]))))
+    cols = csv_line.split('\t')
+    print(f'{cols[5]}\t{cols[6]}\t\t\t\t{cols[7][:-1]}')
+    demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), {cols[6]})'))
 
-#     if cols[9]:
-#         models_sequence.append(Func(model_function, cols[9], int(cols[10])))
-#     models_sequence.append(Wait(1))
-# print(models_sequence)
-
-
-
+# models['villa_0'].setTransparency(1)
+# models['villa_0'].setAlphaScale(.8)
+models['lead'].setTransparency(TransparencyAttrib.M_alpha)
+# models['lead'].setTransparency(6)
+# models['lead'].setColorScale(1, 1, 1, .5)
+# models['lead'].setColor(1, 1, 1, .5)
+# demo_parallel.append(Sequence(Wait(9), LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1))))
 
 # Set max delta
 max_delta = 0

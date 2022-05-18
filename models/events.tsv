@@ -1,0 +1,20 @@
+min	:	s	.	cs	delay [s]	interval(s)	comment
+0	:	00	.	00	0.00	Func(set_modes_and_filters, PRESETS[1])	Ustawiamy preset
+0	:	00	.	21	0.21	Func(print, 'pierwsze pojawienie sie czegos')	pierwsze pojawienie sie czegos
+0	:	01	.	38	1.38	Func(print, 'pierwszy pik')	pierwszy pik
+0	:	02	.	64	2.64	Func(print, 'drugi pik')	drugi pik
+0	:	04	.	00	4.00	Func(print, 'trzeci pik')	trzeci pik
+0	:	05	.	26	5.26	Func(print, 'czwarty pik')	czwarty pik
+0	:	06	.	16	6.16	Func(models['lead'].reparent_to, base.render)	plansza Kroniki filmowej
+0	:	10	.	66	10.66	Parallel(display_sequence, LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1)))	poczatek przejscia w Chiptune
+0	:	15	.	66	15.66	Func(models['lead'].removeNode)	koniec przejscia
+0	:	25	.	12	25.12	Func(models['villa_0'].reparent_to, base.render)	Willa Kramstow
+0	:	26	.	56	26.56	Parallel(Func(models['villa_0'].removeNode), Func(models['villa_garden'].reparent_to, base.render))	willa z ogrodem
+0	:	29	.	56	29.56	Parallel(Func(models['villa_garden'].removeNode), Func(models['pano'].reparent_to, base.render))	XIX wiek
+0	:	31	.	73	31.73	Parallel(Func(models['pano'].removeNode), Func(models['villa_street'].reparent_to, base.render))	Katowic
+0	:	33	.	11	33.11	Parallel(Func(models['villa_street'].removeNode), Func(models['villa_1'].reparent_to, base.render))	ul.Warszawskiej 37
+0	:	40	.	56	40.56	Func(models['villa_1'].removeNode)	pierwszy szum - poczatek
+0	:	41	.	35	41.35	Func(print, 'pierwszy szum - koniec')	pierwszy szum - koniec
+2	:	26	.	00	146.00	Func(models['garden'].reparent_to, base.render)	
+2	:	26	.	00	146.00	Func(models['sign'].reparent_to, base.render)	Ogrodek
+2	:	02	.	10	122.10	Func(print, 3)	
