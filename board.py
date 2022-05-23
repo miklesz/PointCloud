@@ -8,11 +8,17 @@ from panda3d.core import *
 
 # Constants
 # K_VERTICES = 2000
-K_VERTICES = 1000
+# K_VERTICES = 1000
+K_VERTICES = 200
 # NAME = 'stairs_low'
 # NAME = 'lead'
 # NAME = 'villa_0'
-NAME = 'villa_1'
+# NAME = 'villa_1'
+# NAME = 'nox'
+# NAME = 'xenium'
+# NAME = 'river'
+NAME = 'protracker'
+# NAME = 'alco'
 # NAME = 'villa_garden'
 # NAME = 'villa_street'
 # NAME = 'pano'
@@ -164,13 +170,14 @@ def create_points():
 
 # model = base.loader.loadModel(f 'models/bar.bam')
 model = base.render.attach_new_node(create_points())
-model.setRenderModeThickness(4)
+model.setRenderModeThickness(10)
 model.reparentTo(base.render)
 
 # base.cam.setPosHpr(0, -2, 0, 0, 0, 0)
 # base.cam.setPosHpr(0, -3, 0, 0, 0, 0)
 # base.cam.setPosHpr(0, 0, 20, 0, -90, 0)
 # base.cam.setPosHpr(1.5, .5, .3, 90, 0, 0)
+base.camLens.setNear(.1)
 # base.run()
 
 model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')

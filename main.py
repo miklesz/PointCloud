@@ -17,7 +17,6 @@ from direct.showbase.ShowBase import ShowBase
 from direct.showutil.Rope import Rope
 from direct.task import Task
 from panda3d.core import *
-# from direct.stdpy.file import *
 
 # Local application/library specific imports
 from particles import *
@@ -269,6 +268,10 @@ def accept():
     base.accept('arrow_down', accept_pitch, [-2])
     base.accept('arrow_up-repeat', accept_pitch, [+2])
     base.accept('arrow_down-repeat', accept_pitch, [-2])
+    base.accept('lshift', accept_shift, [-5])
+    base.accept('rshift', accept_shift, [+5])
+    base.accept('e', accept_effect)
+    base.accept('j', demo_parallel.setT, [84])
 
 
 def main_task(task):
@@ -282,16 +285,8 @@ def main_task(task):
 Yo FuCkErS!
 time: {str(round(music.get_time(), 2))}
 escape: sys.exit
-space: start/stop demo
-
-# Setting Color Scales
-a: avatarize (now: {COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][0]})
-
-# Setting Volume
-v: toggle volume (now: {music.get_volume()})
-
-# Window Properties
-f: toggle full-screen (now: {fullscreen})
+space: start/stop demo (lshift/rshift to skip)
+j: jump to time
 
 # Render Modes
 p: toggle render mode perspective (now: {current_modes_and_filters['render_mode_perspective']})
@@ -333,6 +328,11 @@ i: display (once)
 g: glowworms/fireflies (once)
 h: handshaking (once)
 c: cubes (once)
+
+# Misc
+a: avatarize - setting color scale (now: {COLOR_SCALES[current_modes_and_filters['color_scale'] % len(COLOR_SCALES)][0]})
+v: toggle (set) volume (now: {music.get_volume()})
+f: toggle full-screen - window properties (now: {fullscreen})
 '''
     if 'text_object' in globals():
         text_object.destroy()
@@ -491,19 +491,33 @@ def accept_roping():
     global demo_parallel
     r.removeNode()
     rope_look.removeNode()
+    np.removeNode()
+    for tn in text_nodes:
+        tn.removeNode()
+    if demo_parallel.getT() == 0:
+        for key in models.keys():
+            models[key].detachNode()
+        # demo_parallel.setT(83)
     # if demo_parallel.isStopped():
     #     demo_parallel.start()
     #     print('demo_parallel.start()')
     #     print(f'demo_parallel.getDuration() = {demo_parallel.getDuration()}')
+    # print(demo_parallel.getT())
     if demo_parallel.isPlaying():
         demo_parallel.pause()
         print('demo_parallel.pause()')
     else:
         demo_parallel.resume()
         print('demo_parallel.resume()')
-    # demo_parallel.setT(100)
     # interval.getDuration()
 
+
+# noinspection PyArgumentList
+def accept_shift(time):
+    # global demo_parallel
+    demo_parallel.setT(demo_parallel.getT()+time)
+    # demo_parallel.set_t(time)
+    # pass
 
 def accept_water():
     r.removeNode()
@@ -909,6 +923,34 @@ def init_function():
     pass
 
 
+def lens_function(t):
+    base.camLens.setFov(t)
+
+
+def accept_effect():
+    print('accept_effect()')
+    r.removeNode()
+    rope_look.removeNode()
+    np.removeNode()
+    for tn in text_nodes:
+        tn.removeNode()
+    models['sign'].reparent_to(base.render)
+    models['garden'].reparent_to(base.render)
+    print(models['sign'].getTightBounds())
+    print(models['garden'].getTightBounds())
+    spectator.set_pos_hpr(17.9, 10, 3.15, 90, 0, 0)
+    interval = ParticleInterval(
+        particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
+        parent=base.render,
+        worldRelative=True,
+        duration=13,
+        softStopT=12.5,
+        cleanup=True
+    )
+    # interval = LerpScaleInterval(spectator, 2, 1, 10, blendType='easeOut')
+    # interval = LerpFunc(lens_function, 2, 1, 90, blendType='easeOut')
+    interval.start()
+
 # def init_task(task):
 # #     # Add some text
 # #     # bk_text = "This is my Demo"
@@ -975,6 +1017,7 @@ base.setBackgroundColor(0, 0, 0)
 base.set_frame_rate_meter(True)
 
 # Set camera lens field of view
+# base.camLens.setFov(150)
 # base.camLens.setFov(115)
 base.camLens.setFov(90)
 # base.camLens.fov = 100
@@ -1029,14 +1072,30 @@ with open(path+'/models/camera.csv') as file_object:
     csv_lines = file_object.readlines()
 vertices = []
 look_vertices = []
+lines = LineSegs()
+lines.setColor(1, 0, 1)
+text_nodes = []
 for csv_line in csv_lines[1+0:]:
     cols = csv_line.split(',')
+    text = TextNode(cols[2])
+    text.setText(cols[2])
+    text_nodes.append(base.render.attachNewNode(text))
+    text_nodes[-1].setP(-90)
+    text_nodes[-1].setPos(float(cols[3]), float(cols[4]), float(cols[5]))
+    text_nodes[-1].setScale(.5)
+    text_nodes[-1].reparentTo(base.render)
     vertices.append((None, (float(cols[3]), float(cols[4]), float(cols[5]))))
     look_vertices.append({'point': (float(cols[6]), float(cols[7]), float(cols[8])), 'color': look_color})
+    lines.moveTo(float(cols[3]),float(cols[4]), float(cols[5]))
+    lines.drawTo(float(cols[6]),float(cols[7]), float(cols[8]))
 #     if cols[9]:
 #         models_sequence.append(Func(model_function, cols[9], int(cols[10])))
 #     models_sequence.append(Wait(1))
 # print(models_sequence)
+# lines.setThickness(4)
+node = lines.create()
+np = NodePath(node)
+np.reparentTo(base.render)
 
 r = Rope()
 r.setup(4, vertices)
@@ -1052,7 +1111,7 @@ rope_look.ropeNode.setUseVertexColor(1)
 rope_look.ropeNode.setThickness(2)
 rope_look.ropeNode.setNumSubdiv(1 * 120)
 rope_look.setPos(0, 0, 0)
-rope_look.reparentTo(base.render)
+# rope_look.reparentTo(base.render)
 rope_look.recompute()
 
 roping_sequence.append(LerpFunc(
@@ -1114,13 +1173,17 @@ pos_intervals = False
 # Load models and make point-clouds
 model_dict = {
     'lead': {'name': 'lead_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'party_3some': {'name': 'party_3some_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'pano': {'name': 'pano_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'alco': {'name': 'alco_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'pano': {'name': 'pano_200k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
     'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
     'villa_1': {'name': 'villa_1_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
     'villa_garden': {'name': 'villa_garden_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
     'villa_street': {'name': 'villa_street_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'nox': {'name': 'nox_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'xenium': {'name': 'xenium_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'river': {'name': 'river_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
     'signboard': {'name': 'signboard_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'protracker': {'name': 'protracker_200k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
 
     'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
@@ -1158,39 +1221,21 @@ for preset in PRESETS[::-1]:
     # pass
 # print("DONE!")
 
-
-points = r.getPoints(len(vertices) * 120)
-looks = rope_look.getPoints(len(vertices) * 120)
-spectator.set_pos(points[0])
-spectator.lookAt(looks[0])
-# spectator.set_pos_hpr(0, 0, 6, -90, -90, 0)
-# spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
-# spectator.set_pos_hpr(18.5, 9.6, 2.8, 0, -90, 0)
-# spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
-
 for key in models.keys():
     models[key].detachNode()
 
-# models['lead'].detachNode()
-# models['party_3some'].detachNode()
-# models['pano'].detachNode()
-# models['villa_0'].detachNode()
-# models['signboard'].detachNode()
-# models['sign'].detachNode()
-# models['garden'].detachNode()
-# models['garden_large'].detachNode()
-# models['podium'].detachNode()
-# models['entrance'].detachNode()
-# models['room_1'].detachNode()
-# models['room_2'].detachNode()
-# models['room_3'].detachNode()
-# models['bar'].detachNode()
-# models['hall_low'].detachNode()
-# models['wc'].detachNode()
-# models['stairs_low'].detachNode()
-# models['stairs_hi'].detachNode()
-# models['register'].detachNode()
-# models['compo'].detachNode()
+points = r.getPoints(len(vertices) * 120)
+looks = rope_look.getPoints(len(vertices) * 120)
+# spectator.set_pos(points[0])
+# spectator.lookAt(looks[0])
+spectator.set_pos_hpr(0, 0, 20, 0, -90, 0)
+# spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
+# spectator.set_pos_hpr(18.5, 9.6, 2.8, 0, -90, 0)
+# spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
+models['sign'].reparent_to(base.render)
+models['garden'].reparent_to(base.render)
+
+# print()
 
 if VERBOSE:
     base.render.ls()
@@ -1256,13 +1301,27 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
 music = base.loader.loadSfx("music/Kramsta by Damage (beta3).ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
+rain_interval = ParticleInterval(
+    particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
+    parent=base.render,
+    worldRelative=True,
+    duration=13,
+    softStopT=11.8,
+    cleanup=True
+)
+
 # Events
 with open(path+'/models/events.tsv') as file_object:
+    # a = file_object.read()
+    # print(a[3800:3900])
+    # exit()
     csv_lines = file_object.readlines()
 for csv_line in csv_lines[1:]:
     cols = csv_line.split('\t')
-    print(f'{cols[5]}\t{cols[6]}\t\t\t\t{cols[7][:-1]}')
-    demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), {cols[6]})'))
+    # print(f'{cols[5]}\t{cols[6]}\t\t\t\t{cols[7][:]}')
+    print(csv_line[:-1])
+    demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), Func(print, "{csv_line[:-1]}"), {cols[6]})'))
+
 
 # models['villa_0'].setTransparency(1)
 # models['villa_0'].setAlphaScale(.8)

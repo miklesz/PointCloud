@@ -96,6 +96,7 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
 
     # Force
     force_group = ForceGroup('zoom_random')
+    force_group = ForceGroup('zoom_random')
     # Force parameters
     force_group.addForce(LinearJitterForce(.02, 0))
     particle_effect.add_force_group(force_group)
@@ -270,8 +271,8 @@ def init_steam_particle_effect(point_size):
 
 
 def init_water_particle_effect(point_size):
-    litter_size = 300
-    life_span = 0.5000  # 0.5000
+    litter_size = 900  # 300 przy 4.5x2.5, 66.67/m2
+    life_span = 1.3  # 0.5000
     particle_effect = ParticleEffect()
     particles = Particles('water')
     # Particles parameters
@@ -279,8 +280,9 @@ def init_water_particle_effect(point_size):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(point_size)
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(10000)  # litter_size*60*life_span
-    particles.setBirthRate(0.0200)  # 1/60
+    #
+    particles.setPoolSize(round(litter_size*60*life_span))  # litter_size*60*life_span, 10000 przy 4.5x4.5, 2222.22/m2
+    particles.setBirthRate(1/60)  # 1/60, 0.0200
     particles.setLitterSize(litter_size)
     particles.setLitterSpread(100)
     particles.setSystemLifespan(0.0000)
@@ -314,12 +316,15 @@ def init_water_particle_effect(point_size):
 
     particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((2.5, 1.5, 1.61991))
-    particles.emitter.set_max_bound((7, 6, 1.61991))
+    # particles.emitter.set_min_bound((2.5, 1.5, 1.61991))
+    # particles.emitter.set_max_bound((7, 6, 1.61991))
+    particles.emitter.set_min_bound((13.2427, -8.1999, 13))
+    particles.emitter.set_max_bound((26.8064, 13.069, 13))
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('gravity')
     force0 = LinearVectorForce(LVector3(0.0000, 0.0000, -1.0000), 25.0000, 1)
+    # force0 = LinearVectorForce(LVector3(0.0000, 0.0000, -0.0000), 25.0000, 1)
     force0.setActive(1)
     force_group.addForce(force0)
     force1 = LinearJitterForce(3.0000, 1)
