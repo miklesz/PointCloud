@@ -8,6 +8,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	06	.	16	6.16	Func(models['lead'].reparent_to, base.render)	plansza Kroniki filmowej		
 0	:	10	.	66	10.66	Parallel(display_sequence, LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1)))	poczatek przejscia w Chiptune		
 0	:	15	.	66	15.66	Func(models['lead'].detachNode)	koniec przejscia		
+0	:	25	.	02	25.02	Func(display_cleanup)	czyszczenie particles		
 0	:	25	.	12	25.12	Func(models['villa_0'].reparent_to, base.render)	Willa Kramstow	The von Kramsta family villa	The von Kramsta family villa
 0	:	26	.	56	26.56	Parallel(Func(models['villa_0'].detachNode), Func(models['villa_garden'].reparent_to, base.render))	willa z ogrodem	a villa with a garden	a villa with a garden
 0	:	29	.	56	29.56	Parallel(Func(models['villa_garden'].detachNode), Func(models['pano'].reparent_to, base.render))	XIX wiek	built in the third quarter of the 19th century	built in the third quarter of the 19th century
@@ -49,7 +50,10 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	84	.	00	84.00	Parallel(Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, 1, 90, blendType='easeOut'))	efekt przejscia w demo		
 1	:	26	.	00	86.00	Func(models['garden'].reparent_to, base.render)	kramsta by damage		
 1	:	29	.	00	89.00	rain_interval	Ogrodek+deszcz		
-1	:	42	.	00	102.00		swietliki		
+1	:	33	.	50	93.50	Func(models['sign'].detachNode)	Wywalenie obiektu sign		
+1	:	40	.	50	100.50	Func(models['garden_large'].reparent_to, base.render)	wstawienie obiektu garden_large		
+1	:	42	.	00	102.00	glow_interval	swietliki		
+1	:	42	.	50	102.50	Func(models['garden'].detachNode)	wywalenie obiektu garden		
 1	:	58	.	00	118.00		lot po wlocie do srodka az do baru		
 2	:	30	.	00	150.00		bar+korytarz przed kiblem (pierwsza petla przy barze)		
 2	:	46	.	00	166.00		jakas akcja w barze (trainspotting)		

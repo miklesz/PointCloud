@@ -105,8 +105,8 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
 
 
 def init_glow_particle_effect(point_size):
-    litter_size = 2
-    life_span = 0.7  # 0.7000
+    litter_size = 75  # 2
+    life_span = 1  # 0.7000
     particle_effect = ParticleEffect()
     particles = Particles('water')
     # Particles parameters
@@ -114,7 +114,7 @@ def init_glow_particle_effect(point_size):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(point_size)
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(2000)  # litter_size*60*life_span
+    particles.setPoolSize(litter_size*60*life_span)  # litter_size*60*life_span, 2000
     particles.setBirthRate(1/60)  # 1/60
     particles.setLitterSize(litter_size)
     # particles.setLitterSpread(1)
@@ -149,16 +149,22 @@ def init_glow_particle_effect(point_size):
     particles.emitter.setExplicitLaunchVector(LVector3(0.0000, 0.0000, 0.0000))
 
     particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
+
     # Box parameters
-    particles.emitter.set_min_bound((2.5, 1.5, -1.5195))
-    particles.emitter.set_max_bound((7, 6, 1.61991))
+    # 63.573052499999996 m3 - 2 punkty na klatkę
+    # particles.emitter.set_min_bound((2.5, 1.5, -1.5195))
+    # particles.emitter.set_max_bound((7, 6, 1.61991))
+    # 2393.8318415378426 m3 - 75 punktów na klatkę
+    particles.emitter.set_min_bound((8.2763, -30.1388, 0.239379))
+    particles.emitter.set_max_bound((27.1292, -8.2001, 6.02706))
+
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('gravity')
     # force0 = LinearVectorForce(LVector3(0.0000, 0.0000, -1.0000), 25.0000, 1)
     # force0.setActive(1)
     # force_group.addForce(force0)
-    force1 = LinearJitterForce(3.0000, 1)
+    force1 = LinearJitterForce(5.0000, 1)  # 3
     # force1 = LinearNoiseForce(3.0000, 1)
     force1.setActive(1)
     force_group.addForce(force1)
@@ -271,8 +277,8 @@ def init_steam_particle_effect(point_size):
 
 
 def init_water_particle_effect(point_size):
-    litter_size = 900  # 300 przy 4.5x2.5, 66.67/m2
-    life_span = 1.3  # 0.5000
+    litter_size = 900  # 900, 300 przy 4.5x2.5, 66.67/m2
+    life_span = 1.2  # 0.5000
     particle_effect = ParticleEffect()
     particles = Particles('water')
     # Particles parameters
@@ -296,9 +302,11 @@ def init_water_particle_effect(point_size):
     particles.factory.set_terminal_velocity_base(400.0000)
     particles.factory.setTerminalVelocitySpread(0.0000)
     # Point factory parameters
+
     # Renderer parameters
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
-    particles.renderer.set_user_alpha(0.45)
+    # particles.renderer.set_user_alpha(0.45)
+
     # Point parameters
     particles.renderer.setStartColor(LVector4(0.25, 0.90, 1.00, 1.00))
     particles.renderer.setEndColor(LVector4(1.00, 1.00, 1.00, 1.00))

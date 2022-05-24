@@ -271,7 +271,7 @@ def accept():
     base.accept('lshift', accept_shift, [-5])
     base.accept('rshift', accept_shift, [+5])
     base.accept('e', accept_effect)
-    base.accept('j', demo_parallel.setT, [84])
+    base.accept('j', demo_parallel.setT, [85])  # 5, 84
 
 
 def main_task(task):
@@ -506,6 +506,7 @@ def accept_roping():
     if demo_parallel.isPlaying():
         demo_parallel.pause()
         print('demo_parallel.pause()')
+        base.render.ls()
     else:
         demo_parallel.resume()
         print('demo_parallel.resume()')
@@ -934,22 +935,38 @@ def accept_effect():
     np.removeNode()
     for tn in text_nodes:
         tn.removeNode()
-    models['sign'].reparent_to(base.render)
+    # models['sign'].reparent_to(base.render)
+    # print(models['sign'].getTightBounds())
     models['garden'].reparent_to(base.render)
-    print(models['sign'].getTightBounds())
     print(models['garden'].getTightBounds())
+    models['garden_large'].reparent_to(base.render)
+    print(models['garden_large'].getTightBounds())
     spectator.set_pos_hpr(17.9, 10, 3.15, 90, 0, 0)
-    interval = ParticleInterval(
-        particleEffect=init_water_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=base.render,
-        worldRelative=True,
-        duration=13,
-        softStopT=12.5,
-        cleanup=True
-    )
+    # interval = ParticleInterval(
+    #     particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
+    #     parent=base.render,
+    #     worldRelative=True,
+    #     duration=13,
+    #     softStopT=-1.4,  # 11.8
+    #     # cleanup=True
+    # )
+    # interval = ParticleInterval(
+    #     particleEffect=init_glow_particle_effect(PRESETS[1]['render_mode_thickness']),
+    #     parent=base.render,
+    #     worldRelative=True,
+    #     duration=16,
+    #     softStopT=8,
+    #     # cleanup=True,
+    #     name='glow'
+    # )
     # interval = LerpScaleInterval(spectator, 2, 1, 10, blendType='easeOut')
     # interval = LerpFunc(lens_function, 2, 1, 90, blendType='easeOut')
-    interval.start()
+    glow_interval.start()
+
+
+def display_cleanup():
+    for display_particle_effect in display_particle_effects:
+        display_particle_effect.cleanup()
 
 # def init_task(task):
 # #     # Add some text
@@ -1056,11 +1073,13 @@ if DOWNLOAD:
     # noinspection PyUnresolvedReferences
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    url = 'http'+'://camera.leszcz.uk'
+    # url = 'http'+'://camera.leszcz.uk'
+    url = 'https://docs.google.com/spreadsheets/d/14FrIBHotjeTTjMmCdHFe7VlGDkBHL83Vpx5ArMxZL8k/export?format=csv&id=14FrIBHotjeTTjMmCdHFe7VlGDkBHL83Vpx5ArMxZL8k'
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/camera.csv', 'wb').write(r.content)
 
-    url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
+    #url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
+    url = 'https://docs.google.com/spreadsheets/d/13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0/export?format=tsv&id=13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0'
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/events.tsv', 'wb').write(r.content)
 
@@ -1234,6 +1253,7 @@ spectator.set_pos_hpr(0, 0, 20, 0, -90, 0)
 # spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
 models['sign'].reparent_to(base.render)
 models['garden'].reparent_to(base.render)
+models['garden_large'].reparent_to(base.render)
 
 # print()
 
@@ -1306,8 +1326,19 @@ rain_interval = ParticleInterval(
     parent=base.render,
     worldRelative=True,
     duration=13,
-    softStopT=11.8,
-    cleanup=True
+    softStopT=-1.4,  # 11.8
+    # cleanup=True,
+    name='rain'
+)
+
+glow_interval = ParticleInterval(
+    particleEffect=init_glow_particle_effect(PRESETS[1]['render_mode_thickness']),
+    parent=base.render,
+    worldRelative=True,
+    duration=8,
+    softStopT=-1.1,
+    cleanup=True,
+    name='glow'
 )
 
 # Events
