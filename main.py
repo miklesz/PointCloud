@@ -42,6 +42,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
+JUMP = 148  # 5, 84, 86, 109, 113
 PRESETS = [
     {
         'preset': 0,
@@ -271,7 +272,7 @@ def accept():
     base.accept('lshift', accept_shift, [-5])
     base.accept('rshift', accept_shift, [+5])
     base.accept('e', accept_effect)
-    base.accept('j', demo_parallel.setT, [85])  # 5, 84
+    base.accept('j', demo_parallel.setT, [JUMP])
 
 
 def main_task(task):
@@ -495,9 +496,10 @@ def accept_roping():
     for tn in text_nodes:
         tn.removeNode()
     if demo_parallel.getT() == 0:
+        # demo_parallel.setPlayRate(.5)
         for key in models.keys():
             models[key].detachNode()
-        # demo_parallel.setT(83)
+        # demo_parallel.setT(JUMP)
     # if demo_parallel.isStopped():
     #     demo_parallel.start()
     #     print('demo_parallel.start()')
@@ -937,10 +939,22 @@ def accept_effect():
         tn.removeNode()
     # models['sign'].reparent_to(base.render)
     # print(models['sign'].getTightBounds())
-    models['garden'].reparent_to(base.render)
-    print(models['garden'].getTightBounds())
-    models['garden_large'].reparent_to(base.render)
-    print(models['garden_large'].getTightBounds())
+    # models['garden'].reparent_to(base.render)
+    # print(models['garden'].getTightBounds())
+    # models['garden_large'].reparent_to(base.render)
+    # print(models['garden_large'].getTightBounds())
+    # models['podium'].reparent_to(base.render)
+    # print(models['podium'].getTightBounds())
+    # models['entrance'].reparent_to(base.render)
+    # print(models['entrance'].getTightBounds())
+    models['room_1'].reparent_to(base.render)
+    print('room_1:', models['room_1'].getTightBounds())
+    models['room_2'].reparent_to(base.render)
+    print('room_2:', models['room_2'].getTightBounds())
+    models['room_3'].reparent_to(base.render)
+    print('room_3:', models['room_3'].getTightBounds())
+    models['bar'].reparent_to(base.render)
+    print('bar:', models['bar'].getTightBounds())
     spectator.set_pos_hpr(17.9, 10, 3.15, 90, 0, 0)
     # interval = ParticleInterval(
     #     particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
@@ -1247,13 +1261,19 @@ points = r.getPoints(len(vertices) * 120)
 looks = rope_look.getPoints(len(vertices) * 120)
 # spectator.set_pos(points[0])
 # spectator.lookAt(looks[0])
-spectator.set_pos_hpr(0, 0, 20, 0, -90, 0)
+spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
 # spectator.set_pos_hpr(0, 0, 0, 90, 0, 0)
 # spectator.set_pos_hpr(18.5, 9.6, 2.8, 0, -90, 0)
 # spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
-models['sign'].reparent_to(base.render)
-models['garden'].reparent_to(base.render)
-models['garden_large'].reparent_to(base.render)
+# models['sign'].reparent_to(base.render)
+# models['garden'].reparent_to(base.render)
+# models['garden_large'].reparent_to(base.render)
+# models['podium'].reparent_to(base.render)
+# models['entrance'].reparent_to(base.render)
+# models['room_1'].reparent_to(base.render)
+# models['room_2'].reparent_to(base.render)
+# models['room_3'].reparent_to(base.render)
+models['bar'].reparent_to(base.render)
 
 # print()
 
@@ -1335,7 +1355,7 @@ glow_interval = ParticleInterval(
     particleEffect=init_glow_particle_effect(PRESETS[1]['render_mode_thickness']),
     parent=base.render,
     worldRelative=True,
-    duration=8,
+    duration=9,
     softStopT=-1.1,
     cleanup=True,
     name='glow'

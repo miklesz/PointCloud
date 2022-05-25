@@ -54,8 +54,15 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 1	:	40	.	50	100.50	Func(models['garden_large'].reparent_to, base.render)	wstawienie obiektu garden_large		
 1	:	42	.	00	102.00	glow_interval	swietliki		
 1	:	42	.	50	102.50	Func(models['garden'].detachNode)	wywalenie obiektu garden		
-1	:	58	.	00	118.00		lot po wlocie do srodka az do baru		
-2	:	30	.	00	150.00		bar+korytarz przed kiblem (pierwsza petla przy barze)		
+1	:	49	.	50	109.50	Func(models['podium'].reparent_to, base.render)	wstawienie obiektu podium		
+1	:	52	.	50	112.50	Func(models['garden_large'].detachNode)	wywalenie obiektu garden_large		
+1	:	53	.	50	113.50	Func(models['entrance'].reparent_to, base.render)	wstawienie obiektu entrance		
+1	:	56	.	00	116.00	Func(models['podium'].detachNode)	wywalenie obiektu podium		
+1	:	58	.	00	118.00	Parallel(beat_interval, Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].reparent_to, base.render))	lot po wlocie do srodka az do baru		
+2	:	04	.	50	124.50	Func(models['room_2'].reparent_to, base.render)	wstawienie obiektu room_2		
+2	:	06	.	50	126.50	Func(models['room_1'].detachNode)	wywalenie obiektu room_1		
+2	:	12	.	50	132.50	Func(models['room_3'].reparent_to, base.render)	wstawienie obiektu room_3		
+2	:	30	.	00	150.00	Parallel(beat_interval, Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render))	bar+korytarz przed kiblem (pierwsza petla przy barze)		
 2	:	46	.	00	166.00		jakas akcja w barze (trainspotting)		
 2	:	49	.	00	169.00		trainspotting - poczatek		
 2	:	50	.	00	170.00		trainspotting - koniec		

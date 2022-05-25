@@ -105,7 +105,7 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
 
 
 def init_glow_particle_effect(point_size):
-    litter_size = 75  # 2
+    litter_size = round(75/2)  # 2
     life_span = 1  # 0.7000
     particle_effect = ParticleEffect()
     particles = Particles('water')
