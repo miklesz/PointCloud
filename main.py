@@ -42,7 +42,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 148  # 5, 84, 86, 109, 113
+JUMP = 84  # 5, 84, 86, 109, 113, 150, 186
 PRESETS = [
     {
         'preset': 0,
@@ -203,7 +203,8 @@ def toggle_volume():
 
 
 def beat(t):
-    fov = cos(t * 30) * (1 - t) * 10 + 100  # sin
+    # fov = cos(t * 30) * (1 - t) * 10 + 100  # sin
+    fov = cos(t * 30) * (1 - t) * 10 + 115  # sin
     base.camLens.setFov(fov)
     # print('beat', t)
 
@@ -955,6 +956,10 @@ def accept_effect():
     print('room_3:', models['room_3'].getTightBounds())
     models['bar'].reparent_to(base.render)
     print('bar:', models['bar'].getTightBounds())
+    models['hall_low'].reparent_to(base.render)
+    print('hall_low:', models['hall_low'].getTightBounds())
+    models['wc'].reparent_to(base.render)
+    print('wc:', models['wc'].getTightBounds())
     spectator.set_pos_hpr(17.9, 10, 3.15, 90, 0, 0)
     # interval = ParticleInterval(
     #     particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
@@ -1273,7 +1278,9 @@ spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
 # models['room_1'].reparent_to(base.render)
 # models['room_2'].reparent_to(base.render)
 # models['room_3'].reparent_to(base.render)
-models['bar'].reparent_to(base.render)
+# models['bar'].reparent_to(base.render)
+# models['hall_low'].reparent_to(base.render)
+# models['wc'].reparent_to(base.render)
 
 # print()
 
@@ -1364,7 +1371,7 @@ glow_interval = ParticleInterval(
 # Events
 with open(path+'/models/events.tsv') as file_object:
     # a = file_object.read()
-    # print(a[3800:3900])
+    # print(a[5700:5800])
     # exit()
     csv_lines = file_object.readlines()
 for csv_line in csv_lines[1:]:

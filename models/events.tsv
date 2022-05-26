@@ -49,6 +49,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	79	.	45	79.45	Func(models['river'].detachNode)	riverwash - koniec		
 0	:	84	.	00	84.00	Parallel(Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, 1, 90, blendType='easeOut'))	efekt przejscia w demo		
 1	:	26	.	00	86.00	Func(models['garden'].reparent_to, base.render)	kramsta by damage		
+1	:	27	.	00	87.00	Func(base.camLens.setFov, 90)	The field of view must be greater than 0 degrees and less than 180, but values greater than 90 will seem extremely distorted. (In the real world, perspective lenses rarely go wider than 80 degrees, and that’s pretty wide.) The default field of view is 40 degrees, which is usually a pretty comfortable viewing angle.		
 1	:	29	.	00	89.00	rain_interval	Ogrodek+deszcz		
 1	:	33	.	50	93.50	Func(models['sign'].detachNode)	Wywalenie obiektu sign		
 1	:	40	.	50	100.50	Func(models['garden_large'].reparent_to, base.render)	wstawienie obiektu garden_large		
@@ -59,6 +60,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 1	:	53	.	50	113.50	Func(models['entrance'].reparent_to, base.render)	wstawienie obiektu entrance		
 1	:	56	.	00	116.00	Func(models['podium'].detachNode)	wywalenie obiektu podium		
 1	:	58	.	00	118.00	Parallel(beat_interval, Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].reparent_to, base.render))	lot po wlocie do srodka az do baru		
+1	:	59	.	00	119.00	Func(base.camLens.setFov, 115)	The field of view must be greater than 0 degrees and less than 180, but values greater than 90 will seem extremely distorted. (In the real world, perspective lenses rarely go wider than 80 degrees, and that’s pretty wide.) The default field of view is 40 degrees, which is usually a pretty comfortable viewing angle.		
 2	:	04	.	50	124.50	Func(models['room_2'].reparent_to, base.render)	wstawienie obiektu room_2		
 2	:	06	.	50	126.50	Func(models['room_1'].detachNode)	wywalenie obiektu room_1		
 2	:	12	.	50	132.50	Func(models['room_3'].reparent_to, base.render)	wstawienie obiektu room_3		
@@ -70,7 +72,8 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 2	:	54	.	00	174.00		trainspotting - koniec		
 3	:	02	.	00	182.00		jakis spokojny efekt - poczatek		
 3	:	06	.	00	186.00		jakis spokojny efekt - koniec		
-3	:	32	.	00	212.00		mmoment wlotu do kibla - poczatek		
+3	:	16	.	00	196.00	Func(models['hall_low'].reparent_to, base.render)	wstawienie obiektu hall_low		
+3	:	32	.	00	212.00	Parallel(beat_interval, Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render))	mmoment wlotu do kibla - poczatek		
 3	:	34	.	00	214.00		akjca w kiblu do momentu konca postoju na lustrze) (do dogadania!)		
 3	:	48	.	00	228.00		pozdrowienia		
 3	:	50	.	00	230.00		oddalenie od lustra az do glownej sali rejestracji		
