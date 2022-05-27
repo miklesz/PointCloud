@@ -90,8 +90,8 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((17.595, 9.6+min_x, 2.8+min_z))
-    particles.emitter.set_max_bound((17.595, 9.6+max_x, 2.8+max_z))
+    particles.emitter.set_min_bound((min_x, .99, min_z))
+    particles.emitter.set_max_bound((max_x, .99, max_z))
     particle_effect.add_particles(particles)
 
     # Force

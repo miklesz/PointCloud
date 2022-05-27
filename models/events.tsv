@@ -9,12 +9,12 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	10	.	66	10.66	Parallel(display_sequence, LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1)))	poczatek przejscia w Chiptune		
 0	:	15	.	66	15.66	Func(models['lead'].detachNode)	koniec przejscia		
 0	:	25	.	02	25.02	Func(display_cleanup)	czyszczenie particles		
-0	:	25	.	12	25.12	Func(models['villa_0'].reparent_to, base.render)	Willa Kramstow	The von Kramsta family villa	The von Kramsta family villa
-0	:	26	.	56	26.56	Parallel(Func(models['villa_0'].detachNode), Func(models['villa_garden'].reparent_to, base.render))	willa z ogrodem	a villa with a garden	a villa with a garden
-0	:	29	.	56	29.56	Parallel(Func(models['villa_garden'].detachNode), Func(models['pano'].reparent_to, base.render))	XIX wiek	built in the third quarter of the 19th century	built in the third quarter of the 19th century
-0	:	31	.	73	31.73	Parallel(Func(models['pano'].detachNode), Func(models['villa_street'].reparent_to, base.render))	Katowic	in the center of Katowice,	in the center of Katowice,
-0	:	33	.	11	33.11	Parallel(Func(models['villa_street'].detachNode), Func(models['villa_1'].reparent_to, base.render))	ul.Warszawskiej 37	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.
-0	:	40	.	56	40.56	Func(models['villa_1'].detachNode)	pierwszy szum - poczatek		
+0	:	25	.	12	25.12	board_intervals['villa_0']	Willa Kramstow, Func(models['villa_0'].reparent_to, base.render)	The von Kramsta family villa	The von Kramsta family villa
+0	:	28	.	12	28.12	board_intervals['villa_garden']	willa z ogrodem	a villa with a garden	a villa with a garden
+0	:	31	.	12	31.12	board_intervals['pano']	XIX wiek	built in the third quarter of the 19th century	built in the third quarter of the 19th century
+0	:	34	.	12	34.12	board_intervals['villa_street']	Katowic	in the center of Katowice,	in the center of Katowice,
+0	:	37	.	12	37.12	board_intervals['villa_1']	ul.Warszawskiej 37	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.
+0	:	40	.	56	40.56		pierwszy szum - poczatek		
 0	:	41	.	35	41.35		pierwszy szum - koniec	W latach piecdziesiatych obiekt przydzielony zostal Klubowi Pracy Tworczej.	In the 1950s, the facility was assigned to the Creative Work Club.
 0	:	44	.	00	44.00		drugi szum - poczatek		
 0	:	44	.	19	44.19		drugi szum - koniec		
@@ -49,7 +49,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	79	.	45	79.45	Func(models['river'].detachNode)	riverwash - koniec		
 0	:	84	.	00	84.00	Parallel(Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, 1, 90, blendType='easeOut'))	efekt przejscia w demo		
 1	:	26	.	00	86.00	Func(models['garden'].reparent_to, base.render)	kramsta by damage		
-1	:	27	.	00	87.00	Func(base.camLens.setFov, 90)	The field of view must be greater than 0 degrees and less than 180, but values greater than 90 will seem extremely distorted. (In the real world, perspective lenses rarely go wider than 80 degrees, and that’s pretty wide.) The default field of view is 40 degrees, which is usually a pretty comfortable viewing angle.		
+1	:	27	.	00	87.00	Func(base.camLens.setFov, 90)	https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses		
 1	:	29	.	00	89.00	rain_interval	Ogrodek+deszcz		
 1	:	33	.	50	93.50	Func(models['sign'].detachNode)	Wywalenie obiektu sign		
 1	:	40	.	50	100.50	Func(models['garden_large'].reparent_to, base.render)	wstawienie obiektu garden_large		
@@ -60,23 +60,19 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 1	:	53	.	50	113.50	Func(models['entrance'].reparent_to, base.render)	wstawienie obiektu entrance		
 1	:	56	.	00	116.00	Func(models['podium'].detachNode)	wywalenie obiektu podium		
 1	:	58	.	00	118.00	Parallel(beat_interval, Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].reparent_to, base.render))	lot po wlocie do srodka az do baru		
-1	:	59	.	00	119.00	Func(base.camLens.setFov, 115)	The field of view must be greater than 0 degrees and less than 180, but values greater than 90 will seem extremely distorted. (In the real world, perspective lenses rarely go wider than 80 degrees, and that’s pretty wide.) The default field of view is 40 degrees, which is usually a pretty comfortable viewing angle.		
+1	:	59	.	00	119.00	Func(base.camLens.setFov, 115)	https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses		
 2	:	04	.	50	124.50	Func(models['room_2'].reparent_to, base.render)	wstawienie obiektu room_2		
 2	:	06	.	50	126.50	Func(models['room_1'].detachNode)	wywalenie obiektu room_1		
 2	:	12	.	50	132.50	Func(models['room_3'].reparent_to, base.render)	wstawienie obiektu room_3		
-2	:	30	.	00	150.00	Parallel(beat_interval, Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render))	bar+korytarz przed kiblem (pierwsza petla przy barze)		
-2	:	46	.	00	166.00		jakas akcja w barze (trainspotting)		
-2	:	49	.	00	169.00		trainspotting - poczatek		
-2	:	50	.	00	170.00		trainspotting - koniec		
-2	:	53	.	00	173.00		trainspotting - poczatek		
-2	:	54	.	00	174.00		trainspotting - koniec		
-3	:	02	.	00	182.00		jakis spokojny efekt - poczatek		
-3	:	06	.	00	186.00		jakis spokojny efekt - koniec		
-3	:	16	.	00	196.00	Func(models['hall_low'].reparent_to, base.render)	wstawienie obiektu hall_low		
-3	:	32	.	00	212.00	Parallel(beat_interval, Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render))	mmoment wlotu do kibla - poczatek		
-3	:	34	.	00	214.00		akjca w kiblu do momentu konca postoju na lustrze) (do dogadania!)		
-3	:	48	.	00	228.00		pozdrowienia		
-3	:	50	.	00	230.00		oddalenie od lustra az do glownej sali rejestracji		
-4	:	06	.	00	246.00		akcje w sali rejestracji		
-4	:	22	.	00	262.00		wlot do sali glownej		
-4	:	38	.	00	278.00		pojawia sie credits na pelnym ekranie		
+2	:	30	.	00	150.00	Parallel(beat_interval, Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render))	bar + corridor in front of the toilet (first loop by the bar)		
+3	:	05	.	00	185.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.		
+3	:	06	.	00	186.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.		
+3	:	07	.	00	187.00	Func(models['hall_low'].reparent_to, base.render)	models['hall_low'].reparent_to(base.render)		
+3	:	16	.	00	196.00	Parallel(beat_interval, Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render))	the moment of inlet to the toilet		
+3	:	18	.	00	198.00		action in the toilet until the end of the stop on the mirror) (to be negotiated!)		
+3	:	32	.	00	212.00		greetings		
+3	:	34	.	00	214.00		remoteness from the mirror all the way to the main registration room		
+4	:	03	.	56	243.56		the effect of entering the registration room		
+4	:	06	.	00	246.00		actions in the registration room		
+4	:	22	.	00	262.00		inlet to the main hall		
+4	:	38	.	00	278.00		credits appear in full screen.		

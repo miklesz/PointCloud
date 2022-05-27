@@ -42,7 +42,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 84  # 5, 84, 86, 109, 113, 150, 186
+JUMP = 84  # 5, 84, 86, 109, 113, 150, 182, 186
 PRESETS = [
     {
         'preset': 0,
@@ -1097,7 +1097,7 @@ if DOWNLOAD:
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/camera.csv', 'wb').write(r.content)
 
-    #url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
+    # url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
     url = 'https://docs.google.com/spreadsheets/d/13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0/export?format=tsv&id=13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0'
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/events.tsv', 'wb').write(r.content)
@@ -1124,8 +1124,8 @@ for csv_line in csv_lines[1+0:]:
     text_nodes[-1].reparentTo(base.render)
     vertices.append((None, (float(cols[3]), float(cols[4]), float(cols[5]))))
     look_vertices.append({'point': (float(cols[6]), float(cols[7]), float(cols[8])), 'color': look_color})
-    lines.moveTo(float(cols[3]),float(cols[4]), float(cols[5]))
-    lines.drawTo(float(cols[6]),float(cols[7]), float(cols[8]))
+    lines.moveTo(float(cols[3]), float(cols[4]), float(cols[5]))
+    lines.drawTo(float(cols[6]), float(cols[7]), float(cols[8]))
 #     if cols[9]:
 #         models_sequence.append(Func(model_function, cols[9], int(cols[10])))
 #     models_sequence.append(Wait(1))
@@ -1210,18 +1210,18 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
-    'lead': {'name': 'lead_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'alco': {'name': 'alco_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'pano': {'name': 'pano_200k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'villa_0': {'name': 'villa_0_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'villa_1': {'name': 'villa_1_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'villa_garden': {'name': 'villa_garden_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'villa_street': {'name': 'villa_street_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'nox': {'name': 'nox_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'xenium': {'name': 'xenium_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'river': {'name': 'river_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'signboard': {'name': 'signboard_1000k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
-    'protracker': {'name': 'protracker_200k', 'pos_hpr': (17.59, 9.6, 2.8, 90, 0, 0)},
+    'lead': {'name': 'lead_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'alco': {'name': 'alco_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'pano': {'name': 'pano_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'villa_0': {'name': 'villa_0_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'villa_1': {'name': 'villa_1_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'villa_garden': {'name': 'villa_garden_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'villa_street': {'name': 'villa_street_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'nox': {'name': 'nox_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'xenium': {'name': 'xenium_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'river': {'name': 'river_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'signboard': {'name': 'signboard_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'protracker': {'name': 'protracker_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
 
     'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
@@ -1345,7 +1345,7 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
     display_sequence.append(Func(force_display, display_particle_effect))
 
 # Sound interval
-music = base.loader.loadSfx("music/Kramsta by Damage (beta3).ogg")  # Load music
+music = base.loader.loadSfx("music/KramstaByDamage (new version).ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 rain_interval = ParticleInterval(
@@ -1367,6 +1367,52 @@ glow_interval = ParticleInterval(
     cleanup=True,
     name='glow'
 )
+
+MAX_POS = .1
+MAX_HPR = 5
+board_intervals = {}
+for board_key in ('villa_0', 'villa_garden', 'pano', 'villa_street', 'villa_1'):
+    rn = Randomizer()
+    models[board_key].setTransparency(TransparencyAttrib.M_alpha)
+    duration = 3 # 1.44
+    board_interval = Sequence(
+        Func(models[board_key].reparent_to, base.render),
+        Parallel(
+            LerpColorScaleInterval(
+                nodePath=models[board_key],
+                duration=duration,
+                colorScale=(1, 1, 1, 0),
+                # colorScale=(0, 0, 0, 1),
+                startColorScale=(1, 1, 1, 1),
+            ),
+            LerpPosHprInterval(
+                nodePath=models[board_key],
+                duration=duration,
+                pos=(
+                    rn.randomRealUnit() * 2 * MAX_POS,
+                    rn.randomRealUnit() * 2 * MAX_POS + .7,
+                    rn.randomRealUnit() * 2 * MAX_POS
+                ),
+                hpr=(
+                    rn.randomRealUnit() * 2 * MAX_HPR,
+                    rn.randomRealUnit() * 2 * MAX_HPR,
+                    rn.randomRealUnit() * 2 * MAX_HPR
+                ),
+                startPos=(
+                    rn.randomRealUnit() * 2 * MAX_POS,
+                    rn.randomRealUnit() * 2 * MAX_POS + .7,
+                    rn.randomRealUnit() * 2 * MAX_POS
+                ),
+                startHpr=(
+                    rn.randomRealUnit() * 2 * MAX_HPR,
+                    rn.randomRealUnit() * 2 * MAX_HPR,
+                    rn.randomRealUnit() * 2 * MAX_HPR
+                ),
+            ),
+        ),
+        Func(models[board_key].detachNode),
+    )
+    board_intervals[board_key] = board_interval
 
 # Events
 with open(path+'/models/events.tsv') as file_object:

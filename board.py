@@ -17,11 +17,11 @@ K_VERTICES = 200
 # NAME = 'nox'
 # NAME = 'xenium'
 # NAME = 'river'
-NAME = 'protracker'
+# NAME = 'protracker'
 # NAME = 'alco'
 # NAME = 'villa_garden'
 # NAME = 'villa_street'
-# NAME = 'pano'
+NAME = 'pano'
 # NAME = 'party_all'
 # NAME = 'party_3some'
 # NAME = 'signboard'
@@ -107,9 +107,18 @@ def create_points():
         # print(im_x, im_y)
         xel_a = my_image.getXelA(im_x, im_y)
         # print(xel_a)
-        pos_writer.addData3(im_x/1000-1.920/2, 0, -im_y/1000+1.080/2)
+        pos_writer.addData3(
+            im_x/1000-1.920/2,
+            rand.randomRealUnit()*2*0.01,
+            -im_y/1000+1.080/2
+        )
         # color_writer.addData4(xel_a[0], xel_a[1], xel_a[2], xel_a[3])
-        color_writer.addData4(xel_a[0], xel_a[1], xel_a[2], 1)
+        color_writer.addData4(
+            xel_a[0],
+            xel_a[1],
+            xel_a[2],
+            1
+        )
         index_writer.addData1i(vertex)
 
 
