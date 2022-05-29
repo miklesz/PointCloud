@@ -5,6 +5,7 @@ import pickle
 # Related third party imports
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
+from direct.filter.CommonFilters import CommonFilters
 
 # Constants
 # K_VERTICES = 2000
@@ -14,14 +15,20 @@ K_VERTICES = 200
 # NAME = 'lead'
 # NAME = 'villa_0'
 # NAME = 'villa_1'
+# NAME = 'villa_2'
+# NAME = 'villa_3'
+# NAME = 'villa_4'
 # NAME = 'nox'
 # NAME = 'xenium'
+# NAME = 'sitek'
+# NAME = 'p1'
 # NAME = 'river'
 # NAME = 'protracker'
 # NAME = 'alco'
 # NAME = 'villa_garden'
 # NAME = 'villa_street'
-NAME = 'pano'
+# NAME = 'pano'
+# NAME = 'spodek'
 # NAME = 'party_all'
 # NAME = 'party_3some'
 # NAME = 'signboard'
@@ -29,6 +36,8 @@ RTAB = False
 
 # Init ShowBase
 base = ShowBase()
+
+base.setBackgroundColor(1, 0, 0)
 
 # Convert
 # model_key = 'room_2'
@@ -96,7 +105,8 @@ def create_points():
     my_image = PNMImage(Filename(f'chronicle/{NAME}.png'))
     x_size = my_image.getXSize()
     y_size = my_image.getYSize()
-
+    K_VERTICES = round(x_size * y_size / 7000)
+    print(f'K_VERTICES = {K_VERTICES}')
 
 
     print(f'x_size = {x_size}, y_size = {y_size}')
@@ -108,9 +118,9 @@ def create_points():
         xel_a = my_image.getXelA(im_x, im_y)
         # print(xel_a)
         pos_writer.addData3(
-            im_x/1000-1.920/2,
-            rand.randomRealUnit()*2*0.01,
-            -im_y/1000+1.080/2
+            im_x/1000-x_size/1000/2,
+            rand.randomRealUnit()*2*0.01 + ((im_x/1000-x_size/1000/2)/2)**2 + ((-im_y/1000+y_size/1000/2)/2)**2,
+            -im_y/1000+y_size/1000/2
         )
         # color_writer.addData4(xel_a[0], xel_a[1], xel_a[2], xel_a[3])
         color_writer.addData4(
@@ -171,7 +181,8 @@ def create_points():
     # prim.addNextVertices(len(lines))  # 8 len(lines)
     geom = Geom(vertex_data)
     geom.addPrimitive(prim)
-    node = GeomNode(f'{NAME}_{K_VERTICES}k')
+    # node = GeomNode(f'{NAME}_{K_VERTICES}k')
+    node = GeomNode(f'{NAME}')
     node.addGeom(geom)
 
     return node
@@ -181,15 +192,20 @@ def create_points():
 model = base.render.attach_new_node(create_points())
 model.setRenderModeThickness(10)
 model.reparentTo(base.render)
+filters = CommonFilters(base.win, base.cam)
+filters.set_cartoon_ink(separation=2)
 
 # base.cam.setPosHpr(0, -2, 0, 0, 0, 0)
 # base.cam.setPosHpr(0, -3, 0, 0, 0, 0)
 # base.cam.setPosHpr(0, 0, 20, 0, -90, 0)
 # base.cam.setPosHpr(1.5, .5, .3, 90, 0, 0)
-base.camLens.setNear(.1)
-# base.run()
 
-model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
+model.setHpr(00, 0, 0)
+base.camLens.setFov(90)
+base.camLens.setNear(.1)
+
+model.writeBamFile(f'models/{NAME}.bam')
+base.run()
 
 
 

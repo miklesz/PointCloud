@@ -49,7 +49,7 @@ def init_cube_particle_effect(point_size, x, y, z, xel_a, duration=8):
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
     particles.emitter.set_min_bound((-x/2, -y/2, -z/2))
-    particles.emitter.set_max_bound((+x/2, +y/2, +z/2))
+    particles.emitter.set_max_bound((+x/2, +y/2, +z /2))
     particle_effect.add_particles(particles)
 
     # Force

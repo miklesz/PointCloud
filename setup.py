@@ -42,6 +42,7 @@ setup(
                 'pandagl',
                 'p3openal_audio',
                 'p3assimp',
+                'p3ffmpeg',
             ],
             'platforms': ['manylinux2010_x86_64', 'macosx_10_9_x86_64', 'win_amd64'],
             # 'platforms': ['macosx_10_9_x86_64', 'win_amd64'],

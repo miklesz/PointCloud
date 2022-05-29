@@ -42,7 +42,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 84  # 5, 84, 86, 109, 113, 150, 182, 186
+JUMP = 40  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186
 PRESETS = [
     {
         'preset': 0,
@@ -1054,7 +1054,7 @@ base.set_frame_rate_meter(True)
 
 # Set camera lens field of view
 # base.camLens.setFov(150)
-# base.camLens.setFov(115)
+# base.camLens.setFov(40)
 base.camLens.setFov(90)
 # base.camLens.fov = 100
 base.camLens.setNear(.1)
@@ -1210,18 +1210,22 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
-    'lead': {'name': 'lead_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'alco': {'name': 'alco_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'pano': {'name': 'pano_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'villa_0': {'name': 'villa_0_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'villa_1': {'name': 'villa_1_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'villa_garden': {'name': 'villa_garden_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'villa_street': {'name': 'villa_street_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'nox': {'name': 'nox_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'xenium': {'name': 'xenium_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'river': {'name': 'river_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'signboard': {'name': 'signboard_1000k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
-    'protracker': {'name': 'protracker_200k', 'pos_hpr': (0, 1, 0, 00, 0, 0)},
+    'lead': {'name': 'lead_1000k', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'alco': {'name': 'alco', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'spodek': {'name': 'spodek', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_0': {'name': 'villa_0', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_1': {'name': 'villa_1', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_garden': {'name': 'villa_garden', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_street': {'name': 'villa_street', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'nox': {'name': 'nox', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'xenium': {'name': 'xenium', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'river': {'name': 'river', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'signboard': {'name': 'signboard', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_2': {'name': 'villa_2', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_3': {'name': 'villa_3', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'villa_4': {'name': 'villa_4', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'protracker': {'name': 'protracker', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'p1': {'name': 'p1', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
 
     'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
@@ -1368,13 +1372,29 @@ glow_interval = ParticleInterval(
     name='glow'
 )
 
-MAX_POS = .1
-MAX_HPR = 5
+MAX_POS = .1/2
+MAX_HPR = 5/2
 board_intervals = {}
-for board_key in ('villa_0', 'villa_garden', 'pano', 'villa_street', 'villa_1'):
+for board_key in (
+        'villa_0',
+        'villa_garden',
+        'spodek',
+        'villa_street',
+        'villa_1',
+        'signboard',
+        'villa_2',
+        'villa_3',
+        'villa_4',
+        'p1',
+        'alco',
+        'protracker',
+        'xenium',
+        'river',
+        'nox',
+):
     rn = Randomizer()
     models[board_key].setTransparency(TransparencyAttrib.M_alpha)
-    duration = 3 # 1.44
+    duration = 3.1 # 1.44
     board_interval = Sequence(
         Func(models[board_key].reparent_to, base.render),
         Parallel(
@@ -1384,13 +1404,14 @@ for board_key in ('villa_0', 'villa_garden', 'pano', 'villa_street', 'villa_1'):
                 colorScale=(1, 1, 1, 0),
                 # colorScale=(0, 0, 0, 1),
                 startColorScale=(1, 1, 1, 1),
+                blendType='easeOut'
             ),
             LerpPosHprInterval(
                 nodePath=models[board_key],
                 duration=duration,
                 pos=(
                     rn.randomRealUnit() * 2 * MAX_POS,
-                    rn.randomRealUnit() * 2 * MAX_POS + .7,
+                    rn.randomRealUnit() * 2 * MAX_POS + .61,
                     rn.randomRealUnit() * 2 * MAX_POS
                 ),
                 hpr=(
@@ -1400,7 +1421,7 @@ for board_key in ('villa_0', 'villa_garden', 'pano', 'villa_street', 'villa_1'):
                 ),
                 startPos=(
                     rn.randomRealUnit() * 2 * MAX_POS,
-                    rn.randomRealUnit() * 2 * MAX_POS + .7,
+                    rn.randomRealUnit() * 2 * MAX_POS + .61,
                     rn.randomRealUnit() * 2 * MAX_POS
                 ),
                 startHpr=(
@@ -1413,6 +1434,55 @@ for board_key in ('villa_0', 'villa_garden', 'pano', 'villa_street', 'villa_1'):
         Func(models[board_key].detachNode),
     )
     board_intervals[board_key] = board_interval
+
+# Retro demo player
+death_tex = MovieTexture("Technological Death")
+success = death_tex.read('models/death_trim.mkv')
+assert success, "Failed to load video!"
+death_tex.stop()
+death_cm = CardMaker("Technological Death Fullscreen Card")
+death_cm.setFrameFullscreenQuad()
+death_cm.setUvRange(death_tex)
+death_card = NodePath(death_cm.generate())
+death_card.setTexture(death_tex)
+death_card.reparentTo(base.render2d)
+death_card.hide()
+
+ray_tex = MovieTexture("Ray World")
+success = ray_tex.read('models/ray_trim.mkv')
+assert success, "Failed to load video!"
+ray_tex.stop()
+ray_cm = CardMaker("Ray World Fullscreen Card")
+ray_cm.setFrameFullscreenQuad()
+ray_cm.setUvRange(ray_tex)
+ray_card = NodePath(ray_cm.generate())
+ray_card.setTexture(ray_tex)
+ray_card.reparentTo(base.render2d)
+ray_card.hide()
+
+pulse_tex = MovieTexture("Sunflower")
+success = pulse_tex.read('models/pulse2_trim.mkv')
+assert success, "Failed to load video!"
+pulse_tex.stop()
+pulse_cm = CardMaker("Sunflower Fullscreen Card")
+pulse_cm.setFrameFullscreenQuad()
+pulse_cm.setUvRange(pulse_tex)
+pulse_card = NodePath(pulse_cm.generate())
+pulse_card.setTexture(pulse_tex)
+pulse_card.reparentTo(base.render2d)
+pulse_card.hide()
+
+set_cm = {}
+set_card = {}
+set_tex = {}
+for i in range(6):
+    set_cm[i] = CardMaker(f'Set Rector {i}')
+    set_cm[i].setFrameFullscreenQuad()
+    set_card[i] = base.render2d.attachNewNode(set_cm[i].generate())
+    set_tex[i] = base.loader.loadTexture(f'models/set_{i}_fit.png')
+    set_card[i].setTexture(set_tex[i])
+    set_card[i].hide()
+
 
 # Events
 with open(path+'/models/events.tsv') as file_object:
