@@ -1226,6 +1226,8 @@ model_dict = {
     'villa_4': {'name': 'villa_4', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'protracker': {'name': 'protracker', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'p1': {'name': 'p1', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'p2': {'name': 'p2', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
+    'p3': {'name': 'p3', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
 
     'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
@@ -1386,6 +1388,8 @@ for board_key in (
         'villa_3',
         'villa_4',
         'p1',
+        'p2',
+        'p3',
         'alco',
         'protracker',
         'xenium',
@@ -1461,7 +1465,7 @@ ray_card.reparentTo(base.render2d)
 ray_card.hide()
 
 pulse_tex = MovieTexture("Sunflower")
-success = pulse_tex.read('models/pulse2_trim.mkv')
+success = pulse_tex.read('models/pulse_trim.mkv')
 assert success, "Failed to load video!"
 pulse_tex.stop()
 pulse_cm = CardMaker("Sunflower Fullscreen Card")

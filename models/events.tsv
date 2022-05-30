@@ -39,8 +39,8 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	55	.	33	55.33	Parallel(Func(pulse_card.detachNode), Func(set_card[5].show))	(szum z basowym efektem) - koniec		
 0	:	55	.	38	55.38		szum	0.32	
 0	:	55	.	70	55.70	Parallel(Func(set_card[5].detachNode), board_intervals['p1'])	od kilku lat odbywaja sie tu zloty bandy komputerowcow	od kilku lat odbywaja sie tu zloty bandy komputerowcow	For several years, rallies of computer enthusiasts have been held here.
-0	:	58	.	80	58.80	board_intervals['p1']	demoscenowacmi (jakies zdjecie kwit z archiwow demosceny;)	samozwanczo nazywaja sie demoscenowcami	They self-proclaimed themselves as Demoscene.
-0	:	61	.	90	61.90	board_intervals['p1']	oprocz spozywania... - poczatek	oprocz spozywania ogromnych ilosci trunkow wyskokowych	Apart from consuming huge amounts of alcoholic beverages,
+0	:	58	.	80	58.80	board_intervals['p2']	demoscenowacmi (jakies zdjecie kwit z archiwow demosceny;)	samozwanczo nazywaja sie demoscenowcami	They self-proclaimed themselves as Demoscene.
+0	:	61	.	90	61.90	board_intervals['p3']	oprocz spozywania... - poczatek	oprocz spozywania ogromnych ilosci trunkow wyskokowych	Apart from consuming huge amounts of alcoholic beverages,
 0	:	65	.	00	65.00	board_intervals['alco']	muzyki (cos z muzyka)	ow partowicze sluchaja dziwnej muzyki	these partygoers listen to strange music,
 0	:	68	.	10	68.10	board_intervals['protracker']	bohomazy (cos z grafika)	ogladaja jakies bohomazy	watch some daubs,
 0	:	71	.	20	71.20	board_intervals['nox']	dema (jakies demo by Damage)	oraz jakies dema	and some demos.
