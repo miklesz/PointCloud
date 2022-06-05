@@ -25,11 +25,13 @@ from particles import *
 current_modes_and_filters = {
     'color_scale': 0,
 }
+enable_roping = True
 done = False
-# pos_hpr_amplitudes = [.005, .005, .005, .5, .5, .5]
-pos_hpr_amplitudes = [.010 * (Randomizer().randomRealUnit() / 25 + 1) for a in range(3)] + \
-                     [.500 * (Randomizer().randomRealUnit() / 25 + 1) for b in range(3)]
-pos_hpr_offsets = [Randomizer().randomReal(2*pi) for i in range(6)]
+# pos_hpr_amplitudes = [.05, .05, .05, .5, .5, .5]  # .005, .5
+pos_hpr_amplitudes = [.1, .1, .1, 1, 1, 1]  # .005, .5
+# pos_hpr_amplitudes = [.010 * (Randomizer().randomRealUnit() / 25 + 1) for a in range(3)] + \
+#                      [.500 * (Randomizer().randomRealUnit() / 25 + 1) for b in range(3)]
+# pos_hpr_offsets = [Randomizer().randomReal(2*pi) for i in range(6)]
 
 # Constants
 COLOR_SCALES = (
@@ -42,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 40  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186
+JUMP = 109  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186
 PRESETS = [
     {
         'preset': 0,
@@ -286,6 +288,9 @@ def main_task(task):
     text = f'''\
 Yo FuCkErS!
 time: {str(round(music.get_time(), 2))}
+'''
+    if not demo_parallel.isPlaying():
+        text += f'''\
 escape: sys.exit
 space: start/stop demo (lshift/rshift to skip)
 j: jump to time
@@ -473,8 +478,9 @@ def roping_function(t):
     if i < 0:
         i = 0
     # print(i)
-    spectator.set_pos(points[i])
-    spectator.lookAt(looks[i])
+    if enable_roping:
+        spectator.set_pos(points[i])
+        spectator.lookAt(looks[i])
     # spectator.lookAt(0, 0, 0)
 
 
@@ -612,9 +618,16 @@ def zoom_function(t):
     # width = 7.5+t*2.5
     width = 4
     base.camLens.setFov(fov)
-    distance = 7.5+width/(2*tan(0.5*fov*2*pi/360))
-    spectator.set_x(distance)
-    # print(fov, distance, width)
+    distance = 3.5-width/(2*tan(0.5*fov*2*pi/360))  # 3.5
+    # orig_x = spectator.get_x()
+    # spectator.set_x(distance)
+    spectator.set_x(spectator.getX()+distance-2.225859478385013)
+    near = .1-(distance-0.4)
+    if near < .1:
+        near = .1
+    base.camLens.setNear(near)
+    # print(width, fov, orig_x, distance, near)
+    # print(width, fov, distance, near)
 
 
 def fov_function(t):
@@ -654,90 +667,25 @@ def dissolve(t, cube_object):
 def start_zoom():
     r.removeNode()
     rope_look.removeNode()
-    models['room_1'].reparent_to(base.render)
-    models['room_2'].reparent_to(base.render)
-    models['room_3'].reparent_to(base.render)
+    models['bar'].reparent_to(base.render)
     # fov_min = 66
     # fov_max = 115
-    duration = 1
-    rotation = 180
-    # Sequence just to avoid warnings!
-    zoom_prepare_parallel = Parallel()
-    zoom_prepare_parallel.append(LerpFunc(fov_function, fromData=0, toData=1, duration=2, blendType='easeInOut'))
+    # spectator.setPos(7.5, 3.5, 0)
+    # spectator.setHpr(90, 0, 0)
+    spectator.set_pos_hpr(-0.3, -1.2, .4, -90, 0, 0)
+    # zoom_prepare_parallel = Parallel()
+    # zoom_prepare_parallel.append(LerpFunc(fov_function, fromData=0, toData=1, duration=2, blendType='easeInOut'))
     # zoom_prepare_parallel.append(init_pos_interval((1.0-5/(2*tan(0.5*66*2*pi/360)), 0, 0), duration=2))
-    zoom_prepare_parallel.append(LerpPosHprInterval(
-        nodePath=spectator,
-        pos=(7.5, 3.5, 0),
-        hpr=(90, 0, 0),
-        duration=2,
-        blendType='easeInOut',
-    ))
-    zoom_sequence = Sequence()
-    zoom_sequence.append(zoom_prepare_parallel)
+    # zoom_prepare_parallel.append(LerpPosHprInterval(
+    #     nodePath=spectator,
+    #     pos=(7.5, 3.5, 0),
+    #     hpr=(90, 0, 0),
+    #     duration=2,
+    #     blendType='easeInOut',
+    # ))
+    # zoom_sequence.append(zoom_prepare_parallel)
 
-    # # print(len(display_particle_effects))
-    # # for display_particle_effect in display_particle_effects:
-    # # zoom_sequence.append(Func(start_display, init_cube(1, 1, 1, (1, 0, 0, 1))))
-    # for cube_number in range(16):
-    #     cube = init_cube_particle_effect(
-    #         current_modes_and_filters['render_mode_thickness'],
-    #         Randomizer().randomReal(.5)+.5,
-    #         Randomizer().randomReal(.5)+.5,
-    #         Randomizer().randomReal(.5)+.5,
-    #         (Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, 1),
-    #         duration
-    #     )
-    #     cube_parallel = Parallel()
-    #     cube_parallel.append(LerpFunc(
-    #         function=dissolve,
-    #         fromData=0,
-    #         toData=1,
-    #         duration=duration,
-    #         blendType='easeIn',
-    #         extraArgs=[cube],
-    #     ))
-    #     cube_parallel.append(ParticleInterval(
-    #         particleEffect=cube,
-    #         parent=base.render,
-    #         worldRelative=False,
-    #         duration=duration,
-    #         cleanup=True,
-    #     ))
-    #     start_h = Randomizer().randomInt(360)
-    #     start_p = Randomizer().randomInt(360)
-    #     start_r = Randomizer().randomInt(360)
-    #     cube_parallel.append(LerpHprInterval(
-    #         nodePath=cube,
-    #         duration=duration,
-    #         hpr=(
-    #             start_h+Randomizer().randomRealUnit()*rotation,
-    #             start_p+Randomizer().randomRealUnit()*rotation,
-    #             start_r+Randomizer().randomRealUnit()*rotation,
-    #         ),
-    #         startHpr=(start_h, start_p, start_r),
-    #     ))
-    #     zoom_sequence.append(cube_parallel)
-    #     # print(cube.getParticlesDict())
-    #     # cube.analyze()
-    #     # cube.setTransparency(TransparencyAttrib.M_alpha)
-    #     # cube.setAlphaScale(0.2)
-    #     # cube.hide()
-    #     # cube.setScale(5)
-
-    # zoom_sequence.append(Wait(2))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
-    zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
-    # start_display()
     zoom_sequence.start()
-    # base.render.analyze()
-    # display_particle_effects[0].analyze()
-    # model.analyze()
-    # point_cloud.analyze()
-    # display_interval = LerpFunc(display, fromData=0, toData=1, duration=10)
 
 
 def accept_cubes():
@@ -836,7 +784,8 @@ def set_background_color(t, color, set_preset):
 
 
 def trainspotting_lerp_function(t):
-    base.cam.set_scale(1, 1-(t*.99), 1)
+    # base.cam.set_scale(1, 1-(t*.99), 1)
+    base.cam.set_scale(1, 1-(t*.9), 1)
 
 
 def accept_trainspotting():
@@ -846,50 +795,38 @@ def accept_trainspotting():
     # models['room_2'].reparent_to(base.render)
     # models['room_3'].reparent_to(base.render)
     models['wc'].reparent_to(base.render)
-    trainspotting_sequence = Sequence()
-    trainspotting_sequence.append(LerpPosHprInterval(
-        nodePath=spectator,
-        pos=(-4, -3.5, .35),
-        hpr=(90, 0, 0),
-        duration=2,
-        blendType='easeInOut',
-    ))
-    trainspotting_sequence.append(LerpFunctionInterval(
-        trainspotting_lerp_function,
-        fromData=0,
-        toData=1,
-        duration=4,
-        blendType='easeInOut',
-    ))
-    trainspotting_sequence.append(LerpFunctionInterval(
-        trainspotting_lerp_function,
-        fromData=1,
-        toData=0,
-        duration=4,
-        blendType='easeInOut',
-    ))
     trainspotting_sequence.start()
 
 
 def handshaking_lerp_function(t):
-    global pos_hpr_amplitudes
-    global pos_hpr_offsets
-    args = []
-    for i in range(6):
-        pos_hpr_amplitudes[i] *= Randomizer().randomRealUnit() / 25 + 1  # 20?
-        pos_hpr_offsets[i] *= Randomizer().randomRealUnit() / 25 + 1  # 30?
-        args.append(sin(pi * t + pos_hpr_offsets[i]) * pos_hpr_amplitudes[i])
-    base.cam.set_pos_hpr(*args)
+    i = int(len(pos_shake)*t)-1
+    if i < 0:
+        i = 0
+    base.cam.set_pos(pos_shake[i])
+    # print(i, pos_shake[i])
+    j = int(len(hpr_shake)*t)-1
+    if j < 0:
+        j = 0
+    base.cam.set_hpr(hpr_shake[j])
+    # print(j, hpr_shake[j])
+    # global pos_hpr_amplitudes
+    # global pos_hpr_offsets
+    # args = []
+    # for i in range(6):
+    #     pos_hpr_amplitudes[i] *= Randomizer().randomRealUnit() / 25 + 1  # 20?
+    #     # pos_hpr_offsets[i] *= Randomizer().randomRealUnit() / 60 + 1  # 30?
+    #     args.append(sin(pi * t + pos_hpr_offsets[i]) * pos_hpr_amplitudes[i])
+    # base.cam.set_pos_hpr(*args)
+    # # print(args)
+    # print(pos_hpr_offsets)
 
 
 def accept_handshaking():
-    handshaking_sequence = Sequence()
-    handshaking_sequence.append(LerpFunctionInterval(
-        handshaking_lerp_function,
-        fromData=0,
-        toData=64,
-        duration=64,
-    ))
+    r.removeNode()
+    rope_look.removeNode()
+    np.removeNode()
+    for tn in text_nodes:
+        tn.removeNode()
     handshaking_sequence.start()
 
 
@@ -948,19 +885,26 @@ def accept_effect():
     # print(models['podium'].getTightBounds())
     # models['entrance'].reparent_to(base.render)
     # print(models['entrance'].getTightBounds())
-    models['room_1'].reparent_to(base.render)
-    print('room_1:', models['room_1'].getTightBounds())
-    models['room_2'].reparent_to(base.render)
-    print('room_2:', models['room_2'].getTightBounds())
-    models['room_3'].reparent_to(base.render)
-    print('room_3:', models['room_3'].getTightBounds())
-    models['bar'].reparent_to(base.render)
-    print('bar:', models['bar'].getTightBounds())
-    models['hall_low'].reparent_to(base.render)
-    print('hall_low:', models['hall_low'].getTightBounds())
-    models['wc'].reparent_to(base.render)
-    print('wc:', models['wc'].getTightBounds())
-    spectator.set_pos_hpr(17.9, 10, 3.15, 90, 0, 0)
+    # models['room_1'].reparent_to(base.render)
+    # print('room_1:', models['room_1'].getTightBounds())
+    # models['room_2'].reparent_to(base.render)
+    # print('room_2:', models['room_2'].getTightBounds())
+    # models['room_3'].reparent_to(base.render)
+    # print('room_3:', models['room_3'].getTightBounds())
+    # models['bar'].reparent_to(base.render)
+    # print('bar:', models['bar'].getTightBounds())
+    # models['hall_low'].reparent_to(base.render)
+    # print('hall_low:', models['hall_low'].getTightBounds())
+    # models['stairs_low'].reparent_to(base.render)
+    # print('stairs_low:', models['stairs_low'].getTightBounds())
+    # models['stairs_hi'].reparent_to(base.render)
+    # print('stairs_hi:', models['stairs_hi'].getTightBounds())
+    models['register'].reparent_to(base.render)
+    print('register:', models['register'].getTightBounds())
+    # models['wc'].reparent_to(base.render)
+    # print('wc:', models['wc'].getTightBounds())
+    spectator.set_pos_hpr(2.225859478385013, -1.2, .4, -90, 0, 0)
+    base.camLens.setFov(115)
     # interval = ParticleInterval(
     #     particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
     #     parent=base.render,
@@ -980,7 +924,8 @@ def accept_effect():
     # )
     # interval = LerpScaleInterval(spectator, 2, 1, 10, blendType='easeOut')
     # interval = LerpFunc(lens_function, 2, 1, 90, blendType='easeOut')
-    glow_interval.start()
+    set_modes_and_filters(PRESETS[2])
+    dust_interval.start()
 
 
 def display_cleanup():
@@ -1092,11 +1037,13 @@ if DOWNLOAD:
     # noinspection PyUnresolvedReferences
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+    print('Downloading camera.csv')
     # url = 'http'+'://camera.leszcz.uk'
     url = 'https://docs.google.com/spreadsheets/d/14FrIBHotjeTTjMmCdHFe7VlGDkBHL83Vpx5ArMxZL8k/export?format=csv&id=14FrIBHotjeTTjMmCdHFe7VlGDkBHL83Vpx5ArMxZL8k'
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/camera.csv', 'wb').write(r.content)
 
+    print('Downloading events.tsv')
     # url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
     url = 'https://docs.google.com/spreadsheets/d/13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0/export?format=tsv&id=13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0'
     r = requests.get(url, allow_redirects=True, verify=False)
@@ -1234,15 +1181,25 @@ model_dict = {
     'garden_large': {'name': 'garden_large_1000k', 'pos_hpr': (18, -10.7, .5, 0, 0, 0)},
     'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
     'entrance': {'name': 'entrance_200k', 'pos_hpr': (12.0, 4.8, 1.8, -109, 0, 0)},
-    'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
-    'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
-    'room_3': {'name': 'room_3_200k', 'pos_hpr': (-5.3, 4.15, -.1, -97.5, 0, 0)},
-    'bar': {'name': 'bar_200k', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
-    'hall_low': {'name': 'hall_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    'wc': {'name': 'wc_200k', 'pos_hpr': (-4.0, -3.7, 0, -100, 0, 0)},
-    'stairs_low': {'name': 'stairs_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    'stairs_hi': {'name': 'stairs_hi_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    'register': {'name': 'register_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    # 'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
+    'room_1': {'name': 'room_1', 'pos_hpr': (+5.7, 3.5, 0, +147, 0, 0)},
+    # 'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
+    'room_2': {'name': 'room_2', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
+    # 'room_3': {'name': 'room_3_200k', 'pos_hpr': (-5.3, 4.15, -.1, -97.5, 0, 0)},
+    'room_3': {'name': 'room_3', 'pos_hpr': (-5.3, 4.15, -.1, +92, 0, 0)},
+    # 'bar': {'name': 'bar_200k', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
+    'bar': {'name': 'bar', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
+    # 'hall_low': {'name': 'hall_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'hall_low': {'name': 'hall_low', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    # 'wc': {'name': 'wc', 'pos_hpr': (-4.0, -3.7, 0, -100, 0, 0)},
+    'wc': {'name': 'wc', 'pos_hpr': (-4.0, -3.7, 0, 90, 0, 0)},
+    # 'stairs_low': {'name': 'stairs_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'stairs_low': {'name': 'stairs_low', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    # 'stairs_hi': {'name': 'stairs_hi_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'stairs_hi': {'name': 'stairs_hi', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    # 'register': {'name': 'register_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    # 'register': {'name': 'register', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
+    'register': {'name': 'register_half', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
 }
 
@@ -1268,8 +1225,10 @@ for preset in PRESETS[::-1]:
 for key in models.keys():
     models[key].detachNode()
 
-points = r.getPoints(len(vertices) * 120)
-looks = rope_look.getPoints(len(vertices) * 120)
+points = r.getPoints(len(vertices) * 5000)
+looks = rope_look.getPoints(len(vertices) * 5000)
+# print(len(looks))
+# exit()
 # spectator.set_pos(points[0])
 # spectator.lookAt(looks[0])
 spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
@@ -1374,6 +1333,61 @@ glow_interval = ParticleInterval(
     name='glow'
 )
 
+
+zoom_sequence = Sequence()
+zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=4, blendType='easeInOut'))
+zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=4, blendType='easeInOut'))
+# zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=4, blendType='easeInOut'))
+# zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=4, blendType='easeInOut'))
+# zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=4, blendType='easeInOut'))
+# zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=4, blendType='easeInOut'))
+dust_parent = base.render.attachNewNode("dust parent")
+dust_parent.reparentTo(base.render)
+dust_parent.setPos(-0.3, -1.2, -.55)  # dust start pos
+# dust_parent.setPos(5.5, -1.6, -.5)  # dust end pos
+dust_interval = Parallel(
+    ParticleInterval(
+        particleEffect=init_dust_particle_effect(PRESETS[2]['render_mode_thickness']),
+        parent=dust_parent,
+        worldRelative=False,
+        duration=16,
+        softStopT=-1,  # 11.8
+        cleanup=True,
+    ),
+    Sequence(
+        LerpPosInterval(
+            nodePath=dust_parent,
+            duration=8,
+            pos=(5.4, -1.6, -.55),
+            blendType='easeOut',
+        ),
+    zoom_sequence,
+    )
+)
+
+trainspotting_sequence = Sequence()
+# trainspotting_sequence.append(LerpPosHprInterval(
+#     nodePath=spectator,
+#     pos=(-4, -3.5, .35),
+#     hpr=(90, 0, 0),
+#     duration=2,
+#     blendType='easeInOut',
+# ))
+trainspotting_sequence.append(LerpFunctionInterval(
+    trainspotting_lerp_function,
+    fromData=0,
+    toData=1,
+    duration=2,
+    blendType='easeInOut',
+))
+trainspotting_sequence.append(LerpFunctionInterval(
+    trainspotting_lerp_function,
+    fromData=1,
+    toData=0,
+    duration=2,
+    blendType='easeInOut',
+))
+
 MAX_POS = .1/2
 MAX_HPR = 5/2
 board_intervals = {}
@@ -1440,41 +1454,23 @@ for board_key in (
     board_intervals[board_key] = board_interval
 
 # Retro demo player
-death_tex = MovieTexture("Technological Death")
-success = death_tex.read('models/death_trim.mkv')
-assert success, "Failed to load video!"
-death_tex.stop()
-death_cm = CardMaker("Technological Death Fullscreen Card")
-death_cm.setFrameFullscreenQuad()
-death_cm.setUvRange(death_tex)
-death_card = NodePath(death_cm.generate())
-death_card.setTexture(death_tex)
-death_card.reparentTo(base.render2d)
-death_card.hide()
-
-ray_tex = MovieTexture("Ray World")
-success = ray_tex.read('models/ray_trim.mkv')
-assert success, "Failed to load video!"
-ray_tex.stop()
-ray_cm = CardMaker("Ray World Fullscreen Card")
-ray_cm.setFrameFullscreenQuad()
-ray_cm.setUvRange(ray_tex)
-ray_card = NodePath(ray_cm.generate())
-ray_card.setTexture(ray_tex)
-ray_card.reparentTo(base.render2d)
-ray_card.hide()
-
-pulse_tex = MovieTexture("Sunflower")
-success = pulse_tex.read('models/pulse_trim.mkv')
-assert success, "Failed to load video!"
-pulse_tex.stop()
-pulse_cm = CardMaker("Sunflower Fullscreen Card")
-pulse_cm.setFrameFullscreenQuad()
-pulse_cm.setUvRange(pulse_tex)
-pulse_card = NodePath(pulse_cm.generate())
-pulse_card.setTexture(pulse_tex)
-pulse_card.reparentTo(base.render2d)
-pulse_card.hide()
+retro_tex = {}
+retro_cm = {}
+retro_card = {}
+for retro_key in ('retro_td', 'retro_rw', 'retro_sf', 'retro_v1b', 'retro_v2', 'retro_v1'):
+    retro_tex[retro_key] = MovieTexture(retro_key)
+    success = retro_tex[retro_key].read(f'models/{retro_key}.mkv')
+    assert success, "Failed to load video!"
+    retro_tex[retro_key].stop()
+    retro_cm[retro_key] = CardMaker(f"{retro_key} fullscreen card")
+    retro_cm[retro_key].setFrameFullscreenQuad()
+    retro_cm[retro_key].setUvRange(retro_tex[retro_key])
+    retro_card[retro_key] = NodePath(retro_cm[retro_key].generate())
+    retro_card[retro_key].setTexture(retro_tex[retro_key])
+    retro_card[retro_key].reparentTo(base.render2d)
+    retro_card[retro_key].hide()
+    # if retro_key == 'retro_v2':
+    #     retro_tex[retro_key].setTime(0)
 
 set_cm = {}
 set_card = {}
@@ -1486,7 +1482,6 @@ for i in range(6):
     set_tex[i] = base.loader.loadTexture(f'models/set_{i}_fit.png')
     set_card[i].setTexture(set_tex[i])
     set_card[i].hide()
-
 
 # Events
 with open(path+'/models/events.tsv') as file_object:
@@ -1500,7 +1495,6 @@ for csv_line in csv_lines[1:]:
     print(csv_line[:-1])
     demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), Func(print, "{csv_line[:-1]}"), {cols[6]})'))
 
-
 # models['villa_0'].setTransparency(1)
 # models['villa_0'].setAlphaScale(.8)
 models['lead'].setTransparency(TransparencyAttrib.M_alpha)
@@ -1508,6 +1502,42 @@ models['lead'].setTransparency(TransparencyAttrib.M_alpha)
 # models['lead'].setColorScale(1, 1, 1, .5)
 # models['lead'].setColor(1, 1, 1, .5)
 # demo_parallel.append(Sequence(Wait(9), LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1))))
+
+# shake_den = (4+12)/2
+shake_den = 4
+pos_shake_rope_vertices = []
+hpr_shake_rope_vertices = []
+for pos_shake_rope_vertices_i in range(round(demo_parallel.getDuration()*shake_den)):
+    pos_shake_rope_vertices.append((None, (
+        pos_hpr_amplitudes[0] * Randomizer().randomRealUnit(),
+        pos_hpr_amplitudes[1] * Randomizer().randomRealUnit(),
+        pos_hpr_amplitudes[2] * Randomizer().randomRealUnit(),
+    )))
+for hpr_shake_rope_vertices_i in range(round(demo_parallel.getDuration()*shake_den)):
+    hpr_shake_rope_vertices.append((None, (
+        pos_hpr_amplitudes[3] * Randomizer().randomRealUnit(),
+        pos_hpr_amplitudes[4] * Randomizer().randomRealUnit(),
+        pos_hpr_amplitudes[5] * Randomizer().randomRealUnit(),
+    )))
+pos_shake_rope = Rope()
+hpr_shake_rope = Rope()
+pos_shake_rope.setup(4, pos_shake_rope_vertices)
+hpr_shake_rope.setup(4, hpr_shake_rope_vertices)
+pos_shake = pos_shake_rope.getPoints(round(demo_parallel.getDuration())*5000)
+hpr_shake = hpr_shake_rope.getPoints(round(demo_parallel.getDuration())*5000)
+# print(len(pos_shake))
+
+handshaking_sequence = Sequence()
+handshaking_sequence.append(LerpFunctionInterval(
+    handshaking_lerp_function,
+    fromData=0,
+    toData=1,
+    duration=len(pos_shake_rope_vertices),
+))
+demo_parallel.append(handshaking_sequence)
+
+# print(demo_parallel.getDuration())
+# exit()
 
 # Set max delta
 max_delta = 0

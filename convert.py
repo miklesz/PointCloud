@@ -7,15 +7,21 @@ from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
 
 # Constants
-K_VERTICES = 1000
+# K_VERTICES = 1000
 # K_VERTICES = int(12419935/1000)
 RTAB = False
 
 # NAME = 'garden'
 # ANGLE = -84  # garden: -84
 
-NAME = 'garden_large'
-ANGLE = 21.5  # garden_large: 21 (trochę leci w prawo), 22 (trochę leci w lewo)
+ANGLE = -169  # historyczny z GitHub, dobry dla hall
+
+# NAME = 'garden_large'
+# NAME = 'wc'
+# NAME = 'hall'
+# NAME = 'bar'
+NAME = 'room_3'
+# ANGLE = 21.5  # garden_large: 21 (trochę leci w prawo), 22 (trochę leci w lewo)
 
 theta = radians(ANGLE)
 cos_t = cos(theta)
@@ -50,35 +56,36 @@ def create_points():
     index_writer = GeomVertexWriter(vertex_data, "index")
     color_writer = GeomVertexWriter(vertex_data, 'color')
 
-    # print('Reading lines')
-    # with open(f'models_other/{NAME}.ply') as f:
-    #     lines = f.readlines()
-    # print(f'Read {len(lines)} lines')
-    # skip = lines.index('end_header\n')+1
-    # lines = lines[skip:]
-    # points = []
-    # print('Appending points')
-    # for line in lines:
-    #     fields = line.split()
-    #     x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
-    #     if RTAB:
-    #         r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
-    #     else:
-    #         r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
-    #     points.append([x, y, z, r, g, b, a])
+    print('Reading lines')
+    with open(f'models_other/{NAME}.ply') as f:
+        lines = f.readlines()
+    print(f'Read {len(lines)} lines')
+    skip = lines.index('end_header\n')+1
+    lines = lines[skip:]
+    points = []
+    print('Appending points')
+    for line in lines:
+        fields = line.split()
+        x, y, z = float(fields[0]), float(fields[1]), float(fields[2])
+        if RTAB:
+            r, g, b, a = float(fields[6])/255, float(fields[7])/255, float(fields[8])/255, 1
+        else:
+            r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
+        points.append([x, y, z, r, g, b, a])
     #
     # print('Dumping points')
     # with open(f'{NAME}', 'wb') as f2:
     #     pickle.dump(points, f2)
 
-    print('Loading points')
-    with open(f'{NAME}', 'rb') as f2:
-        points = pickle.load(f2)
-
-    if theta:
-        print('Rotating points')
-        for i in range(len(points)):
-            points[i][0], points[i][1] = points[i][0]*cos_t-points[i][1]*sin_t, points[i][0]*sin_t+points[i][1]*cos_t
+    # print('Loading points')
+    # with open(f'{NAME}', 'rb') as f2:
+    # # with open(f'points', 'rb') as f2:
+    #         points = pickle.load(f2)
+    # #
+    # if theta:
+    #     print('Rotating points')
+    #     for i in range(len(points)):
+    #         points[i][0], points[i][1] = points[i][0]*cos_t-points[i][1]*sin_t, points[i][0]*sin_t+points[i][1]*cos_t
 
     print('Excluding points (if applicable)')
 
@@ -97,17 +104,20 @@ def create_points():
     # points = [point for point in points if not (point[0] < -1.8 and point[1] > 0.5 and point[2] < 0.1)]
 
     # garden_large
-    points = [point for point in points if point[1] < 2.5]
+    # points = [point for point in points if point[1] < 2.5]
 
     # garden
     # points = [point for point in points if point[1] >= -8.7]
 
+    # print(f'len(lines) = {len(lines)}')
     print(f'len(points) = {len(points)}')
-    factor = len(points)/(K_VERTICES * 1000)
+    # factor = len(points)/(K_VERTICES * 1000)
+    factor = 1
     print(f'factor = {factor}')
 
     print('Constructing object')
-    for vertex in range(K_VERTICES * 1000):
+    # for vertex in range(K_VERTICES * 1000):
+    for vertex in range(len(points)//factor):
         x, y, z, r, g, b, a = points[int(vertex*factor)]
         pos_writer.addData3(x, y, z)
         color_writer.addData4(r, g, b, a)
@@ -130,12 +140,14 @@ def create_points():
     #     index += 1
 
     prim = GeomPoints(Geom.UH_static)
-    prim.addNextVertices(K_VERTICES * 1000)  # 8 len(lines)
-    # prim.addNextVertices(len(lines))  # 8 len(lines)
+    # prim.addNextVertices(K_VERTICES * 1000)  # 8 len(lines)
+    prim.addNextVertices(len(points)//factor)  # 8 len(lines)
     geom = Geom(vertex_data)
     geom.addPrimitive(prim)
-    node = GeomNode(f'{NAME}_{K_VERTICES}k')
+    node = GeomNode(f'{NAME}')
     node.addGeom(geom)
+
+    print('Ready!!!')
 
     return node
 
@@ -154,7 +166,12 @@ print(model.get_tight_bounds())
 # Set frame rate meter
 base.set_frame_rate_meter(True)
 
-# model.setHpr(0, 90, 0)
-# base.run()
+model.setHpr(0, 90, 0)
+base.run()
 
-model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
+# model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
+# model.writeBamFile(f'models/{NAME}.bam')
+# model.writeBamFile(f'models/stairs_hi.bam')
+# model.writeBamFile(f'models/register_half.bam')
+# model.writeBamFile(f'models/bar.bam')
+model.writeBamFile(f'models/room_3.bam')

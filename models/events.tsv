@@ -14,12 +14,12 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	31	.	32	31.32	board_intervals['spodek']	XIX wiek	built in the third quarter of the 19th century	built in the third quarter of the 19th century
 0	:	34	.	42	34.42	board_intervals['villa_street']	Katowic	in the center of Katowice,	in the center of Katowice,
 0	:	37	.	52	37.52	board_intervals['villa_1']	ul.Warszawskiej 37	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.
-0	:	40	.	56	40.56	Parallel(Func(models['villa_1'].detachNode), Func(set_card[5].show))	pierwszy szum - poczatek (prawdziwy szum)	0.79	
-0	:	41	.	35	41.35	Parallel(Func(set_card[5].hide), Sequence(board_intervals['villa_3'], board_intervals['villa_4']))	pierwszy szum - koniec	W latach piecdziesiatych obiekt przydzielony zostal Klubowi Pracy Tworczej.	In the 1950s, the facility was assigned to the Creative Work Club.
-0	:	44	.	00	44.00	Parallel(Func(set_card[5].show))	drugi szum - poczatek (prawdziwy szum)	0.19	
-0	:	44	.	19	44.19	Parallel(Func(set_card[5].hide))	drugi szum - koniec		
-0	:	47	.	01	47.01	Parallel(Func(models['villa_4'].detachNode), Func(death_card.show), Func(death_tex.play))	efekt - poczatek	1.73	
-0	:	48	.	74	48.74	Parallel(Func(death_card.detachNode), board_intervals['signboard'])	efekt - koniec	od strony ul. Warszawskiej zajmowala redakcja efemerycznego tygodnika	from the side of ul. Warszawska was occupied by the editorial staff of the ephemeral weekly
+0	:	40	.	56	40.56	Parallel(Func(models['villa_1'].detachNode), Func(retro_card['retro_v1b'].show), Func(retro_tex['retro_v1b'].play))	pierwszy szum - poczatek (prawdziwy szum)	0.79	
+0	:	41	.	35	41.35	Parallel(Func(retro_card['retro_v1b'].detachNode), Sequence(board_intervals['villa_3'], board_intervals['villa_4']))	pierwszy szum - koniec	W latach piecdziesiatych obiekt przydzielony zostal Klubowi Pracy Tworczej.	In the 1950s, the facility was assigned to the Creative Work Club.
+0	:	44	.	00	44.00	Parallel(Func(retro_card['retro_v2'].show), Func(retro_tex['retro_v2'].play))	drugi szum - poczatek (prawdziwy szum)	0.19	Parallel(Func(retro_card['retro_v2'].show), Func(retro_tex['retro_v2'].play))
+0	:	44	.	19	44.19	Parallel(Func(retro_card['retro_v2'].detachNode))	drugi szum - koniec	oryginalnie: 44.19	
+0	:	47	.	01	47.01	Parallel(Func(models['villa_4'].detachNode), Func(retro_card['retro_td'].show), Func(retro_tex['retro_td'].play))	efekt - poczatek	1.73	
+0	:	48	.	74	48.74	Parallel(Func(retro_card['retro_td'].detachNode), board_intervals['signboard'])	efekt - koniec	od strony ul. Warszawskiej zajmowala redakcja efemerycznego tygodnika	from the side of ul. Warszawska was occupied by the editorial staff of the ephemeral weekly
 0	:	51	.	84	51.84	board_intervals['villa_2']			
 0	:	52	.	21	52.21	Parallel(Func(models['villa_2'].detachNode), Func(set_card[0].show))	szum 6x przerywany - 1 poczatek	set rector	
 0	:	52	.	26	52.26	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[0].detachNode))	szum 6x przerywany - 1 koniec		
@@ -31,14 +31,14 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	52	.	49	52.49	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[3].detachNode))	szum 6x przerywany - 4 koniec		
 0	:	52	.	52	52.52	Parallel(Func(models['villa_2'].detachNode), Func(set_card[4].show))	szum 6x przerywany - 5 poczatek		
 0	:	52	.	54	52.54	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[4].hide))	szum 6x przerywany - 5 koniec		
-0	:	52	.	56	52.56	Parallel(Func(models['villa_2'].detachNode), Func(set_card[4].show))	szum 6x przerywany - 6 poczatek		
-0	:	52	.	74	52.74	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[4].detachNode))	szum 6x przerywany - 6 koniec		
-0	:	53	.	38	53.38	Parallel(Func(models['villa_2'].detachNode), Func(ray_card.show), Func(ray_tex.play))	(szum echo 2x)	0.89	
+0	:	52	.	56	52.56	Parallel(Func(models['villa_2'].detachNode), Func(set_card[5].show))	szum 6x przerywany - 6 poczatek	0.18	
+0	:	52	.	74	52.74	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[5].detachNode))	szum 6x przerywany - 6 koniec		
+0	:	53	.	38	53.38	Parallel(Func(models['villa_2'].detachNode), Func(retro_card['retro_rw'].show), Func(retro_tex['retro_rw'].play))	(szum echo 2x)	0.89	
 0	:	53	.	70	53.70		(szum echo 2x)		
-0	:	54	.	27	54.27	Parallel(Func(ray_card.detachNode), Func(pulse_card.show), Func(pulse_tex.play))	(szum z basowym efektem) - poczatek	1.06	
-0	:	55	.	33	55.33	Parallel(Func(pulse_card.detachNode), Func(set_card[5].show))	(szum z basowym efektem) - koniec		
-0	:	55	.	38	55.38		szum	0.32	
-0	:	55	.	70	55.70	Parallel(Func(set_card[5].detachNode), board_intervals['p1'])	od kilku lat odbywaja sie tu zloty bandy komputerowcow	od kilku lat odbywaja sie tu zloty bandy komputerowcow	For several years, rallies of computer enthusiasts have been held here.
+0	:	54	.	27	54.27	Parallel(Func(retro_card['retro_rw'].detachNode), Func(retro_card['retro_sf'].show), Func(retro_tex['retro_sf'].play))	(szum z basowym efektem) - poczatek	1.06	
+0	:	55	.	33	55.33	Parallel(Func(retro_card['retro_sf'].detachNode))	(szum z basowym efektem) - koniec		
+0	:	55	.	38	55.38	Parallel(Func(retro_card['retro_v1'].show), Func(retro_tex['retro_v1'].play))	szum	0.32	
+0	:	55	.	70	55.70	Parallel(Func(retro_card['retro_v1'].detachNode), board_intervals['p1'])	od kilku lat odbywaja sie tu zloty bandy komputerowcow	od kilku lat odbywaja sie tu zloty bandy komputerowcow	For several years, rallies of computer enthusiasts have been held here.
 0	:	58	.	80	58.80	board_intervals['p2']	demoscenowacmi (jakies zdjecie kwit z archiwow demosceny;)	samozwanczo nazywaja sie demoscenowcami	They self-proclaimed themselves as Demoscene.
 0	:	61	.	90	61.90	board_intervals['p3']	oprocz spozywania... - poczatek	oprocz spozywania ogromnych ilosci trunkow wyskokowych	Apart from consuming huge amounts of alcoholic beverages,
 0	:	65	.	00	65.00	board_intervals['alco']	muzyki (cos z muzyka)	ow partowicze sluchaja dziwnej muzyki	these partygoers listen to strange music,
@@ -64,13 +64,22 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 2	:	06	.	50	126.50	Func(models['room_1'].detachNode)	wywalenie obiektu room_1		
 2	:	12	.	50	132.50	Func(models['room_3'].reparent_to, base.render)	wstawienie obiektu room_3		
 2	:	30	.	00	150.00	Parallel(beat_interval, Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render))	bar + corridor in front of the toilet (first loop by the bar)		
+2	:	46	.	00	166.00	dust_interval	dust		
 3	:	05	.	00	185.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.		
 3	:	06	.	00	186.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.		
-3	:	07	.	00	187.00	Func(models['hall_low'].reparent_to, base.render)	models['hall_low'].reparent_to(base.render)		
+3	:	09	.	00	189.00	Func(models['hall_low'].reparent_to, base.render)	models['hall_low'].reparent_to(base.render)		
 3	:	16	.	00	196.00	Parallel(beat_interval, Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render))	the moment of inlet to the toilet		
-3	:	18	.	00	198.00		action in the toilet until the end of the stop on the mirror) (to be negotiated!)		
+3	:	18	.	00	198.00	trainspotting_sequence	action in the toilet until the end of the stop on the mirror) (to be negotiated!)		
+3	:	26	.	00	206.00	trainspotting_sequence			
 3	:	32	.	00	212.00		greetings		
-3	:	34	.	00	214.00		remoteness from the mirror all the way to the main registration room		
+3	:	34	.	00	214.00	Parallel(beat_interval, Func(set_modes_and_filters, PRESETS[6]), Func(models['hall_low'].reparent_to, base.render))	remoteness from the mirror all the way to the main registration room		
+3	:	38	.	00	218.00	Parallel(beat_interval)			
+3	:	42	.	00	222.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render))			
+3	:	46	.	00	226.00	Parallel(beat_interval, Func(models['wc'].detachNode))			
+3	:	50	.	00	230.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render))			
+3	:	53	.	50	233.50	Parallel(Func(models['stairs_low'].detachNode))			
+3	:	54	.	00	234.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render))	Parallel(beat_interval, Func(models['stairs_low'].detachNode), Func(models['register'].reparent_to, base.render))		
+3	:	58	.	00	238.00	Parallel(beat_interval)			
 4	:	03	.	56	243.56		the effect of entering the registration room		
 4	:	06	.	00	246.00		actions in the registration room		
 4	:	22	.	00	262.00		inlet to the main hall		
