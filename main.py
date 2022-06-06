@@ -44,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 109  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186
+JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186
 PRESETS = [
     {
         'preset': 0,
@@ -899,12 +899,12 @@ def accept_effect():
     # print('stairs_low:', models['stairs_low'].getTightBounds())
     # models['stairs_hi'].reparent_to(base.render)
     # print('stairs_hi:', models['stairs_hi'].getTightBounds())
-    models['register'].reparent_to(base.render)
-    print('register:', models['register'].getTightBounds())
-    # models['wc'].reparent_to(base.render)
-    # print('wc:', models['wc'].getTightBounds())
-    spectator.set_pos_hpr(2.225859478385013, -1.2, .4, -90, 0, 0)
-    base.camLens.setFov(115)
+    # models['register'].reparent_to(base.render)
+    # print('register:', models['register'].getTightBounds())
+    models['wc'].reparent_to(base.render)
+    print('wc:', models['wc'].getTightBounds())
+    # spectator.set_pos_hpr(2.225859478385013, -1.2, .4, -90, 0, 0)
+    # base.camLens.setFov(115)
     # interval = ParticleInterval(
     #     particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
     #     parent=base.render,
@@ -924,9 +924,11 @@ def accept_effect():
     # )
     # interval = LerpScaleInterval(spectator, 2, 1, 10, blendType='easeOut')
     # interval = LerpFunc(lens_function, 2, 1, 90, blendType='easeOut')
-    set_modes_and_filters(PRESETS[2])
-    dust_interval.start()
+    # set_modes_and_filters(PRESETS[2])
+    # dust_interval.start()
 
+    set_modes_and_filters(PRESETS[7])
+    spectator.set_pos_hpr(-4.75, -4.5, 0.35, 180, 0, 0)
 
 def display_cleanup():
     for display_particle_effect in display_particle_effects:
@@ -1482,6 +1484,34 @@ for i in range(6):
     set_tex[i] = base.loader.loadTexture(f'models/set_{i}_fit.png')
     set_card[i].setTexture(set_tex[i])
     set_card[i].hide()
+
+# Mirror
+format = GeomVertexFormat.getV3n3c4()
+vertexData = GeomVertexData('mirror', format, Geom.UHStatic)
+vertexData.setNumRows(4)
+vertices = GeomVertexWriter(vertexData, 'vertex')
+vertices.addData3f(-1, 0, 1)
+vertices.addData3f(1, 0, 1)
+vertices.addData3f(1, 0, -1)
+vertices.addData3f(-1, 0, -1)
+# Store the triangles, counter clockwise from front
+primitive = GeomTriangles(Geom.UHStatic)
+primitive.addVertices(3, 1, 0)
+primitive.addVertices(3, 2, 1)
+geom = Geom(vertexData)
+geom.addPrimitive(primitive)
+node = GeomNode('mirror gnode')
+node.addGeom(geom)
+mirror_node_path = base.render.attachNewNode(node)
+mirror_node_path.setTransparency(TransparencyAttrib.M_alpha)
+tex = base.loader.loadTexture('models/Neon-Square-PNG-Clipart.png')
+mirror_node_path.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
+mirror_node_path.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr(LVecBase3f(0, -90, 0)))
+mirror_node_path.setTexOffset(TextureStage.getDefault(), .5, .5)
+mirror_node_path.setTexScale(TextureStage.getDefault(), .5, 1, .5)
+mirror_node_path.setTexProjector(TextureStage.getDefault(), base.render, mirror_node_path)
+mirror_node_path.setTexture(tex)
+mirror_node_path.set_pos_hpr(-4.75, -5.31611, 0.35, 180, 0, 0)
 
 # Events
 with open(path+'/models/events.tsv') as file_object:
