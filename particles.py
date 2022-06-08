@@ -10,6 +10,7 @@ from panda3d.physics import BaseParticleRenderer
 from panda3d.physics import LinearJitterForce
 from panda3d.physics import LinearNoiseForce
 from panda3d.physics import LinearVectorForce
+# from panda3d.physics import LinearSourceForce
 from panda3d.physics import LinearCylinderVortexForce
 from panda3d.physics import PointParticleRenderer
 
@@ -412,4 +413,51 @@ def init_dust_particle_effect(point_size):
     force_group.addForce(force4)
 
     particle_effect.addForceGroup(force_group)
+    return particle_effect
+
+
+def init_greetings_particle_effect(point_size):
+    litter_size = 200  # 250  # 10  # 20
+    life_span = 2
+    particle_effect = ParticleEffect()
+    particles = Particles('greetings')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(point_size)
+    particles.set_emitter("BoxEmitter")
+    particles.setPoolSize(round((litter_size*1.4)*60*(life_span+0.25)))
+    # particles.setPoolSize(40000)
+    particles.setBirthRate(1/60)
+    particles.setLitterSize(litter_size)
+    particles.setLitterSpread(round(litter_size * 0.4))
+    # Factory parameters
+    particles.factory.set_lifespan_base(life_span)
+    particles.factory.setLifespanSpread(0.2500)
+    particles.factory.set_terminal_velocity_base(400.0000)
+    # Renderer parameters
+    particles.renderer.setStartColor((13/255, 8/255, 244/255, 1))
+    particles.renderer.setEndColor((166/255, 28/255, 158/255, 1))
+    particles.renderer.setBlendType(1)
+    # particles.renderer.setBlendMethod(3)
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_IN_OUT)
+    # particles.renderer.set_user_alpha(0.50)
+    # particles.renderer.set_user_alpha(0.45)
+    # particles.renderer.set_user_alpha(0.80)
+    # Emitter parameters
+    particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
+    particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
+    particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
+    # Box parameters
+    particles.emitter.set_min_bound((-4.75-1, -5.31611-.5, 0.35-1))  # -5.31611
+    particles.emitter.set_max_bound((-4.75+1, -5.31611-.4, 0.35+1))  # -5.31611
+    particle_effect.add_particles(particles)
+
+    # Force
+    force_group = ForceGroup('force_group')
+    # Force parameters
+    force_group.addForce(LinearJitterForce(.2, 0))
+    force_group.addForce(LinearNoiseForce(.025, 0))
+    particle_effect.add_force_group(force_group)
+
     return particle_effect

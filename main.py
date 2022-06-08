@@ -926,6 +926,7 @@ def accept_effect():
     # interval = LerpFunc(lens_function, 2, 1, 90, blendType='easeOut')
     # set_modes_and_filters(PRESETS[2])
     # dust_interval.start()
+    greetings_interval.start()
 
     set_modes_and_filters(PRESETS[7])
     spectator.set_pos_hpr(-4.75, -4.5, 0.35, 180, 0, 0)
@@ -1504,7 +1505,8 @@ node = GeomNode('mirror gnode')
 node.addGeom(geom)
 mirror_node_path = base.render.attachNewNode(node)
 mirror_node_path.setTransparency(TransparencyAttrib.M_alpha)
-tex = base.loader.loadTexture('models/Neon-Square-PNG-Clipart.png')
+# tex = base.loader.loadTexture('models/Neon-Square-PNG-Clipart.png')
+tex = base.loader.loadTexture('models/tex_dmg.png')
 mirror_node_path.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
 mirror_node_path.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr(LVecBase3f(0, -90, 0)))
 mirror_node_path.setTexOffset(TextureStage.getDefault(), .5, .5)
@@ -1512,6 +1514,16 @@ mirror_node_path.setTexScale(TextureStage.getDefault(), .5, 1, .5)
 mirror_node_path.setTexProjector(TextureStage.getDefault(), base.render, mirror_node_path)
 mirror_node_path.setTexture(tex)
 mirror_node_path.set_pos_hpr(-4.75, -5.31611, 0.35, 180, 0, 0)
+
+greetings_interval = ParticleInterval(
+    particleEffect=init_greetings_particle_effect(PRESETS[6]['render_mode_thickness']),
+    parent=base.render,
+    worldRelative=True,
+    duration=10,
+    softStopT=-2.25,
+    cleanup=True,
+    name='greetings'
+)
 
 # Events
 with open(path+'/models/events.tsv') as file_object:
