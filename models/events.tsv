@@ -46,7 +46,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	71	.	20	71.20	board_intervals['nox']	dema (jakies demo by Damage)	oraz jakies dema	and some demos.
 0	:	74	.	30	74.30	board_intervals['xenium']	xenium	party nazywa sie xenium, a wczesniej w wolnym tlumaczeniu	The party is called \"Xenium\", and earlier in free translation,
 0	:	77	.	40	77.40	board_intervals['river']	riverwash - poczatek	twoja stara pierze w rzece	\"Your Mother Washes in the River\".
-0	:	84	.	00	84.00	Parallel(Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, 1, 90, blendType='easeOut'))	efekt przejscia w demo		
+0	:	84	.	00	84.00	Parallel(Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, .2, 90, blendType='easeOut'))	efekt przejscia w demo		
 1	:	26	.	00	86.00	Func(models['garden'].reparent_to, base.render)	kramsta by damage		
 1	:	27	.	00	87.00	Func(base.camLens.setFov, 90)	https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses		
 1	:	29	.	00	89.00	rain_interval	Ogrodek+deszcz		
@@ -58,11 +58,11 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 1	:	52	.	50	112.50	Func(models['garden_large'].detachNode)	wywalenie obiektu garden_large		
 1	:	53	.	50	113.50	Func(models['entrance'].reparent_to, base.render)	wstawienie obiektu entrance		
 1	:	56	.	00	116.00	Func(models['podium'].detachNode)	wywalenie obiektu podium		
-1	:	58	.	00	118.00	Parallel(beat_interval, Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].reparent_to, base.render))	lot po wlocie do srodka az do baru		
-1	:	59	.	00	119.00	Func(base.camLens.setFov, 115)	https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses		
-2	:	04	.	50	124.50	Func(models['room_2'].reparent_to, base.render)	wstawienie obiektu room_2		
-2	:	06	.	50	126.50	Func(models['room_1'].detachNode)	wywalenie obiektu room_1		
-2	:	12	.	50	132.50	Func(models['room_3'].reparent_to, base.render)	wstawienie obiektu room_3		
+1	:	58	.	00	118.00	Parallel(beat_interval, Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].reparent_to, base.render), Func(models['room_2'].reparent_to, base.render), Func(base.camLens.setFov, 115))	lot po wlocie do srodka az do baru		
+1	:	59	.	00	119.00		https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses		
+2	:	04	.	50	124.50		wstawienie obiektu room_2		
+2	:	10	.	00	130.00	Parallel(Func(models['room_1'].detachNode), Func(models['room_3'].reparent_to, base.render))	wywalenie obiektu room_1		
+2	:	12	.	50	132.50		wstawienie obiektu room_3		
 2	:	30	.	00	150.00	Parallel(beat_interval, Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render))	bar + corridor in front of the toilet (first loop by the bar)		
 2	:	46	.	00	166.00	dust_interval	dust		
 3	:	05	.	00	185.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.		
@@ -71,15 +71,15 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 3	:	16	.	00	196.00	Parallel(beat_interval, Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render))	the moment of inlet to the toilet		
 3	:	18	.	00	198.00	trainspotting_sequence	action in the toilet until the end of the stop on the mirror) (to be negotiated!)		
 3	:	26	.	00	206.00	trainspotting_sequence			
-3	:	32	.	00	212.00		greetings		
+3	:	32	.	00	212.00	greetings_interval	greetings		
 3	:	34	.	00	214.00	Parallel(beat_interval, Func(set_modes_and_filters, PRESETS[6]), Func(models['hall_low'].reparent_to, base.render))	remoteness from the mirror all the way to the main registration room		
-3	:	38	.	00	218.00	Parallel(beat_interval)			
+3	:	38	.	00	218.00	beat_interval			
 3	:	42	.	00	222.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render))			
 3	:	46	.	00	226.00	Parallel(beat_interval, Func(models['wc'].detachNode))			
 3	:	50	.	00	230.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render))			
-3	:	53	.	50	233.50	Parallel(Func(models['stairs_low'].detachNode))			
+3	:	53	.	50	233.50	Func(models['stairs_low'].detachNode)			
 3	:	54	.	00	234.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render))	Parallel(beat_interval, Func(models['stairs_low'].detachNode), Func(models['register'].reparent_to, base.render))		
-3	:	58	.	00	238.00	Parallel(beat_interval)			
+3	:	58	.	00	238.00	beat_interval			
 4	:	03	.	56	243.56		the effect of entering the registration room		
 4	:	06	.	00	246.00		actions in the registration room		
 4	:	22	.	00	262.00		inlet to the main hall		

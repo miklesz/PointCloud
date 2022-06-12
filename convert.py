@@ -10,18 +10,27 @@ from panda3d.core import *
 # K_VERTICES = 1000
 # K_VERTICES = int(12419935/1000)
 RTAB = False
+factor = 3
 
 # NAME = 'garden'
 # ANGLE = -84  # garden: -84
 
-ANGLE = -169  # historyczny z GitHub, dobry dla hall
+# ANGLE = -169  # historyczny z GitHub, good for hall
 
 # NAME = 'garden_large'
 # NAME = 'wc'
 # NAME = 'hall'
 # NAME = 'bar'
-NAME = 'room_3'
+# NAME = 'room_3'
+
+# NAME = 'garden_large'
 # ANGLE = 21.5  # garden_large: 21 (trochę leci w prawo), 22 (trochę leci w lewo)
+
+NAME = 'podium'
+ANGLE = 0
+
+# NAME = 'entrance'
+# ANGLE = 0
 
 theta = radians(ANGLE)
 cos_t = cos(theta)
@@ -43,7 +52,7 @@ def create_points():
     array = GeomVertexArrayFormat()
     array.addColumn(InternalName.make("vertex"), 3, Geom.NT_float32, Geom.C_point)
     array.addColumn(InternalName.make("color"), 4, Geom.NT_uint8, Geom.C_color)
-    array.addColumn(InternalName.make("index"), 1, Geom.NT_int32, Geom.C_index)
+    # array.addColumn(InternalName.make("index"), 1, Geom.NT_int32, Geom.C_index)
 
     vertex_format = GeomVertexFormat()
     vertex_format.addArray(array)
@@ -53,8 +62,10 @@ def create_points():
     # vertex_data.set_num_rows(8)
 
     pos_writer = GeomVertexWriter(vertex_data, "vertex")
-    index_writer = GeomVertexWriter(vertex_data, "index")
+    # index_writer = GeomVertexWriter(vertex_data, "index")
     color_writer = GeomVertexWriter(vertex_data, 'color')
+
+    # Reading lines
 
     print('Reading lines')
     with open(f'models_other/{NAME}.ply') as f:
@@ -72,56 +83,55 @@ def create_points():
         else:
             r, g, b, a = float(fields[3])/255, float(fields[4])/255, float(fields[5])/255, 1
         points.append([x, y, z, r, g, b, a])
-    #
+
+    # Dumping points
+
     # print('Dumping points')
     # with open(f'{NAME}', 'wb') as f2:
     #     pickle.dump(points, f2)
 
+    # Loading points
+
     # print('Loading points')
     # with open(f'{NAME}', 'rb') as f2:
-    # # with open(f'points', 'rb') as f2:
-    #         points = pickle.load(f2)
-    # #
-    # if theta:
-    #     print('Rotating points')
-    #     for i in range(len(points)):
-    #         points[i][0], points[i][1] = points[i][0]*cos_t-points[i][1]*sin_t, points[i][0]*sin_t+points[i][1]*cos_t
+    #     points = pickle.load(f2)
+
+    # Rotating poins (if applicable)
+
+    if theta:
+        print('Rotating points')
+        for i in range(len(points)):
+            points[i][0], points[i][1] = points[i][0]*cos_t-points[i][1]*sin_t, points[i][0]*sin_t+points[i][1]*cos_t
+
+    # Excluding points (if applicable)
 
     print('Excluding points (if applicable)')
-
     # Przedpokój przy WC
     # points = [point for point in points if point[2] < -0.1 and point[0] > 0.2]
-
     # Schody dolne
     # points = [point for point in points if point[0] <= 0.2 and point[1] > -0.4]
     # points = [point for point in points if not (point[0] > -2.0 and point[2] > -0.1)]
-
     # Schody górne
     # points = [point for point in points if point[1] <= -0.4 and point[0] < -2.2]
-
     # Rejestracja
     # points = [point for point in points if point[0] >= -2.2 and point[2] >= -0.1]
     # points = [point for point in points if not (point[0] < -1.8 and point[1] > 0.5 and point[2] < 0.1)]
-
     # garden_large
     # points = [point for point in points if point[1] < 2.5]
-
     # garden
-    # points = [point for point in points if point[1] >= -8.7]
+    points = [point for point in points if point[1] >= -8.7]
 
-    # print(f'len(lines) = {len(lines)}')
-    print(f'len(points) = {len(points)}')
-    # factor = len(points)/(K_VERTICES * 1000)
-    factor = 1
-    print(f'factor = {factor}')
+    # Constructing object
 
     print('Constructing object')
-    # for vertex in range(K_VERTICES * 1000):
+    print(f'len(points) = {len(points)}')
+    print(f'factor = {factor}')
+    print(f'len(points)//factor = {len(points)//factor}')
     for vertex in range(len(points)//factor):
         x, y, z, r, g, b, a = points[int(vertex*factor)]
         pos_writer.addData3(x, y, z)
         color_writer.addData4(r, g, b, a)
-        index_writer.addData1i(vertex)
+        # index_writer.addData1i(vertex)
 
     # index = 0
     # for line in lines:
@@ -166,12 +176,16 @@ print(model.get_tight_bounds())
 # Set frame rate meter
 base.set_frame_rate_meter(True)
 
-model.setHpr(0, 90, 0)
-base.run()
+# model.setHpr(0, 90, 0)
+# base.run()
 
 # model.writeBamFile(f'models/{NAME}_{K_VERTICES}k.bam')
 # model.writeBamFile(f'models/{NAME}.bam')
 # model.writeBamFile(f'models/stairs_hi.bam')
 # model.writeBamFile(f'models/register_half.bam')
 # model.writeBamFile(f'models/bar.bam')
-model.writeBamFile(f'models/room_3.bam')
+# model.writeBamFile(f'models/room_3.bam')
+# model.writeBamFile(f'models/garden_{factor}.bam')
+# model.writeBamFile(f'models/garden_large_{factor}.bam')
+model.writeBamFile(f'models/podium_{factor}.bam')
+# model.writeBamFile(f'models/entrance_{factor}.bam')

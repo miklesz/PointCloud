@@ -18,6 +18,7 @@ setup(
                 'models/**',
                 'music/*',
                 'icons/*',
+                'config/*',
                 # 'particles/*'
             ],
             # 'console_apps': {

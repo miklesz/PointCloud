@@ -449,8 +449,8 @@ def init_greetings_particle_effect(point_size):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((-4.75-1, -5.31611-.5, 0.35-1))  # -5.31611
-    particles.emitter.set_max_bound((-4.75+1, -5.31611-.4, 0.35+1))  # -5.31611
+    particles.emitter.set_min_bound((-4.75-1*1.2, -5.25-.4, 0.35-1*.8))  # -.4  # -5.31611
+    particles.emitter.set_max_bound((-4.75+1*1.2, -5.25-.5, 0.35+1*.8))  # -.5  # -5.31611
     particle_effect.add_particles(particles)
 
     # Force

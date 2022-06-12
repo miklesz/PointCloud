@@ -28,7 +28,7 @@ current_modes_and_filters = {
 enable_roping = True
 done = False
 # pos_hpr_amplitudes = [.05, .05, .05, .5, .5, .5]  # .005, .5
-pos_hpr_amplitudes = [.1, .1, .1, 1, 1, 1]  # .005, .5
+pos_hpr_amplitudes = [.1, .1, .1, 5, 5, 5]  # .005, .5
 # pos_hpr_amplitudes = [.010 * (Randomizer().randomRealUnit() / 25 + 1) for a in range(3)] + \
 #                      [.500 * (Randomizer().randomRealUnit() / 25 + 1) for b in range(3)]
 # pos_hpr_offsets = [Randomizer().randomReal(2*pi) for i in range(6)]
@@ -44,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186
+JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206
 PRESETS = [
     {
         'preset': 0,
@@ -272,8 +272,10 @@ def accept():
     base.accept('arrow_down', accept_pitch, [-2])
     base.accept('arrow_up-repeat', accept_pitch, [+2])
     base.accept('arrow_down-repeat', accept_pitch, [-2])
-    base.accept('lshift', accept_shift, [-5])
-    base.accept('rshift', accept_shift, [+5])
+    # base.accept('lshift', accept_shift, [-5])
+    # base.accept('rshift', accept_shift, [+5])
+    base.accept(',', accept_shift, [-5])
+    base.accept('.', accept_shift, [+5])
     base.accept('e', accept_effect)
     base.accept('j', demo_parallel.setT, [JUMP])
 
@@ -292,7 +294,7 @@ time: {str(round(music.get_time(), 2))}
     if not demo_parallel.isPlaying():
         text += f'''\
 escape: sys.exit
-space: start/stop demo (lshift/rshift to skip)
+space: start/stop demo (,/. to skip)
 j: jump to time
 
 # Render Modes
@@ -929,7 +931,8 @@ def accept_effect():
     greetings_interval.start()
 
     set_modes_and_filters(PRESETS[7])
-    spectator.set_pos_hpr(-4.75, -4.5, 0.35, 180, 0, 0)
+    base.camLens.setFov(115)
+    spectator.set_pos_hpr(-4.75, -4.95, 0.10, 180, 0, 0)
 
 def display_cleanup():
     for display_particle_effect in display_particle_effects:
@@ -962,9 +965,16 @@ def display_cleanup():
 #
 #     return Task.done
 
+# Config
+# noinspection PyUnresolvedReferences
+loadPrcFile("config/Confauto.prc")
+loadPrcFile("config/Config.prc")
 
 # Init ShowBase
 base = ShowBase()
+
+print(cpMgr)
+# exit()
 
 has_force = False
 
@@ -999,6 +1009,8 @@ base.setBackgroundColor(0, 0, 0)
 
 # Set frame rate meter
 base.set_frame_rate_meter(True)
+# frm = FrameRateMeter()
+# frm.setUpdateInterval(10)
 
 # Set camera lens field of view
 # base.camLens.setFov(150)
@@ -1179,29 +1191,19 @@ model_dict = {
     'p2': {'name': 'p2', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'p3': {'name': 'p3', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
 
-    'sign': {'name': 'sign_1000k', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
-    'garden': {'name': 'garden_1000k', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
-    'garden_large': {'name': 'garden_large_1000k', 'pos_hpr': (18, -10.7, .5, 0, 0, 0)},
-    'podium': {'name': 'podium_200k', 'pos_hpr': (15.5, -2.8, 2.7, -15, 0, 0)},
-    'entrance': {'name': 'entrance_200k', 'pos_hpr': (12.0, 4.8, 1.8, -109, 0, 0)},
-    # 'room_1': {'name': 'room_1_200k', 'pos_hpr': (+5.7, 3.5, 0, -43.5, 0, 0)},
+    'sign': {'name': 'sign', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
+    'garden': {'name': 'garden_5', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
+    'garden_large': {'name': 'garden_large_10', 'pos_hpr': (18, -10.7, .5, 0, 0, 0)},
+    'podium': {'name': 'podium_3', 'pos_hpr': (15.5, -2.8, 2.7, 175.5, 0, 0)},
+    'entrance': {'name': 'entrance_3', 'pos_hpr': (12.0, 4.8, 1.8, 83, 0, 0)},  # -109
     'room_1': {'name': 'room_1', 'pos_hpr': (+5.7, 3.5, 0, +147, 0, 0)},
-    # 'room_2': {'name': 'room_2_200k', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
     'room_2': {'name': 'room_2', 'pos_hpr': (-1, 3, 0, +132, 90, 0)},
-    # 'room_3': {'name': 'room_3_200k', 'pos_hpr': (-5.3, 4.15, -.1, -97.5, 0, 0)},
     'room_3': {'name': 'room_3', 'pos_hpr': (-5.3, 4.15, -.1, +92, 0, 0)},
-    # 'bar': {'name': 'bar_200k', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
     'bar': {'name': 'bar', 'pos_hpr': (1.9, -3.4, 0, 56, 0, 0)},
-    # 'hall_low': {'name': 'hall_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'hall_low': {'name': 'hall_low', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    # 'wc': {'name': 'wc', 'pos_hpr': (-4.0, -3.7, 0, -100, 0, 0)},
     'wc': {'name': 'wc', 'pos_hpr': (-4.0, -3.7, 0, 90, 0, 0)},
-    # 'stairs_low': {'name': 'stairs_low_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'stairs_low': {'name': 'stairs_low', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    # 'stairs_hi': {'name': 'stairs_hi_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'stairs_hi': {'name': 'stairs_hi', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    # 'register': {'name': 'register_200k', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
-    # 'register': {'name': 'register', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'register': {'name': 'register_half', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
 }
@@ -1248,6 +1250,7 @@ spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
 # models['room_3'].reparent_to(base.render)
 # models['bar'].reparent_to(base.render)
 # models['hall_low'].reparent_to(base.render)
+# models['stairs_low'].reparent_to(base.render)
 # models['wc'].reparent_to(base.render)
 
 # print()
@@ -1506,22 +1509,22 @@ node.addGeom(geom)
 mirror_node_path = base.render.attachNewNode(node)
 mirror_node_path.setTransparency(TransparencyAttrib.M_alpha)
 # tex = base.loader.loadTexture('models/Neon-Square-PNG-Clipart.png')
-tex = base.loader.loadTexture('models/tex_dmg.png')
+tex = base.loader.loadTexture('models/tex_dmg_new.png')
 mirror_node_path.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
 mirror_node_path.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr(LVecBase3f(0, -90, 0)))
 mirror_node_path.setTexOffset(TextureStage.getDefault(), .5, .5)
 mirror_node_path.setTexScale(TextureStage.getDefault(), .5, 1, .5)
 mirror_node_path.setTexProjector(TextureStage.getDefault(), base.render, mirror_node_path)
 mirror_node_path.setTexture(tex)
-mirror_node_path.set_pos_hpr(-4.75, -5.31611, 0.35, 180, 0, 0)
+mirror_node_path.set_pos_hpr(-4.75, -5.25, 0.35, 180, 0, 0)
 
 greetings_interval = ParticleInterval(
     particleEffect=init_greetings_particle_effect(PRESETS[6]['render_mode_thickness']),
     parent=base.render,
     worldRelative=True,
-    duration=10,
-    softStopT=-2.25,
-    cleanup=True,
+    duration=6,
+    softStopT=2,
+    # cleanup=True,
     name='greetings'
 )
 
