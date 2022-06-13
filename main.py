@@ -44,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206
+JUMP = 150  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206
 PRESETS = [
     {
         'preset': 0,
@@ -966,13 +966,15 @@ def display_cleanup():
 #     return Task.done
 
 # Config
-# noinspection PyUnresolvedReferences
-loadPrcFile("config/Confauto.prc")
-loadPrcFile("config/Config.prc")
+print('sys.platform:', sys.platform)
+if sys.platform == 'darwin':
+    loadPrcFile("config/Confauto.prc")
+    loadPrcFile("config/Config.prc")
 
 # Init ShowBase
 base = ShowBase()
 
+# noinspection PyUnresolvedReferences
 print(cpMgr)
 # exit()
 
@@ -1316,7 +1318,8 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
     display_sequence.append(Func(force_display, display_particle_effect))
 
 # Sound interval
-music = base.loader.loadSfx("music/KramstaByDamage (new version).ogg")  # Load music
+# music = base.loader.loadSfx("music/KramstaByDamage (new version).ogg")  # Load music
+music = base.loader.loadSfx("music/Kramsta by Damage RS.ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 rain_interval = ParticleInterval(
