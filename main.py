@@ -44,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 150  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206
+JUMP = 196  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206
 PRESETS = [
     {
         'preset': 0,
@@ -111,6 +111,8 @@ PRESETS = [
         'render_mode_thickness': 10,
     },
 ]
+SHAKE_DEN = 1
+STILL_START = 25
 VERBOSE = True  # False
 
 
@@ -224,9 +226,13 @@ def beat(t):
 #     # return task  # Unnecessary
 #     # return task
 
+def escape():
+    print('Escape pressed -> sys.exit')
+    sys.exit()
+
 
 def accept():
-    base.accept('escape', sys.exit)
+    base.accept('escape', escape)
     base.accept('v', toggle_volume)
     base.accept('f', toggle_fullscreen)
     base.accept('m', move_to_random)
@@ -643,16 +649,6 @@ def fov_function(t):
 def init_display_sequence():
     r.removeNode()
     rope_look.removeNode()
-    # print("Filename:", Filename("models/lead_32x18.png"))
-    # my_new_image = PNMImage(Filename("models/lead_32x18.png"))  # Read image
-    # print('my_new_image:', my_new_image)
-    #
-    # my_new_object = base.loader.loadModel('models/lead_1000k.bam')
-    # print('my_new_object:', my_new_object)
-
-    # fn = Filename("models/lead_32x18.png")
-    # fn.makeAbsolute()
-    # print(fn)
     display_sequence.start()
 
 
@@ -801,26 +797,15 @@ def accept_trainspotting():
 
 
 def handshaking_lerp_function(t):
-    i = int(len(pos_shake)*t)-1
+    i = int(len(pos_shake)*t*SHAKE_DEN)-1
     if i < 0:
         i = 0
     base.cam.set_pos(pos_shake[i])
     # print(i, pos_shake[i])
-    j = int(len(hpr_shake)*t)-1
+    j = int(len(hpr_shake)*t*SHAKE_DEN)-1
     if j < 0:
         j = 0
     base.cam.set_hpr(hpr_shake[j])
-    # print(j, hpr_shake[j])
-    # global pos_hpr_amplitudes
-    # global pos_hpr_offsets
-    # args = []
-    # for i in range(6):
-    #     pos_hpr_amplitudes[i] *= Randomizer().randomRealUnit() / 25 + 1  # 20?
-    #     # pos_hpr_offsets[i] *= Randomizer().randomRealUnit() / 60 + 1  # 30?
-    #     args.append(sin(pi * t + pos_hpr_offsets[i]) * pos_hpr_amplitudes[i])
-    # base.cam.set_pos_hpr(*args)
-    # # print(args)
-    # print(pos_hpr_offsets)
 
 
 def accept_handshaking():
@@ -903,8 +888,8 @@ def accept_effect():
     # print('stairs_hi:', models['stairs_hi'].getTightBounds())
     # models['register'].reparent_to(base.render)
     # print('register:', models['register'].getTightBounds())
-    models['wc'].reparent_to(base.render)
-    print('wc:', models['wc'].getTightBounds())
+    # models['wc'].reparent_to(base.render)
+    # print('wc:', models['wc'].getTightBounds())
     # spectator.set_pos_hpr(2.225859478385013, -1.2, .4, -90, 0, 0)
     # base.camLens.setFov(115)
     # interval = ParticleInterval(
@@ -928,11 +913,33 @@ def accept_effect():
     # interval = LerpFunc(lens_function, 2, 1, 90, blendType='easeOut')
     # set_modes_and_filters(PRESETS[2])
     # dust_interval.start()
-    greetings_interval.start()
+    # greetings_interval.start()
+    # set_modes_and_filters(PRESETS[7])
+    # base.camLens.setFov(115)
+    # spectator.set_pos_hpr(-4.75, -4.95, 0.10, 180, 0, 0)
 
-    set_modes_and_filters(PRESETS[7])
-    base.camLens.setFov(115)
-    spectator.set_pos_hpr(-4.75, -4.95, 0.10, 180, 0, 0)
+    wc_splash_interval.start()
+
+    # set_modes_and_filters(PRESETS[1])
+    # rain_splash_parent = base.render.attachNewNode('rain_splash_parent')
+    # rain_splash_parent.reparentTo(base.render)
+    # rain_splash_parent.setPos(0, 10, 0)
+    # rain_splash_interval = ParticleInterval(
+    #     particleEffect=init_splash_particle_effect(
+    #         point_size=current_modes_and_filters['render_mode_thickness'],
+    #         pool_size=round(400),
+    #     ),
+    #     parent=rain_splash_parent,
+    #     worldRelative=False,
+    #     duration=0.5+1/60,
+    #     softStopT=1/60,
+    #     cleanup=True,
+    #     name='rain_splash'
+    # )
+    # rain_splash_interval.start()
+
+    # spectator.set_pos_hpr(-5.5, -4.25, -.7, 90, 0, 0)
+
 
 def display_cleanup():
     for display_particle_effect in display_particle_effects:
@@ -1174,7 +1181,6 @@ pos_intervals = False
 
 # Load models and make point-clouds
 model_dict = {
-    'lead': {'name': 'lead_1000k', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'alco': {'name': 'alco', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'spodek': {'name': 'spodek', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'villa_0': {'name': 'villa_0', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
@@ -1264,32 +1270,11 @@ if VERBOSE:
 base.enableParticles()
 
 # Init display_sequence
-my_image_path = 'models/lead_32x18.png'
+my_image_path = 'models/lead_new_48x27.png'
 if path.startswith('/'):
     my_image_path = path+'/'+my_image_path
 print('my_image_path:', my_image_path)
 my_image = PNMImage(my_image_path)  # Read image (opt: 64x36)
-
-# my_image_path = path+'/models/lead_32x18.png'
-# if my_image_path[1:].startswith(':\\'):
-#     print("Replacing Windows path!")
-#     # my_image_path = my_image_path.replace('/', '\\')
-#     my_image_path = my_image_path.replace('/', '\\')
-#
-# my_image = PNMImage(my_image_path)  # Read image (opt: 64x36)
-
-# my_pnm_image = PNMImage('models/lead_32x18.png')
-
-# my_image = base.loader.loadTexture('models/lead_32x18.png')
-# print(my_image, type(my_image))
-#
-# my_pnm_image=PNMImage()
-# tex=my_image.getTexture()
-# tex.store(my_pnm_image)
-# print(my_pnm_image, type(my_pnm_image))
-
-# exit()
-
 display_sequence = Sequence()  # Initialise sequence
 display_particle_effects = []  # Append particle effects
 tile_size = 1.920 / my_image.getXSize()
@@ -1300,7 +1285,9 @@ for x in range(my_image.getXSize()):
         max_x = ((x + 1) - (my_image.getXSize() / 2)) * tile_size
         max_z = -((z + 1) - (my_image.getYSize() / 2)) * tile_size
         xel_a = my_image.getXelA(x, z)
-        if xel_a[3] >= 0:
+        # print(xel_a)
+        if xel_a[3] > 0.5:
+            xel_a[3] = 1
             display_particle_effects.append(init_display_particle_effect(
                 # current_modes_and_filters['render_mode_thickness'],
                 PRESETS[1]['render_mode_thickness'],
@@ -1316,10 +1303,10 @@ for display_particle_effect in display_particle_effects:  # Append functions
 display_sequence.append(Wait(5))  # Append wait
 for display_particle_effect in display_particle_effects:  # Append particle outs
     display_sequence.append(Func(force_display, display_particle_effect))
+# exit()
 
 # Sound interval
-# music = base.loader.loadSfx("music/KramstaByDamage (new version).ogg")  # Load music
-music = base.loader.loadSfx("music/Kramsta by Damage RS.ogg")  # Load music
+music = base.loader.loadSfx("audio/Kramsta by Damage 5xpik.ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 rain_interval = ParticleInterval(
@@ -1438,7 +1425,7 @@ for board_key in (
                 duration=duration,
                 pos=(
                     rn.randomRealUnit() * 2 * MAX_POS,
-                    rn.randomRealUnit() * 2 * MAX_POS + .61,
+                    rn.randomRealUnit() * 2 * MAX_POS + .59,
                     rn.randomRealUnit() * 2 * MAX_POS
                 ),
                 hpr=(
@@ -1448,7 +1435,7 @@ for board_key in (
                 ),
                 startPos=(
                     rn.randomRealUnit() * 2 * MAX_POS,
-                    rn.randomRealUnit() * 2 * MAX_POS + .61,
+                    rn.randomRealUnit() * 2 * MAX_POS + .59,
                     rn.randomRealUnit() * 2 * MAX_POS
                 ),
                 startHpr=(
@@ -1466,9 +1453,17 @@ for board_key in (
 retro_tex = {}
 retro_cm = {}
 retro_card = {}
-for retro_key in ('retro_td', 'retro_rw', 'retro_sf', 'retro_v1b', 'retro_v2', 'retro_v1'):
+import time
+for retro_key in (
+        'retro_td.mkv',
+        'retro_rw.mkv',
+        'retro_sf.mkv',
+        'retro_v1b.mkv',
+        'retro_v2.mkv',
+        'retro_v1.mkv'
+):
     retro_tex[retro_key] = MovieTexture(retro_key)
-    success = retro_tex[retro_key].read(f'models/{retro_key}.mkv')
+    success = retro_tex[retro_key].read(f'video/{retro_key}')
     assert success, "Failed to load video!"
     retro_tex[retro_key].stop()
     retro_cm[retro_key] = CardMaker(f"{retro_key} fullscreen card")
@@ -1478,19 +1473,20 @@ for retro_key in ('retro_td', 'retro_rw', 'retro_sf', 'retro_v1b', 'retro_v2', '
     retro_card[retro_key].setTexture(retro_tex[retro_key])
     retro_card[retro_key].reparentTo(base.render2d)
     retro_card[retro_key].hide()
-    # if retro_key == 'retro_v2':
-    #     retro_tex[retro_key].setTime(0)
 
 set_cm = {}
 set_card = {}
 set_tex = {}
-for i in range(6):
+for i in range(7+1):
     set_cm[i] = CardMaker(f'Set Rector {i}')
     set_cm[i].setFrameFullscreenQuad()
     set_card[i] = base.render2d.attachNewNode(set_cm[i].generate())
     set_tex[i] = base.loader.loadTexture(f'models/set_{i}_fit.png')
     set_card[i].setTexture(set_tex[i])
     set_card[i].hide()
+set_card[6].setTransparency(TransparencyAttrib.M_alpha)
+set_card[7].setTransparency(TransparencyAttrib.M_alpha)
+set_card[6].setPos(0, 0, 1.3)
 
 # Mirror
 format = GeomVertexFormat.getV3n3c4()
@@ -1521,12 +1517,28 @@ mirror_node_path.setTexProjector(TextureStage.getDefault(), base.render, mirror_
 mirror_node_path.setTexture(tex)
 mirror_node_path.set_pos_hpr(-4.75, -5.25, 0.35, 180, 0, 0)
 
+wc_splash_parent = base.render.attachNewNode('wc_splash_parent')
+wc_splash_parent.reparentTo(base.render)
+wc_splash_parent.setPos(-6.2, -4.23, -.8)
+wc_splash_interval = ParticleInterval(
+    particleEffect=init_splash_particle_effect(
+        point_size=PRESETS[7]['render_mode_thickness'],
+        pool_size=round(400*60*0.5)
+    ),
+    parent=wc_splash_parent,
+    worldRelative=False,
+    duration=2,
+    softStopT=1.5,
+    cleanup=True,
+    name='wc_splash'
+)
+
 greetings_interval = ParticleInterval(
     particleEffect=init_greetings_particle_effect(PRESETS[6]['render_mode_thickness']),
     parent=base.render,
     worldRelative=True,
-    duration=6,
-    softStopT=2,
+    duration=5.44,
+    softStopT=-2,
     # cleanup=True,
     name='greetings'
 )
@@ -1545,28 +1557,23 @@ for csv_line in csv_lines[1:]:
 
 # models['villa_0'].setTransparency(1)
 # models['villa_0'].setAlphaScale(.8)
-models['lead'].setTransparency(TransparencyAttrib.M_alpha)
-# models['lead'].setTransparency(6)
-# models['lead'].setColorScale(1, 1, 1, .5)
-# models['lead'].setColor(1, 1, 1, .5)
-# demo_parallel.append(Sequence(Wait(9), LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1))))
 
-# shake_den = (4+12)/2
-shake_den = 4
 pos_shake_rope_vertices = []
 hpr_shake_rope_vertices = []
-for pos_shake_rope_vertices_i in range(round(demo_parallel.getDuration()*shake_den)):
+for pos_shake_rope_vertices_i in range(round(demo_parallel.getDuration() * SHAKE_DEN)):
     pos_shake_rope_vertices.append((None, (
         pos_hpr_amplitudes[0] * Randomizer().randomRealUnit(),
         pos_hpr_amplitudes[1] * Randomizer().randomRealUnit(),
         pos_hpr_amplitudes[2] * Randomizer().randomRealUnit(),
     )))
-for hpr_shake_rope_vertices_i in range(round(demo_parallel.getDuration()*shake_den)):
+for hpr_shake_rope_vertices_i in range(round(demo_parallel.getDuration() * SHAKE_DEN)):
     hpr_shake_rope_vertices.append((None, (
         pos_hpr_amplitudes[3] * Randomizer().randomRealUnit(),
         pos_hpr_amplitudes[4] * Randomizer().randomRealUnit(),
         pos_hpr_amplitudes[5] * Randomizer().randomRealUnit(),
     )))
+pos_shake_rope_vertices[:STILL_START*SHAKE_DEN] = [(None, (0, 0, 0))]*STILL_START*SHAKE_DEN
+hpr_shake_rope_vertices[:STILL_START*SHAKE_DEN] = [(None, (0, 0, 0))]*STILL_START*SHAKE_DEN
 pos_shake_rope = Rope()
 hpr_shake_rope = Rope()
 pos_shake_rope.setup(4, pos_shake_rope_vertices)

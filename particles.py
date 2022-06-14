@@ -92,8 +92,8 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((min_x, .99, min_z))
-    particles.emitter.set_max_bound((max_x, .99, max_z))
+    particles.emitter.set_min_bound((min_x, .98, min_z))
+    particles.emitter.set_max_bound((max_x, .98, max_z))
     particle_effect.add_particles(particles)
 
     # Force
@@ -173,7 +173,7 @@ def init_glow_particle_effect(point_size):
     return particle_effect
 
 
-def init_splash_particle_effect(point_size):
+def init_splash_particle_effect(point_size, pool_size):
     litter_size = 300
     life_span = 0.5000  # 0.5000
     particle_effect = ParticleEffect()
@@ -183,8 +183,8 @@ def init_splash_particle_effect(point_size):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(point_size)
     particles.set_emitter("DiscEmitter")
-    particles.setPoolSize(1000)  # litter_size*60*life_span
-    particles.setBirthRate(0.0200)  # 1/60
+    particles.setPoolSize(pool_size)  # litter_size*60*life_span, 1000
+    particles.setBirthRate(1/60)  # 1/60
     particles.setLitterSize(litter_size)
     particles.setLitterSpread(100)
     particles.setSystemLifespan(0.0000)
@@ -192,7 +192,7 @@ def init_splash_particle_effect(point_size):
     particles.setSystemGrowsOlderFlag(0)
     # Factory parameters
     particles.factory.set_lifespan_base(life_span)
-    particles.factory.setLifespanSpread(0.2500)
+    # particles.factory.setLifespanSpread(0.2500)
     particles.factory.setMassBase(2.0000)
     particles.factory.setMassSpread(0.0100)
     particles.factory.set_terminal_velocity_base(400.0000)
@@ -216,7 +216,7 @@ def init_splash_particle_effect(point_size):
     particles.emitter.setExplicitLaunchVector(LVector3(1.0000, 0.0000, 0.0000))
     # particles.emitter.setExplicitLaunchVector(LVector3(0.0000, 0.0000, 0.0000))
 
-    particles.emitter.setRadiateOrigin(LPoint3(0.0000, 0.0000, 0.0000))
+    particles.emitter.setRadiateOrigin(LPoint3(0, 0, 0))
     # Disc parameters
     particles.emitter.setRadius(0.0500)
     particles.emitter.setOuterAngle(356.1859)

@@ -23,14 +23,14 @@ K_VERTICES = 200
 # NAME = 'sitek'
 # NAME = 'p1'
 # NAME = 'p2'
-NAME = 'p3'
+# NAME = 'p3'
 # NAME = 'river'
 # NAME = 'protracker'
 # NAME = 'alco'
 # NAME = 'villa_garden'
 # NAME = 'villa_street'
 # NAME = 'pano'
-# NAME = 'spodek'
+NAME = 'spodek'
 # NAME = 'party_all'
 # NAME = 'party_3some'
 # NAME = 'signboard'
@@ -208,48 +208,3 @@ base.camLens.setNear(.1)
 
 model.writeBamFile(f'models/{NAME}.bam')
 base.run()
-
-
-
-
-
-
-
-
-
-
-# model.ls()
-# model.analyze()
-
-# point_cloud = model.find("**/+GeomNode")
-# for geom in point_cloud.node().modify_geoms():
-#     geom.make_points_in_place()
-
-# for c in model.findAllMatches("**/+GeomNode"):
-#     gn = c.node()
-#     for i in range(gn.getNumGeoms()):
-#         state = gn.getGeomState(i)
-#         state = state.removeAttrib(TextureAttrib.getClassType())
-#         gn.setGeomState(i, state)
-
-# do some fancy calculations on the normals, or texture coordinates that you
-# don't want to do at runtime
-
-# Save your new custom Panda
-# model.writeBamFile(f 'models/{model_key}.bam')
-
-# point_cloud = model_dict[model_key]['model'].find("**/+GeomNode")
-# for geom in point_cloud.node().modify_geoms():
-#     print(geom)
-#     geom.make_points_in_place()
-# point_cloud.reparentTo(base.render)
-# del model_dict[model_key]['model']
-# del point_cloud
-#
-# model_dict[model_key]['cloud'] = model_dict[model_key]['model'].find("**/+GeomNode")
-# for geom in model_dict[model_key]['cloud'].node().modify_geoms():
-#     geom.make_points_in_place()
-
-# point_cloud.writeBamFile(f 'models/{model_key}/textured_output.bam')
-# point_cloud.writeBamFile(f 'models/bar_ply/textured_output.bam')
-# model.writeBamFile(f 'models/bar.bam')

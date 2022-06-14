@@ -16,7 +16,8 @@ setup(
         'build_apps': {
             'include_patterns': [
                 'models/**',
-                'music/*',
+                'audio/*',
+                'video/*',
                 'icons/*',
                 'config/*',
                 # 'particles/*'
