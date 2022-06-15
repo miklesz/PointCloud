@@ -8,7 +8,7 @@ wc: (LPoint3f(-6.8239, -5.31611, -1.16693), LPoint3f(-1.11878, -2.13325, 1.24488
 stairs_low: (LPoint3f(-10.3057, -2.4, -1.65981), LPoint3f(-3.90001, 5.87786, 3.39))
 stairs_hi: (LPoint3f(-10.1052, -7.28751, 0.33519), LPoint3f(-6.3, -2.4, 3.9988))
 register: (LPoint3f(-6.3, -8.72222, 1.40044), LPoint3f(3.74623, 0.644193, 5.74398))
-
+compo: (LPoint3f(-1.86942, -8.58629, 1.01067), LPoint3f(14.764, 0.800051, 5.99653))
 
 No negative feedback comments
 

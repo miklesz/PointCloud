@@ -44,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 196  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206
+JUMP = 166  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
 PRESETS = [
     {
         'preset': 0,
@@ -453,30 +453,13 @@ def move_to_random():
 
 
 def start_steam():
-    r.removeNode()
-    rope_look.removeNode()
-    models['room_1'].reparent_to(base.render)
-    models['room_2'].reparent_to(base.render)
-    models['room_3'].reparent_to(base.render)
+    # r.removeNode()
+    # rope_look.removeNode()
+    # models['room_1'].reparent_to(base.render)
+    # models['room_2'].reparent_to(base.render)
+    # models['room_3'].reparent_to(base.render)
     # print(models['room_1'].getTightBounds())
-    steam_sequence = Sequence()
-    steam_sequence.append(LerpPosHprInterval(
-        nodePath=spectator,
-        pos=(7.5, 3.5, 0),
-        hpr=(90, 0, 0),
-        duration=2,
-        blendType='easeInOut',
-    ))
-    steam_sequence.append(ParticleInterval(
-        particleEffect=init_steam_particle_effect(current_modes_and_filters['render_mode_thickness']),
-        parent=base.render,
-        worldRelative=True,
-        duration=16,
-        softStopT=8,
-        cleanup=True,
-        name='steam'
-    ))
-    steam_sequence.start()
+    steam_interval.start()
 
 
 def roping_function(t):
@@ -888,6 +871,8 @@ def accept_effect():
     # print('stairs_hi:', models['stairs_hi'].getTightBounds())
     # models['register'].reparent_to(base.render)
     # print('register:', models['register'].getTightBounds())
+    # models['compo'].reparent_to(base.render)
+    # print('compo:', models['compo'].getTightBounds())
     # models['wc'].reparent_to(base.render)
     # print('wc:', models['wc'].getTightBounds())
     # spectator.set_pos_hpr(2.225859478385013, -1.2, .4, -90, 0, 0)
@@ -1260,6 +1245,8 @@ spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
 # models['hall_low'].reparent_to(base.render)
 # models['stairs_low'].reparent_to(base.render)
 # models['wc'].reparent_to(base.render)
+# models['register'].reparent_to(base.render)
+# models['compo'].reparent_to(base.render)
 
 # print()
 
@@ -1346,7 +1333,7 @@ dust_interval = Parallel(
         particleEffect=init_dust_particle_effect(PRESETS[2]['render_mode_thickness']),
         parent=dust_parent,
         worldRelative=False,
-        duration=16,
+        duration=24,
         softStopT=-1,  # 11.8
         cleanup=True,
     ),
@@ -1534,13 +1521,23 @@ wc_splash_interval = ParticleInterval(
 )
 
 greetings_interval = ParticleInterval(
-    particleEffect=init_greetings_particle_effect(PRESETS[6]['render_mode_thickness']),
+    particleEffect=init_greetings_particle_effect(PRESETS[7]['render_mode_thickness']),
     parent=base.render,
     worldRelative=True,
     duration=5.44,
     softStopT=-2,
     # cleanup=True,
     name='greetings'
+)
+
+steam_interval = ParticleInterval(
+    particleEffect=init_steam_particle_effect(PRESETS[6]['render_mode_thickness']),
+    parent=base.render,
+    worldRelative=True,
+    duration=31,
+    softStopT=16,
+    cleanup=True,
+    name='steam'
 )
 
 # Events

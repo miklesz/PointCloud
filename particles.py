@@ -264,16 +264,18 @@ def init_steam_particle_effect(point_size):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.3800))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((2.5, 1.5, -1.5195))
-    particles.emitter.set_max_bound((7, 6, -1.5195))
+    particles.emitter.set_min_bound((0, -8.0, 1.01067))
+    particles.emitter.set_max_bound((7, -0.1, 1.01067))
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('vertex')
+
     # Force parameters
     linear_noise_force = LinearNoiseForce(0.1500, 0)
     linear_noise_force.setActive(True)
     force_group.addForce(linear_noise_force)
     particle_effect.add_force_group(force_group)
+
     return particle_effect
 
 
@@ -344,7 +346,7 @@ def init_water_particle_effect(point_size):
 
 
 def init_dust_particle_effect(point_size):
-    litter_size = 100  # 25
+    litter_size = 300  # 25, 100
     life_span = 1
     particle_effect = ParticleEffect()
     particles = Particles('dust')
@@ -374,11 +376,14 @@ def init_dust_particle_effect(point_size):
 
     # Renderer parameters
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
-    particles.renderer.set_user_alpha(1.00)
+    # particles.renderer.set_user_alpha(1.00)
+    particles.renderer.set_user_alpha(0.45)
 
     # Point parameters
     # particles.renderer.setStartColor(LVector4(184/255, 151/255, 122/255, 1.00))
-    particles.renderer.setStartColor(LVector4(0, 1, 0, 1))
+    # particles.renderer.setStartColor(LVector4(0, 1, 0, 1))  # (0, 1, 0, 1)
+    particles.renderer.setStartColor(LVector4(0.25, 0.90, 1.00, 1.00))
+    particles.renderer.setEndColor(LVector4(1.00, 1.00, 1.00, 1.00))
     # particles.renderer.setEndColor(LVector4(1.00, 1.00, 1.00, 1.00))
     # particles.renderer.setBlendType(PointParticleRenderer.PPONECOLOR)
     # particles.renderer.setBlendMethod(BaseParticleRenderer.PPNOBLEND)

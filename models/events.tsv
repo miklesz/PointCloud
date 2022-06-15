@@ -74,13 +74,14 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 3	:	28	.	56	208.56	greetings_interval	greetings	5.44	
 3	:	34	.	00	214.00	Parallel(beat_interval, Func(set_modes_and_filters, PRESETS[6]), Func(models['hall_low'].reparent_to, base.render))	remoteness from the mirror all the way to the main registration room		
 3	:	38	.	00	218.00	beat_interval			
-3	:	42	.	00	222.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render))			
-3	:	46	.	00	226.00	Parallel(beat_interval, Func(models['wc'].detachNode))			
-3	:	50	.	00	230.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render))			
-3	:	53	.	50	233.50	Func(models['stairs_low'].detachNode)			
-3	:	54	.	00	234.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render))	Parallel(beat_interval, Func(models['stairs_low'].detachNode), Func(models['register'].reparent_to, base.render))		
-3	:	58	.	00	238.00	beat_interval			
-4	:	03	.	56	243.56		the effect of entering the registration room		
-4	:	06	.	00	246.00		actions in the registration room		
-4	:	22	.	00	262.00		inlet to the main hall		
+3	:	42	.	00	222.00	beat_interval			
+3	:	46	.	00	226.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render))			
+3	:	50	.	00	230.00	Parallel(beat_interval, Func(models['wc'].detachNode))			
+3	:	54	.	00	234.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render))			
+3	:	57	.	50	237.50	Func(models['stairs_low'].detachNode)	Parallel(beat_interval, Func(models['stairs_low'].detachNode), Func(models['register'].reparent_to, base.render))		
+3	:	58	.	00	238.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render))			
+4	:	02	.	00	242.00	Parallel(beat_interval, Func(models['stairs_hi'].detachNode))			
+4	:	03	.	56	243.56	beat_interval	the effect of entering the registration room		
+4	:	06	.	00	246.00	beat_interval	actions in the registration room		
+4	:	22	.	00	262.00	Parallel(beat_interval, Func(models['compo'].reparent_to, base.render), steam_interval)	inlet to the main hall		
 4	:	38	.	00	278.00		credits appear in full screen.		
