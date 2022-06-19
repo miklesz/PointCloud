@@ -44,7 +44,7 @@ COLOR_SCALES = (
     ('Dollar Bill', (128, 194, 113))
 )
 DOWNLOAD = True  # True/False
-JUMP = 166  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
+JUMP = 218  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
 PRESETS = [
     {
         'preset': 0,
@@ -1184,6 +1184,8 @@ model_dict = {
     'p2': {'name': 'p2', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'p3': {'name': 'p3', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
 
+    'ball': {'name': 'ball', 'pos_hpr': (-2.1, -0.25, 0, 90, -60, 0)},
+
     'sign': {'name': 'sign', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_5', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
     'garden_large': {'name': 'garden_large_10', 'pos_hpr': (18, -10.7, .5, 0, 0, 0)},
@@ -1209,6 +1211,9 @@ for model_key in model_dict:
     models[model_key] = base.loader.loadModel(f'models/{name}.bam')
     models[model_key].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
     models[model_key].reparentTo(base.render)
+
+models['ball'].setTransparency(TransparencyAttrib.M_alpha)
+models['ball'].setScale(.75)
 
 # print('podium: ', models['podium'].getTightBounds())
 # print('garden: ', models['garden'].getTightBounds())

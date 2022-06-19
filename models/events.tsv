@@ -74,7 +74,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 3	:	28	.	56	208.56	greetings_interval	greetings	5.44	
 3	:	34	.	00	214.00	Parallel(beat_interval, Func(set_modes_and_filters, PRESETS[6]), Func(models['hall_low'].reparent_to, base.render))	remoteness from the mirror all the way to the main registration room		
 3	:	38	.	00	218.00	beat_interval			
-3	:	42	.	00	222.00	beat_interval			
+3	:	42	.	00	222.00	Parallel(beat_interval, Func(models['ball'].reparent_to, base.render))			
 3	:	46	.	00	226.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render))			
 3	:	50	.	00	230.00	Parallel(beat_interval, Func(models['wc'].detachNode))			
 3	:	54	.	00	234.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render))			
