@@ -29,11 +29,12 @@ color_writer = GeomVertexWriter(vertex_data, 'color')
 # Constructing points
 print('Constructing points')
 points = []
+rand = Randomizer()
 for alpha in range(-180, 180, STEP):
     for beta in range(-90, 90, STEP):
-        x = cos(radians(alpha))*cos(radians(beta))
-        y = sin(radians(beta))
-        z = sin(radians(alpha))*cos(radians(beta))
+        x = cos(radians(alpha))*cos(radians(beta))+rand.randomRealUnit()/20
+        y = sin(radians(beta))+rand.randomRealUnit()/20
+        z = sin(radians(alpha))*cos(radians(beta))+rand.randomRealUnit()/20
         rgba = ((1, 0, 0, .5), (1, 1, 1, .5))[alpha//20 % 2 ^ beta//20 % 2]
         points.append((x, y, z)+rgba)
 
@@ -69,6 +70,6 @@ print(model.get_tight_bounds())
 # Set frame rate meter
 base.set_frame_rate_meter(True)
 
-# model.setHpr(90, -60, 0)
+model.setHpr(90, -60, 0)
 model.writeBamFile('models/ball.bam')
-# base.run()
+base.run()

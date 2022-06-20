@@ -1184,7 +1184,7 @@ model_dict = {
     'p2': {'name': 'p2', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'p3': {'name': 'p3', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
 
-    'ball': {'name': 'ball', 'pos_hpr': (-2.1, -0.25, 0, 90, -60, 0)},
+    'ball': {'name': 'ball', 'pos_hpr': (2.7, -0.25, 0-.75/2, 90, -60, 0)},
 
     'sign': {'name': 'sign', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
     'garden': {'name': 'garden_5', 'pos_hpr': (22.1, 0.5, .5, 0, 0, 0)},
