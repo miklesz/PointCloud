@@ -43,8 +43,13 @@ COLOR_SCALES = (
     ('Key Lime', (239, 252, 147)),
     ('Dollar Bill', (128, 194, 113))
 )
-DOWNLOAD = False  # True/False
-JUMP = 238  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
+print('sys.executable:', sys.executable)
+if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python':
+    DOWNLOAD = True  # True/False
+else:
+    DOWNLOAD = False  # True/False
+print('DOWNLOAD:', DOWNLOAD)
+JUMP = 198  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
 PRESETS = [
     {
         'preset': 0,
@@ -1500,7 +1505,7 @@ node.addGeom(geom)
 mirror_node_path = base.render.attachNewNode(node)
 mirror_node_path.setTransparency(TransparencyAttrib.M_alpha)
 # tex = base.loader.loadTexture('models/Neon-Square-PNG-Clipart.png')
-tex = base.loader.loadTexture('models/tex_dmg_new.png')
+tex = base.loader.loadTexture('models/greetings.png')
 mirror_node_path.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
 mirror_node_path.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr(LVecBase3f(0, -90, 0)))
 mirror_node_path.setTexOffset(TextureStage.getDefault(), .5, .5)
