@@ -83,7 +83,23 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 3	:	57	.	50	237.50	Func(models['stairs_low'].detachNode)			
 3	:	58	.	00	238.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render), Func(models['ball'].show), LerpPosInterval(models['ball'], 4, (-3.25, -4, 3.1), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (360, -60, 180*5)))			
 4	:	02	.	00	242.00	Parallel(beat_interval, Func(models['stairs_hi'].detachNode), LerpHprInterval(models['ball'], 4, (360, -60, 180*6)))			
-4	:	03	.	56	243.56	beat_interval	the effect of entering the registration room		
-4	:	06	.	00	246.00	beat_interval	actions in the registration room		
+4	:	03	.	63	243.63	LerpScaleInterval(models['ball'], 0.05, .75*15/16, blendType='easeOut')	entry 1	0.05	
+4	:	03	.	68	243.68	LerpScaleInterval(models['ball'], 0.05, .75*14/16, blendType='easeOut')	entry 2	0.05	
+4	:	03	.	73	243.73	LerpScaleInterval(models['ball'], 0.05, .75*13/16, blendType='easeOut')	entry 3	0.27	
+4	:	04	.	00	244.00	LerpScaleInterval(models['ball'], 0.05, .75*12/16, blendType='easeOut')	entry 4	0.09	
+4	:	04	.	09	244.09	LerpScaleInterval(models['ball'], 0.05, .75*11/16, blendType='easeOut')	entry 5	0.10	
+4	:	04	.	19	244.19	LerpScaleInterval(models['ball'], 0.05, .75*10/16, blendType='easeOut')	entry 6	0.09	
+4	:	04	.	28	244.28	LerpScaleInterval(models['ball'], 0.05, .75*9/16, blendType='easeOut')	entry 7	0.10	
+4	:	04	.	38	244.38	LerpScaleInterval(models['ball'], 0.05, .75*8/16, blendType='easeOut')	entry 8	0.09	
+4	:	04	.	47	244.47	LerpScaleInterval(models['ball'], 0.05, .75*7/16, blendType='easeOut')	entry 9	0.09	
+4	:	04	.	56	244.56	LerpScaleInterval(models['ball'], 0.05, .75*6/16, blendType='easeOut')	entry 10	0.10	
+4	:	04	.	66	244.66	LerpScaleInterval(models['ball'], 0.05, .75*5/16, blendType='easeOut')	entry 11	0.34	
+4	:	05	.	00	245.00	LerpScaleInterval(models['ball'], 0.05, .75*4/16, blendType='easeOut')	entry 12	0.09	
+4	:	05	.	09	245.09	LerpScaleInterval(models['ball'], 0.05, .75*3/16, blendType='easeOut')	entry 13	0.10	
+4	:	05	.	19	245.19	LerpScaleInterval(models['ball'], 0.05, .75*2/16, blendType='easeOut')	entry 14	0.09	
+4	:	05	.	28	245.28	LerpScaleInterval(models['ball'], 0.05, .75*1/16, blendType='easeOut')	entry 15	0.20	
+4	:	05	.	48	245.48	LerpScaleInterval(models['ball'], 0.08, .75*1, blendType='easeOut')	the last 1st accent	0.08	
+4	:	05	.	56	245.56	LerpScaleInterval(models['ball'], 0.44, .75*7, blendType='easeOut')	the last 2nd accent	0.44	
+4	:	06	.	00	246.00	Sequence(Func(models['ball'].removeNode), beat_interval)	actions in the registration room		
 4	:	22	.	00	262.00	Parallel(beat_interval, Func(models['compo'].reparent_to, base.render), steam_interval)	inlet to the main hall		
 4	:	38	.	00	278.00		credits appear in full screen.		

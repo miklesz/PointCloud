@@ -43,8 +43,8 @@ COLOR_SCALES = (
     ('Key Lime', (239, 252, 147)),
     ('Dollar Bill', (128, 194, 113))
 )
-DOWNLOAD = True  # True/False
-JUMP = 218  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
+DOWNLOAD = False  # True/False
+JUMP = 238  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
 PRESETS = [
     {
         'preset': 0,
