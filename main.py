@@ -49,7 +49,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DOWNLOAD = False  # True/False
 print('DOWNLOAD:', DOWNLOAD)
-JUMP = 198  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
+JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
 PRESETS = [
     {
         'preset': 0,
@@ -645,9 +645,7 @@ def dissolve(t, cube_object):
     force_group = ForceGroup()
     force_group.addForce(LinearJitterForce(t*25, 0))
     cube_object.addForceGroup(force_group)
-    # cube_object.setTransparency(TransparencyAttrib.M_alpha)
     cube_object.setAlphaScale(1-t)
-    # cube_object.setColorScale(1, 1, 1, (1-t))
 
 
 def start_zoom():
@@ -677,86 +675,8 @@ def start_zoom():
 def accept_cubes():
     r.removeNode()
     rope_look.removeNode()
-    models['room_1'].reparent_to(base.render)
-    # fov_min = 66
-    # fov_max = 115
-    duration = 1
-    rotation = 180
-    cube_sequence = Sequence()
-    cube_sequence.append(LerpPosHprInterval(
-        nodePath=spectator,
-        pos=(7.5, 3.5, 0),
-        hpr=(90, 0, 0),
-        duration=2,
-        blendType='easeInOut',
-    ))
-
-    # print(len(display_particle_effects))
-    # for display_particle_effect in display_particle_effects:
-    # zoom_sequence.append(Func(start_display, init_cube(1, 1, 1, (1, 0, 0, 1))))
-    for cube_number in range(16):
-        cube = init_cube_particle_effect(
-            current_modes_and_filters['render_mode_thickness'],
-            Randomizer().randomReal(.5)+.5,
-            Randomizer().randomReal(.5)+.5,
-            Randomizer().randomReal(.5)+.5,
-            (Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, Randomizer().randomReal(.5)+.5, 1),
-            duration
-        )
-        cube_parallel = Parallel()
-        cube_parallel.append(LerpFunc(
-            function=dissolve,
-            fromData=0,
-            toData=1,
-            duration=duration,
-            blendType='easeIn',
-            extraArgs=[cube],
-        ))
-        cube_parallel.append(ParticleInterval(
-            particleEffect=cube,
-            parent=models['room_1'],
-            worldRelative=False,
-            duration=duration,
-            cleanup=True,
-        ))
-        start_h = Randomizer().randomInt(360)
-        start_p = Randomizer().randomInt(360)
-        start_r = Randomizer().randomInt(360)
-        cube_parallel.append(LerpHprInterval(
-            nodePath=cube,
-            duration=duration,
-            hpr=(
-                start_h+Randomizer().randomRealUnit()*rotation,
-                start_p+Randomizer().randomRealUnit()*rotation,
-                start_r+Randomizer().randomRealUnit()*rotation,
-            ),
-            startHpr=(start_h, start_p, start_r),
-        ))
-        cube_sequence.append(cube_parallel)
-        # print(cube.getParticlesDict())
-        # cube.analyze()
-        # cube.setTransparency(TransparencyAttrib.M_alpha)
-        # cube.setAlphaScale(0.2)
-        # cube.hide()
-        # cube.setScale(5)
-
-    # zoom_sequence.append(Wait(2))
-    # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=2, blendType='easeInOut'))
-
-    # for display_particle_effect in display_particle_effects:
-    #     zoom_sequence.append(Func(force_display, display_particle_effect))
-
-    # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
-    # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
-    # zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=1, blendType='easeInOut'))
-    # zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=1, blendType='easeInOut'))
-    # start_display()
-    cube_sequence.start()
-    # base.render.analyze()
-    # display_particle_effects[0].analyze()
-    # model.analyze()
-    # point_cloud.analyze()
-    # display_interval = LerpFunc(display, fromData=0, toData=1, duration=10)
+    # models['room_1'].reparent_to(base.render)
+    cube_parallels[1].start()
 
 
 def set_fog_exp_density(t, fog):
@@ -1474,7 +1394,7 @@ for retro_key in (
 set_cm = {}
 set_card = {}
 set_tex = {}
-for i in range(7+1):
+for i in range(12+1):
     set_cm[i] = CardMaker(f'Set Rector {i}')
     set_cm[i].setFrameFullscreenQuad()
     set_card[i] = base.render2d.attachNewNode(set_cm[i].generate())
@@ -1539,6 +1459,61 @@ greetings_interval = ParticleInterval(
     # cleanup=True,
     name='greetings'
 )
+
+cube_duration = 1.18
+rotation = 180
+cube_parent_0 = base.render.attachNewNode('cube_parent_0')
+cube_parent_1 = base.render.attachNewNode('cube_parent_1')
+# cube_parent_0.setPos(-3.25, -4, 3.1)
+cube_parent_0.setPos(-3.25, (-7.5+0.5)*1/3-0.5, 3.1)
+cube_parent_1.setPos(-3.25, (-7.5+0.5)*2/3-0.5, 3.1)
+cube_parallels = []
+for cube_number in range(17):
+    cube_parallel = Parallel()
+    cube = init_cube_particle_effect(
+        PRESETS[6]['render_mode_thickness'],
+        Randomizer().randomReal(.5)*2 + .5,
+        Randomizer().randomReal(.5)*2 + .5,
+        Randomizer().randomReal(.5)*2 + .5,
+        (Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, 1),
+        cube_duration,
+    )
+    cube_parallel.append(
+        LerpFunc(
+            function=dissolve,
+            fromData=0,
+            toData=1,
+            duration=cube_duration,
+            blendType='easeIn',
+            extraArgs=[cube],
+        )
+    )
+    cube_parallel.append(
+        ParticleInterval(
+            particleEffect=cube,
+            parent=(cube_parent_0, cube_parent_1)[cube_number % 2],
+            worldRelative=False,
+            duration=cube_duration,
+            cleanup=True,
+        )
+    )
+    start_h = Randomizer().randomInt(360)
+    start_p = Randomizer().randomInt(360)
+    start_r = Randomizer().randomInt(360)
+    cube_parallel.append(
+        LerpHprInterval(
+            nodePath=cube,
+            duration=cube_duration,
+            hpr=(
+                start_h + Randomizer().randomRealUnit() * rotation,
+                start_p + Randomizer().randomRealUnit() * rotation,
+                start_r + Randomizer().randomRealUnit() * rotation,
+            ),
+            startHpr=(start_h, start_p, start_r),
+        )
+    )
+    cube_parallels.append(cube_parallel)
+# exit()
 
 steam_interval = ParticleInterval(
     particleEffect=init_steam_particle_effect(PRESETS[6]['render_mode_thickness']),

@@ -15,11 +15,12 @@ from panda3d.physics import LinearCylinderVortexForce
 from panda3d.physics import PointParticleRenderer
 
 
-def init_cube_particle_effect(point_size, x, y, z, xel_a, duration=8):
+def init_cube_particle_effect(point_size, x, y, z, xel_a, duration):
+    print(point_size, x, y, z, xel_a, duration)
     # litter_size = round(abs(400_000*x*y*z))  # 250  # 10  # 20
     # print(x, y, z, litter_size)
     # life_span = 10  # Default: 8
-    litter_size = 50000  # 250  # 10  # 20
+    litter_size = 7000  # 250  # 10  # 20  # 50000
     particle_effect = ParticleEffect(name='particle_cube')
     particles = Particles('display')
     # Particles parameters
@@ -50,8 +51,10 @@ def init_cube_particle_effect(point_size, x, y, z, xel_a, duration=8):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((-x / 2, -y / 2, -z / 2))
-    particles.emitter.set_max_bound((+x / 2, +y / 2, +z / 2))
+    min_bound = (-x/2, -y/2, -z/2)
+    max_bound = (+x/2, +y/2, +z/2)
+    particles.emitter.set_min_bound(min_bound)
+    particles.emitter.set_max_bound(max_bound)
     particle_effect.add_particles(particles)
 
     # Force
@@ -441,8 +444,10 @@ def init_greetings_particle_effect(point_size):
     particles.factory.setLifespanSpread(0.2500)
     particles.factory.set_terminal_velocity_base(400.0000)
     # Renderer parameters
-    particles.renderer.setStartColor((13/255, 8/255, 244/255, 1))
-    particles.renderer.setEndColor((166/255, 28/255, 158/255, 1))
+    particles.renderer.setStartColor((1, 1, 1, 1))
+    # particles.renderer.setStartColor((13/255, 8/255, 244/255, 1))
+    particles.renderer.setEndColor((13/255, 8/255, 244/255, 1))
+    # particles.renderer.setEndColor((166/255, 28/255, 158/255, 1))
     particles.renderer.setBlendType(1)
     # particles.renderer.setBlendMethod(3)
     particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_IN_OUT)
