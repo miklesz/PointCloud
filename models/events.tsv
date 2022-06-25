@@ -1,10 +1,10 @@
 min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en	
 0	:	00	.	00	0.00	Func(set_modes_and_filters, PRESETS[1])	Ustawiamy preset			
-0	:	00	.	03	0.03	Func(set_card[8].show)	pierwszy pik	1.35	1	
-0	:	01	.	38	1.38	Sequence(Func(set_card[8].removeNode), Func(set_card[9].show))	drugi pik	1.26	1+2	for example, around 001: 38- 001: 43 this is the peak
-0	:	02	.	64	2.64	Sequence(Func(set_card[9].removeNode), Func(set_card[10].show))	trzeci pik	1.36	1+2+3	
-0	:	04	.	00	4.00	Sequence(Func(set_card[10].removeNode), Func(set_card[11].show))	czwarty pik	1.26	1+2+3+4	
-0	:	05	.	26	5.26	Sequence(Func(set_card[11].removeNode), Func(set_card[12].show))	piaty pik	0.90	1 + 2 + 3 + 4 + text, Hold for 0.50s and turn it off, all hard	
+0	:	00	.	03	0.03	Func(set_card[8].show)	pierwszy pik	1.07	1	
+0	:	01	.	10	1.10	Sequence(Func(set_card[8].removeNode), Func(set_card[9].show))	drugi pik	1.26	1+2	for example, around 001: 38- 001: 43 this is the peak
+0	:	02	.	36	2.36	Sequence(Func(set_card[9].removeNode), Func(set_card[10].show))	trzeci pik	1.11	1+2+3	
+0	:	03	.	47	3.47	Sequence(Func(set_card[10].removeNode), Func(set_card[11].show))	czwarty pik	1.26	1+2+3+4	
+0	:	04	.	73	4.73	Sequence(Func(set_card[11].removeNode), Func(set_card[12].show))	piaty pik	1.43	1 + 2 + 3 + 4 + text, Hold for 0.50s and turn it off, all hard	
 0	:	05	.	31	5.31	Func(set_card[12].removeNode)	end of piaty pik			
 0	:	06	.	16	6.16	Sequence(Func(set_card[6].show), Func(set_card[7].show), LerpPosInterval(set_card[6], 2.25, (0, 0, 0),  (0, 0, 1.9), blendType='easeOut'), LerpPosInterval(set_card[6], 2.25, (0, 0, 1.9),  (0, 0, 0), blendType='easeIn'))	plansza Kroniki filmowej	2.25	Parallel(Func(set_card[6].show), Func(set_card[7].show), Sequence(LerpPosInterval(set_card[6], 2.25, (0, 0, .3),  (0, 0, 1.3), blendType='easeOut'), LerpPosInterval(set_card[6], 2.25, (0, 0, 1.3),  (0, 0, 0), blendType='easeIn')))	
 0	:	10	.	66	10.66	Parallel(Func(set_card[6].detachNode), display_sequence, LerpColorScaleInterval(set_card[7], 5, (1, 1, 1, 0), (1, 1, 1, 1)))	poczatek przejscia w Chiptune	Parallel(display_sequence, LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1)))		
@@ -59,66 +59,66 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 1	:	52	.	50	112.50	Func(models['garden_large'].detachNode)	wywalenie obiektu garden_large			
 1	:	53	.	50	113.50	Func(models['entrance'].reparent_to, base.render)	wstawienie obiektu entrance			
 1	:	56	.	00	116.00	Func(models['podium'].detachNode)	wywalenie obiektu podium			
-1	:	58	.	00	118.00	Parallel(beat_interval, Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].reparent_to, base.render), Func(models['room_2'].reparent_to, base.render), Func(base.camLens.setFov, 115))	lot po wlocie do srodka az do baru			
+1	:	58	.	00	118.00	Sequence(Func(models['entrance'].detachNode), Func(set_modes_and_filters, PRESETS[3]), Func(base.camLens.setFov, 115), Func(models['room_1'].reparent_to, base.render), Func(models['room_2'].reparent_to, base.render), beat_interval)	lot po wlocie do srodka az do baru			
 1	:	59	.	00	119.00		https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses			
 2	:	04	.	50	124.50		wstawienie obiektu room_2			
-2	:	10	.	00	130.00	Parallel(Func(models['room_1'].detachNode), Func(models['room_3'].reparent_to, base.render))	wywalenie obiektu room_1			
+2	:	10	.	00	130.00	Sequence(Func(models['room_1'].detachNode), Func(models['room_3'].reparent_to, base.render))	wywalenie obiektu room_1			
 2	:	12	.	50	132.50		wstawienie obiektu room_3			
-2	:	30	.	00	150.00	Parallel(beat_interval, Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render))	bar + corridor in front of the toilet (first loop by the bar)			
+2	:	30	.	00	150.00	Sequence(Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render), beat_interval)	bar + corridor in front of the toilet (first loop by the bar)			
 2	:	46	.	00	166.00	dust_interval	dust			
 3	:	05	.	00	185.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.			
 3	:	06	.	00	186.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.			
 3	:	09	.	00	189.00	Func(models['hall_low'].reparent_to, base.render)	models['hall_low'].reparent_to(base.render)			
-3	:	16	.	00	196.00	Parallel(beat_interval, Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render))	the moment of inlet to the toilet			
+3	:	16	.	00	196.00	Sequence(Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render), beat_interval)	the moment of inlet to the toilet			
 3	:	18	.	00	198.00	trainspotting_sequence	action in the toilet until the end of the stop on the mirror) (to be negotiated!)			
 3	:	26	.	00	206.00	wc_splash_interval	trainspotting_sequence			
-3	:	28	.	56	208.56	greetings_interval	greetings	5.44		
-3	:	34	.	00	214.00	Parallel(beat_interval, Func(set_modes_and_filters, PRESETS[6]), Func(models['hall_low'].reparent_to, base.render))	remoteness from the mirror all the way to the main registration room			
-3	:	38	.	00	218.00	Parallel(beat_interval, Func(models['ball'].reparent_to, base.render))				
-3	:	42	.	00	222.00	Parallel(beat_interval, LerpPosInterval(models['ball'], 4, (-2.1, -0.25, 0-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (90, -60, 180*1)))				
-3	:	46	.	00	226.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render), LerpPosInterval(models['ball'], 4, (-9, -0.25, 2-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (180, -60, 180*2)))				
-3	:	50	.	00	230.00	Parallel(beat_interval, Func(models['wc'].detachNode), LerpPosInterval(models['ball'], 4, (-9, -4, 2-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (270, -60, 180*3)))				
-3	:	53	.	00	233.00	Func(models['ball'].hide)				
-3	:	54	.	00	234.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render), Func(models['ball'].show), LerpPosInterval(models['ball'], 4, (-5, -4, 3.1-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (360, -60, 180*4)))				
-3	:	56	.	50	236.50	Func(models['ball'].hide)				
-3	:	57	.	50	237.50	Func(models['stairs_low'].detachNode)				
-3	:	58	.	00	238.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render), Func(models['ball'].show), LerpPosInterval(models['ball'], 4, (-3.25, -4, 3.1), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (360, -60, 180*5)))				
-4	:	02	.	00	242.00	Parallel(beat_interval, Func(models['stairs_hi'].detachNode), LerpHprInterval(models['ball'], 4, (360, -60, 180*6)))				
-4	:	03	.	63	243.63	LerpScaleInterval(models['ball'], 0.05, .75*15/16, blendType='easeOut')	entry 1	0.05		
-4	:	03	.	68	243.68	LerpScaleInterval(models['ball'], 0.05, .75*14/16, blendType='easeOut')	entry 2	0.05		
-4	:	03	.	73	243.73	LerpScaleInterval(models['ball'], 0.05, .75*13/16, blendType='easeOut')	entry 3	0.27		
-4	:	04	.	00	244.00	LerpScaleInterval(models['ball'], 0.05, .75*12/16, blendType='easeOut')	entry 4	0.09		
-4	:	04	.	09	244.09	LerpScaleInterval(models['ball'], 0.05, .75*11/16, blendType='easeOut')	entry 5	0.10		
-4	:	04	.	19	244.19	LerpScaleInterval(models['ball'], 0.05, .75*10/16, blendType='easeOut')	entry 6	0.09		
-4	:	04	.	28	244.28	LerpScaleInterval(models['ball'], 0.05, .75*9/16, blendType='easeOut')	entry 7	0.10		
-4	:	04	.	38	244.38	LerpScaleInterval(models['ball'], 0.05, .75*8/16, blendType='easeOut')	entry 8	0.09		
-4	:	04	.	47	244.47	LerpScaleInterval(models['ball'], 0.05, .75*7/16, blendType='easeOut')	entry 9	0.09		
-4	:	04	.	56	244.56	LerpScaleInterval(models['ball'], 0.05, .75*6/16, blendType='easeOut')	entry 10	0.10		
-4	:	04	.	66	244.66	LerpScaleInterval(models['ball'], 0.05, .75*5/16, blendType='easeOut')	entry 11	0.34		
-4	:	05	.	00	245.00	LerpScaleInterval(models['ball'], 0.05, .75*4/16, blendType='easeOut')	entry 12	0.09		
-4	:	05	.	09	245.09	LerpScaleInterval(models['ball'], 0.05, .75*3/16, blendType='easeOut')	entry 13	0.10		
-4	:	05	.	19	245.19	LerpScaleInterval(models['ball'], 0.05, .75*2/16, blendType='easeOut')	entry 14	0.09		
-4	:	05	.	28	245.28	LerpScaleInterval(models['ball'], 0.05, .75*1/16, blendType='easeOut')	entry 15	0.20		
-4	:	05	.	48	245.48	LerpScaleInterval(models['ball'], 0.08, .75*1, blendType='easeOut')	the last 1st accent	0.08		
-4	:	05	.	56	245.56	LerpScaleInterval(models['ball'], 0.44, .75*7, blendType='easeOut')	the last 2nd accent	0.44		
-4	:	06	.	00	246.00	Sequence(Func(models['ball'].removeNode), beat_interval)	actions in the registration room			
-4	:	06	.	38	246.38	cube_parallels[0]	snare	1	2.00	0.81
-4	:	07	.	19	247.19	cube_parallels[1]	snare	2	2.00	1.19
-4	:	08	.	38	248.38	cube_parallels[2]	snare - minimum	3	1.18	0.81
-4	:	09	.	19	249.19	cube_parallels[3]	snare	4	1.19	0.37
-4	:	09	.	56	249.56	cube_parallels[4]	snare	5	1.63	0.82
-4	:	10	.	38	250.38	cube_parallels[5]	snare	6	2.00	0.81
-4	:	11	.	19	251.19	cube_parallels[6]	snare	7	2.00	1.19
-4	:	12	.	38	252.38	cube_parallels[7]	snare	8	1.18	0.81
-4	:	13	.	19	253.19	cube_parallels[8]	snare	9	1.19	0.37
-4	:	13	.	56	253.56	cube_parallels[9]	snare	10	1.63	0.82
-4	:	14	.	38	254.38	cube_parallels[10]	snare	11	2.00	0.81
-4	:	15	.	19	255.19	cube_parallels[11]	snare	12	2.00	1.19
-4	:	16	.	38	256.38	cube_parallels[12]	snare	13	1.18	0.81
-4	:	17	.	19	257.19	cube_parallels[13]	snare	14	1.19	0.37
-4	:	17	.	56	257.56	cube_parallels[14]	snare	16	1.63	0.82
-4	:	18	.	38	258.38	cube_parallels[15]	snare	17	1.81	0.81
-4	:	19	.	19	259.19	cube_parallels[16]	snare	18	2.81	1.00
-4	:	20	.	19	260.19		transition			
-4	:	22	.	00	262.00	Parallel(beat_interval, Func(models['compo'].reparent_to, base.render), steam_interval)	inlet to the main hall			
-4	:	38	.	00	278.00		credits appear in full screen.			
+3	:	28	.	56	208.56	greetings_interval	greetings	7.44		
+3	:	36	.	00	216.00	Sequence(Func(set_modes_and_filters, PRESETS[6]), Func(models['hall_low'].reparent_to, base.render), beat_interval)	remoteness from the mirror all the way to the main registration room			
+3	:	40	.	00	220.00	Sequence(Func(models['ball'].reparent_to, base.render), beat_interval)				
+3	:	44	.	00	224.00	Parallel(beat_interval, LerpPosInterval(models['ball'], 4, (-2.1, -0.25, 0-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (90, -60, 180*1)))				
+3	:	48	.	00	228.00	Parallel(beat_interval, Func(models['stairs_low'].reparent_to, base.render), LerpPosInterval(models['ball'], 4, (-9, -0.25, 2-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (180, -60, 180*2)))				
+3	:	52	.	00	232.00	Parallel(beat_interval, Func(models['wc'].detachNode), LerpPosInterval(models['ball'], 4, (-9, -4, 2-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (270, -60, 180*3)))				
+3	:	55	.	00	235.00	Func(models['ball'].hide)				
+3	:	56	.	00	236.00	Parallel(beat_interval, Func(models['hall_low'].detachNode), Func(models['stairs_hi'].reparent_to, base.render), Func(models['ball'].show), LerpPosInterval(models['ball'], 4, (-5, -4, 3.1-.75/2), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (360, -60, 180*4)))				
+3	:	58	.	50	238.50	Func(models['ball'].hide)				
+3	:	59	.	50	239.50	Func(models['stairs_low'].detachNode)				
+4	:	00	.	00	240.00	Parallel(beat_interval, Func(models['register'].reparent_to, base.render), Func(models['ball'].show), LerpPosInterval(models['ball'], 4, (-3.25, -4, 3.1), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (360, -60, 180*5)))				
+4	:	04	.	00	244.00	Parallel(beat_interval, Func(models['stairs_hi'].detachNode), LerpHprInterval(models['ball'], 4, (360, -60, 180*6)))				
+4	:	05	.	63	245.63	LerpScaleInterval(models['ball'], 0.05, .75*15/16, blendType='easeOut')	entry 1	0.05		
+4	:	05	.	68	245.68	LerpScaleInterval(models['ball'], 0.05, .75*14/16, blendType='easeOut')	entry 2	0.05		
+4	:	05	.	73	245.73	LerpScaleInterval(models['ball'], 0.05, .75*13/16, blendType='easeOut')	entry 3	0.27		
+4	:	06	.	00	246.00	LerpScaleInterval(models['ball'], 0.05, .75*12/16, blendType='easeOut')	entry 4	0.09		
+4	:	06	.	09	246.09	LerpScaleInterval(models['ball'], 0.05, .75*11/16, blendType='easeOut')	entry 5	0.10		
+4	:	06	.	19	246.19	LerpScaleInterval(models['ball'], 0.05, .75*10/16, blendType='easeOut')	entry 6	0.09		
+4	:	06	.	28	246.28	LerpScaleInterval(models['ball'], 0.05, .75*9/16, blendType='easeOut')	entry 7	0.10		
+4	:	06	.	38	246.38	LerpScaleInterval(models['ball'], 0.05, .75*8/16, blendType='easeOut')	entry 8	0.09		
+4	:	06	.	47	246.47	LerpScaleInterval(models['ball'], 0.05, .75*7/16, blendType='easeOut')	entry 9	0.09		
+4	:	06	.	56	246.56	LerpScaleInterval(models['ball'], 0.05, .75*6/16, blendType='easeOut')	entry 10	0.10		
+4	:	06	.	66	246.66	LerpScaleInterval(models['ball'], 0.05, .75*5/16, blendType='easeOut')	entry 11	0.34		
+4	:	07	.	00	247.00	LerpScaleInterval(models['ball'], 0.05, .75*4/16, blendType='easeOut')	entry 12	0.09		
+4	:	07	.	09	247.09	LerpScaleInterval(models['ball'], 0.05, .75*3/16, blendType='easeOut')	entry 13	0.10		
+4	:	07	.	19	247.19	LerpScaleInterval(models['ball'], 0.05, .75*2/16, blendType='easeOut')	entry 14	0.09		
+4	:	07	.	28	247.28	LerpScaleInterval(models['ball'], 0.05, .75*1/16, blendType='easeOut')	entry 15	0.20		
+4	:	07	.	48	247.48	LerpScaleInterval(models['ball'], 0.08, .75*1, blendType='easeOut')	the last 1st accent	0.08		
+4	:	07	.	56	247.56	LerpScaleInterval(models['ball'], 0.44, .75*7, blendType='easeOut')	the last 2nd accent	0.44		
+4	:	08	.	00	248.00	Sequence(Func(models['ball'].removeNode), beat_interval)	actions in the registration room			
+4	:	08	.	38	248.38	cube_parallels[0]	snare	1	2.00	0.81
+4	:	09	.	19	249.19	cube_parallels[1]	snare	2	2.00	1.19
+4	:	10	.	38	250.38	cube_parallels[2]	snare - minimum	3	1.18	0.81
+4	:	11	.	19	251.19	cube_parallels[3]	snare	4	1.19	0.37
+4	:	11	.	56	251.56	cube_parallels[4]	snare	5	1.63	0.82
+4	:	12	.	38	252.38	cube_parallels[5]	snare	6	2.00	0.81
+4	:	13	.	19	253.19	cube_parallels[6]	snare	7	2.00	1.19
+4	:	14	.	38	254.38	cube_parallels[7]	snare	8	1.18	0.81
+4	:	15	.	19	255.19	cube_parallels[8]	snare	9	1.19	0.37
+4	:	15	.	56	255.56	cube_parallels[9]	snare	10	1.63	0.82
+4	:	16	.	38	256.38	cube_parallels[10]	snare	11	2.00	0.81
+4	:	17	.	19	257.19	cube_parallels[11]	snare	12	2.00	1.19
+4	:	18	.	38	258.38	cube_parallels[12]	snare	13	1.18	0.81
+4	:	19	.	19	259.19	cube_parallels[13]	snare	14	1.19	0.37
+4	:	19	.	56	259.56	cube_parallels[14]	snare	16	1.63	0.82
+4	:	20	.	38	260.38	cube_parallels[15]	snare	17	1.81	0.81
+4	:	21	.	19	261.19	cube_parallels[16]	snare	18	2.81	1.00
+4	:	22	.	19	262.19		transition			
+4	:	24	.	00	264.00	Parallel(beat_interval, Func(models['compo'].reparent_to, base.render), steam_interval)	inlet to the main hall			
+4	:	40	.	00	280.00		credits appear in full screen.			

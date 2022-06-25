@@ -1203,7 +1203,7 @@ for x in range(my_image.getXSize()):
         max_z = -((z + 1) - (my_image.getYSize() / 2)) * tile_size
         xel_a = my_image.getXelA(x, z)
         # print(xel_a)
-        if xel_a[3] > 0.5:
+        if xel_a[3] > 0.6:  # 0.5
             xel_a[3] = 1
             display_particle_effects.append(init_display_particle_effect(
                 # current_modes_and_filters['render_mode_thickness'],
@@ -1223,7 +1223,7 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
 # exit()
 
 # Sound interval
-music = base.loader.loadSfx("audio/Kramsta by Damage 5xpik.ogg")  # Load music
+music = base.loader.loadSfx("audio/Kramsta by Damage (wersja finalna).ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 rain_interval = ParticleInterval(
@@ -1433,6 +1433,7 @@ mirror_node_path.setTexScale(TextureStage.getDefault(), .5, 1, .5)
 mirror_node_path.setTexProjector(TextureStage.getDefault(), base.render, mirror_node_path)
 mirror_node_path.setTexture(tex)
 mirror_node_path.set_pos_hpr(-4.75, -5.25, 0.35, 180, 0, 0)
+mirror_node_path.set_scale(0.8)
 
 wc_splash_parent = base.render.attachNewNode('wc_splash_parent')
 wc_splash_parent.reparentTo(base.render)
@@ -1454,8 +1455,8 @@ greetings_interval = ParticleInterval(
     particleEffect=init_greetings_particle_effect(PRESETS[7]['render_mode_thickness']),
     parent=base.render,
     worldRelative=True,
-    duration=5.44,
-    softStopT=-2,
+    duration=7.44,
+    softStopT=-2.25,  # Greetsy do końca nie wygasaja
     # cleanup=True,
     name='greetings'
 )
@@ -1475,6 +1476,7 @@ for cube_number in range(17):
         Randomizer().randomReal(.5)*2 + .5,
         Randomizer().randomReal(.5)*2 + .5,
         Randomizer().randomReal(.5)*2 + .5,
+        # kolory do poprawy
         (Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, 1),
         cube_duration,
     )

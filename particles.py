@@ -425,7 +425,7 @@ def init_dust_particle_effect(point_size):
 
 
 def init_greetings_particle_effect(point_size):
-    litter_size = 200  # 250  # 10  # 20
+    litter_size = 900  # 250  # 10  # 20
     life_span = 2
     particle_effect = ParticleEffect()
     particles = Particles('greetings')
@@ -445,15 +445,21 @@ def init_greetings_particle_effect(point_size):
     particles.factory.set_terminal_velocity_base(400.0000)
     # Renderer parameters
     particles.renderer.setStartColor((1, 1, 1, 1))
+    particles.renderer.setEndColor((153/255, 154/255, 149/255, 1))
+
+    # particles.renderer.setStartColor((1, 1, 1, 1))
     # particles.renderer.setStartColor((13/255, 8/255, 244/255, 1))
-    particles.renderer.setEndColor((13/255, 8/255, 244/255, 1))
+    # particles.renderer.setEndColor((1, 1, 1, 1))
+    # particles.renderer.setEndColor((13/255, 8/255, 244/255, 1))
     # particles.renderer.setEndColor((166/255, 28/255, 158/255, 1))
     particles.renderer.setBlendType(1)
     # particles.renderer.setBlendMethod(3)
-    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_IN_OUT)
-    # particles.renderer.set_user_alpha(0.50)
+    # particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_IN_OUT)
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
+    # particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_USER)
     # particles.renderer.set_user_alpha(0.45)
-    # particles.renderer.set_user_alpha(0.80)
+    # particles.renderer.set_user_alpha(0.45)
+    particles.renderer.set_user_alpha(0.80)
     # Emitter parameters
     particles.emitter.set_emission_type(BaseParticleEmitter.ET_EXPLICIT)
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
@@ -466,8 +472,9 @@ def init_greetings_particle_effect(point_size):
     # Force
     force_group = ForceGroup('force_group')
     # Force parameters
-    force_group.addForce(LinearJitterForce(.2, 0))
-    force_group.addForce(LinearNoiseForce(.025, 0))
+    # force_group.addForce(LinearJitterForce(.2, 0))
+    force_group.addForce(LinearJitterForce(1, 0))
+    # force_group.addForce(LinearNoiseForce(.025, 0))
     particle_effect.add_force_group(force_group)
 
     return particle_effect
