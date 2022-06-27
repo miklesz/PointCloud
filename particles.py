@@ -425,7 +425,7 @@ def init_dust_particle_effect(point_size):
 
 
 def init_greetings_particle_effect(point_size):
-    litter_size = 900  # 250  # 10  # 20
+    litter_size = 800  # 250  # 10  # 20
     life_span = 2
     particle_effect = ParticleEffect()
     particles = Particles('greetings')
