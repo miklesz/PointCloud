@@ -49,7 +49,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DOWNLOAD = False  # True/False
 print('DOWNLOAD:', DOWNLOAD)
-JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238
+JUMP = 132  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -118,6 +118,7 @@ PRESETS = [
 ]
 SHAKE_DEN = 1
 STILL_START = 25
+STILL_STOP = 280
 VERBOSE = True  # False
 
 
@@ -884,9 +885,11 @@ def display_cleanup():
 
 # Config
 print('sys.platform:', sys.platform)
-if sys.platform == 'darwin':
-    loadPrcFile("config/Confauto.prc")
-    loadPrcFile("config/Config.prc")
+# if sys.platform == 'darwin':
+#     loadPrcFile("config/Confauto.prc")
+#     loadPrcFile("config/Config.prc")
+loadPrcFile("config/Confauto.prc")
+loadPrcFile("config/Config.prc")
 
 # Init ShowBase
 base = ShowBase()
@@ -1186,6 +1189,44 @@ if VERBOSE:
 
 base.enableParticles()
 
+# Subtitles
+texts = (
+    'Polish Scene Chronicle',
+    'The von Kramsta family villa',
+    'a villa with a garden',
+    'built in the third quarter of the 19th century',
+    'in the center of Katowice,',
+    'at ul. Warszawska 37,',
+    'it is entered in the register of immovable monuments of the Silesia Voivodeship.',
+    'In the 1950s, the facility was assigned to the Creative Work Club.',
+    'from the side of ul. Warszawska was occupied by the editorial staff of the ephemeral weekly',
+    'For several years, rallies of computer enthusiasts have been held here.',
+    'They self-proclaimed themselves as Demoscene.',
+    'Apart from consuming huge amounts of alcoholic beverages,',
+    'these party goers listen to strange music,',
+    'watch some daubs,',
+    'and some demos.',
+    'The party is called \"Xenium\", and earlier in free translation,',
+    '\"Your Mother Washes in the River\".',
+    'That sad guy at the bar is Argasek ^ BrCr',
+    'the worst TOILET in Scotland',
+    'GLORY TO SCIENCE',
+)
+subtitles = []
+for text in texts:
+    subtitles.append(
+        OnscreenText(text=text,  # text
+            pos=(0, -.95),  # +.96
+            fg=(1, 1, 1, 1),
+            bg=(0, 0, 0, .5),
+            scale=0.1,  # 0.05
+            align=TextNode.ACenter,
+        )
+    )
+for subtitle in subtitles:
+    subtitle.hide()
+
+
 # Init display_sequence
 my_image_path = 'models/lead_new_48x27.png'
 if path.startswith('/'):
@@ -1223,7 +1264,7 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
 # exit()
 
 # Sound interval
-music = base.loader.loadSfx("audio/Kramsta by Damage (wersja finalna).ogg")  # Load music
+music = base.loader.loadSfx("audio/Kramsta by Damage.ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 rain_interval = ParticleInterval(
@@ -1527,6 +1568,40 @@ steam_interval = ParticleInterval(
     name='steam'
 )
 
+# Credits
+credits_format = GeomVertexFormat.getV3n3c4()
+credits_vertex_data = GeomVertexData('credits', format, Geom.UHStatic)
+credits_vertex_data.setNumRows(4)
+credits_vertices = GeomVertexWriter(credits_vertex_data, 'vertex')
+credits_vertices.addData3f(-1.920, 0, 1.080)
+credits_vertices.addData3f(1.920, 0, 1.080)
+credits_vertices.addData3f(1.920, 0, -1.080)
+credits_vertices.addData3f(-1.920, 0, -1.080)
+# Store the triangles, counter clockwise from front
+credits_primitive = GeomTriangles(Geom.UHStatic)
+credits_primitive.addVertices(3, 1, 0)
+credits_primitive.addVertices(3, 2, 1)
+credits_geom = Geom(credits_vertex_data)
+credits_geom.addPrimitive(credits_primitive)
+credits_node = GeomNode('credits gnode')
+credits_node.addGeom(credits_geom)
+credits_node_path = base.render.attachNewNode(credits_node)
+credits_node_path.setTransparency(TransparencyAttrib.M_alpha)
+credits_tex = base.loader.loadTexture('models/credits.png')
+credits_node_path.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
+credits_node_path.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr(LVecBase3f(0, -90, 180)))
+credits_node_path.setTexOffset(TextureStage.getDefault(), .5, .5)
+# credits_node_path.setTexOffset(TextureStage.getDefault(), 1.920, 1.920)
+# credits_node_path.setTexScale(TextureStage.getDefault(), .5, 1, .5)
+credits_node_path.setTexScale(TextureStage.getDefault(), 1/1.920/2, 1, 1/1.080/2)
+credits_node_path.setTexProjector(TextureStage.getDefault(), base.render, credits_node_path)
+credits_node_path.setTexture(credits_tex)
+credits_node_path.set_pos_hpr(6.5, -4, 3.1, -90, 0, 180)
+credits_node_path.set_scale(1.4)
+credits_node_path.set_color_scale(0, 0, 0, 1)
+# credits_node_path.set_color(1, 1, 1, 1)
+
+
 # Events
 with open(path+'/models/events.tsv') as file_object:
     # a = file_object.read()
@@ -1558,6 +1633,8 @@ for hpr_shake_rope_vertices_i in range(round(demo_parallel.getDuration() * SHAKE
     )))
 pos_shake_rope_vertices[:STILL_START*SHAKE_DEN] = [(None, (0, 0, 0))]*STILL_START*SHAKE_DEN
 hpr_shake_rope_vertices[:STILL_START*SHAKE_DEN] = [(None, (0, 0, 0))]*STILL_START*SHAKE_DEN
+pos_shake_rope_vertices[STILL_STOP*SHAKE_DEN:] = [(None, (0, 0, 0))]*(len(pos_shake_rope_vertices)-STILL_STOP)*SHAKE_DEN
+hpr_shake_rope_vertices[STILL_STOP*SHAKE_DEN:] = [(None, (0, 0, 0))]*(len(hpr_shake_rope_vertices)-STILL_STOP)*SHAKE_DEN
 pos_shake_rope = Rope()
 hpr_shake_rope = Rope()
 pos_shake_rope.setup(4, pos_shake_rope_vertices)

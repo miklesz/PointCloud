@@ -109,7 +109,7 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
 
 
 def init_glow_particle_effect(point_size):
-    litter_size = round(75/2)  # 2
+    litter_size = round(75/2)  # 2  # round(75/2)
     life_span = 1  # 0.7000
     particle_effect = ParticleEffect()
     particles = Particles('water')
@@ -283,7 +283,7 @@ def init_steam_particle_effect(point_size):
 
 
 def init_water_particle_effect(point_size):
-    litter_size = 900  # 900, 300 przy 4.5x2.5, 66.67/m2
+    litter_size = 800  # 900, 300 przy 4.5x2.5, 66.67/m2
     life_span = 1.2  # 0.5000
     particle_effect = ParticleEffect()
     particles = Particles('water')
@@ -425,7 +425,7 @@ def init_dust_particle_effect(point_size):
 
 
 def init_greetings_particle_effect(point_size):
-    litter_size = 800  # 250  # 10  # 20
+    litter_size = 600  # 250  # 10  # 20  # 900
     life_span = 2
     particle_effect = ParticleEffect()
     particles = Particles('greetings')

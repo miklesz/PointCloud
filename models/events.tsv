@@ -6,48 +6,59 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 0	:	03	.	47	3.47	Sequence(Func(set_card[10].removeNode), Func(set_card[11].show))	czwarty pik	1.26	1+2+3+4	
 0	:	04	.	73	4.73	Sequence(Func(set_card[11].removeNode), Func(set_card[12].show))	piaty pik	1.43	1 + 2 + 3 + 4 + text, Hold for 0.50s and turn it off, all hard	
 0	:	05	.	31	5.31	Func(set_card[12].removeNode)	end of piaty pik			
-0	:	06	.	16	6.16	Sequence(Func(set_card[6].show), Func(set_card[7].show), LerpPosInterval(set_card[6], 2.25, (0, 0, 0),  (0, 0, 1.9), blendType='easeOut'), LerpPosInterval(set_card[6], 2.25, (0, 0, 1.9),  (0, 0, 0), blendType='easeIn'))	plansza Kroniki filmowej	2.25	Parallel(Func(set_card[6].show), Func(set_card[7].show), Sequence(LerpPosInterval(set_card[6], 2.25, (0, 0, .3),  (0, 0, 1.3), blendType='easeOut'), LerpPosInterval(set_card[6], 2.25, (0, 0, 1.3),  (0, 0, 0), blendType='easeIn')))	
+0	:	06	.	16	6.16	Sequence(Func(set_card[6].show), Func(set_card[7].show), Func(subtitles[0].show), LerpPosInterval(set_card[6], 2.25, (0, 0, 0),  (0, 0, 1.9), blendType='easeOut'), LerpPosInterval(set_card[6], 2.25, (0, 0, 1.9),  (0, 0, 0), blendType='easeIn'), Func(subtitles[0].destroy))	plansza Kroniki filmowej	2.25	Parallel(Func(set_card[6].show), Func(set_card[7].show), Sequence(LerpPosInterval(set_card[6], 2.25, (0, 0, .3),  (0, 0, 1.3), blendType='easeOut'), LerpPosInterval(set_card[6], 2.25, (0, 0, 1.3),  (0, 0, 0), blendType='easeIn')))	
 0	:	10	.	66	10.66	Parallel(Func(set_card[6].detachNode), display_sequence, LerpColorScaleInterval(set_card[7], 5, (1, 1, 1, 0), (1, 1, 1, 1)))	poczatek przejscia w Chiptune	Parallel(display_sequence, LerpColorScaleInterval(models['lead'], 5, (1, 1, 1, 0), (1, 1, 1, 1)))		
 0	:	15	.	66	15.66	Func(set_card[7].detachNode)	koniec przejscia	Func(models['lead'].detachNode)		
 0	:	25	.	02	25.02	Func(display_cleanup)	czyszczenie particles			
-0	:	25	.	12	25.12	board_intervals['villa_0']	Willa Kramstow, Func(models['villa_0'].reparent_to, base.render)	The von Kramsta family villa	The von Kramsta family villa	
-0	:	28	.	22	28.22	board_intervals['villa_garden']	willa z ogrodem	a villa with a garden	a villa with a garden	
-0	:	31	.	32	31.32	board_intervals['spodek']	XIX wiek	built in the third quarter of the 19th century	built in the third quarter of the 19th century	
-0	:	34	.	42	34.42	board_intervals['villa_street']	Katowic	in the center of Katowice,	in the center of Katowice,	
-0	:	37	.	52	37.52	board_intervals['villa_1']	ul.Warszawskiej 37	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.	at ul. Warszawska 37, is entered in the register of immovable monuments of the Silesian Voivodeship.	
-0	:	40	.	56	40.56	Parallel(Func(models['villa_1'].detachNode), Func(retro_card['retro_v1b.mkv'].show), Func(retro_tex['retro_v1b.mkv'].play))	pierwszy szum - poczatek (prawdziwy szum)	0.79		
-0	:	41	.	35	41.35	Parallel(Func(retro_card['retro_v1b.mkv'].detachNode), Sequence(board_intervals['villa_3'], board_intervals['villa_4']))	pierwszy szum - koniec	W latach piecdziesiatych obiekt przydzielony zostal Klubowi Pracy Tworczej.	In the 1950s, the facility was assigned to the Creative Work Club.	
-0	:	44	.	00	44.00	Parallel(Func(retro_card['retro_v2.mkv'].show), Func(retro_tex['retro_v2.mkv'].play))	drugi szum - poczatek (prawdziwy szum)	0.19	Parallel(Func(retro_card['retro_v2'].show), Func(retro_tex['retro_v2'].play))	
-0	:	44	.	19	44.19	Parallel(Func(retro_card['retro_v2.mkv'].detachNode))	drugi szum - koniec	oryginalnie: 44.19		
-0	:	47	.	01	47.01	Sequence(Func(models['villa_4'].detachNode), Func(retro_card['retro_td.mkv'].show), Func(retro_tex['retro_td.mkv'].play))	efekt - poczatek	1.73		
-0	:	48	.	74	48.74	Parallel(Func(retro_card['retro_td.mkv'].detachNode), board_intervals['signboard'])	efekt - koniec	od strony ul. Warszawskiej zajmowala redakcja efemerycznego tygodnika	from the side of ul. Warszawska was occupied by the editorial staff of the ephemeral weekly	
+0	:	25	.	12	25.12	Parallel(board_intervals['villa_0'], Func(subtitles[1].show))	Willa Kramstow, Func(models['villa_0'].reparent_to, base.render)	The von Kramsta family villa		
+0	:	26	.	56	26.56	Sequence(Func(subtitles[1].destroy), Func(subtitles[2].show))		a villa with a garden		
+0	:	28	.	22	28.22	board_intervals['villa_garden']	willa z ogrodem			
+0	:	29	.	56	29.56	Sequence(Func(subtitles[2].destroy), Func(subtitles[3].show))		built in the third quarter of the 19th century		
+0	:	31	.	32	31.32	board_intervals['spodek']	XIX wiek			
+0	:	31	.	73	31.73	Sequence(Func(subtitles[3].destroy), Func(subtitles[4].show))		in the center of Katowice,		
+0	:	33	.	11	33.11	Sequence(Func(subtitles[4].destroy), Func(subtitles[5].show))		at ul. Warszawska 37		
+0	:	34	.	42	34.42	Sequence(Func(subtitles[5].destroy), Func(subtitles[6].show), board_intervals['villa_street'])	Katowic	it is entered in the register of immovable monuments of the Silesian Voivodeship.		
+0	:	37	.	52	37.52	board_intervals['villa_1']	ul.Warszawskiej 37			
+0	:	40	.	56	40.56	Parallel(Func(subtitles[6].destroy), Func(models['villa_1'].detachNode), Func(retro_card['retro_v1b.mkv'].show), Func(retro_tex['retro_v1b.mkv'].play))	pierwszy szum - poczatek (prawdziwy szum)	0.79		
+0	:	41	.	35	41.35	Parallel(Func(retro_card['retro_v1b.mkv'].detachNode), Sequence(Func(subtitles[7].show), board_intervals['villa_3'], board_intervals['villa_4']))	pierwszy szum - koniec	W latach piecdziesiatych obiekt przydzielony zostal Klubowi Pracy Tworczej.	In the 1950s, the facility was assigned to the Creative Work Club.	
+0	:	44	.	00	44.00	Parallel(Func(subtitles[7].hide), Func(retro_card['retro_v2.mkv'].show), Func(retro_tex['retro_v2.mkv'].play))	drugi szum - poczatek (prawdziwy szum)	0.19	Parallel(Func(retro_card['retro_v2'].show), Func(retro_tex['retro_v2'].play))	
+0	:	44	.	19	44.19	Parallel(Func(retro_card['retro_v2.mkv'].detachNode), Func(subtitles[7].show))	drugi szum - koniec	oryginalnie: 44.19		
+0	:	47	.	01	47.01	Sequence(Func(subtitles[7].destroy), Func(models['villa_4'].detachNode), Func(retro_card['retro_td.mkv'].show), Func(retro_tex['retro_td.mkv'].play))	efekt - poczatek	1.73		
+0	:	48	.	74	48.74	Parallel(Func(retro_card['retro_td.mkv'].detachNode), Func(subtitles[8].show), board_intervals['signboard'])	efekt - koniec	od strony ul. Warszawskiej zajmowala redakcja efemerycznego tygodnika	from the side of ul. Warszawska was occupied by the editorial staff of the ephemeral weekly	
 0	:	51	.	84	51.84	board_intervals['villa_2']				
-0	:	52	.	21	52.21	Parallel(Func(models['villa_2'].detachNode), Func(set_card[0].show))	szum 6x przerywany - 1 poczatek	set rector		
-0	:	52	.	26	52.26	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[0].detachNode))	szum 6x przerywany - 1 koniec			
-0	:	52	.	35	52.35	Parallel(Func(models['villa_2'].detachNode), Func(set_card[1].show))	szum 6x przerywany - 2 poczatek			
-0	:	52	.	38	52.38	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[1].detachNode))	szum 6x przerywany - 2 koniec			
-0	:	52	.	40	52.40	Parallel(Func(models['villa_2'].detachNode), Func(set_card[2].show))	szum 6x przerywany - 3 poczatek			
-0	:	52	.	42	52.42	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[2].detachNode))	szum 6x przerywany - 3 koniec			
-0	:	52	.	45	52.45	Parallel(Func(models['villa_2'].detachNode), Func(set_card[3].show))	szum 6x przerywany - 4 poczatek			
-0	:	52	.	49	52.49	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[3].detachNode))	szum 6x przerywany - 4 koniec			
-0	:	52	.	52	52.52	Parallel(Func(models['villa_2'].detachNode), Func(set_card[4].show))	szum 6x przerywany - 5 poczatek			
-0	:	52	.	54	52.54	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[4].hide))	szum 6x przerywany - 5 koniec			
-0	:	52	.	56	52.56	Parallel(Func(models['villa_2'].detachNode), Func(set_card[5].show))	szum 6x przerywany - 6 poczatek	0.18		
-0	:	52	.	74	52.74	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[5].detachNode))	szum 6x przerywany - 6 koniec			
-0	:	53	.	38	53.38	Parallel(Func(models['villa_2'].detachNode), Func(retro_card['retro_rw.mkv'].show), Func(retro_tex['retro_rw.mkv'].play))	(szum echo 2x)	0.89		
+0	:	52	.	21	52.21	Parallel(Func(models['villa_2'].detachNode), Func(subtitles[8].hide), Func(set_card[0].show))	szum 6x przerywany - 1 poczatek	set rector		
+0	:	52	.	26	52.26	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[0].detachNode), Func(subtitles[8].show))	szum 6x przerywany - 1 koniec			
+0	:	52	.	35	52.35	Parallel(Func(models['villa_2'].detachNode), Func(set_card[1].show), Func(subtitles[8].hide))	szum 6x przerywany - 2 poczatek			
+0	:	52	.	38	52.38	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[1].detachNode), Func(subtitles[8].show))	szum 6x przerywany - 2 koniec			
+0	:	52	.	40	52.40	Parallel(Func(models['villa_2'].detachNode), Func(set_card[2].show), Func(subtitles[8].hide))	szum 6x przerywany - 3 poczatek			
+0	:	52	.	42	52.42	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[2].detachNode), Func(subtitles[8].show))	szum 6x przerywany - 3 koniec			
+0	:	52	.	45	52.45	Parallel(Func(models['villa_2'].detachNode), Func(set_card[3].show), Func(subtitles[8].hide))	szum 6x przerywany - 4 poczatek			
+0	:	52	.	49	52.49	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[3].detachNode), Func(subtitles[8].show))	szum 6x przerywany - 4 koniec			
+0	:	52	.	52	52.52	Parallel(Func(models['villa_2'].detachNode), Func(set_card[4].show), Func(subtitles[8].hide))	szum 6x przerywany - 5 poczatek			
+0	:	52	.	54	52.54	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[4].hide), Func(subtitles[8].show))	szum 6x przerywany - 5 koniec			
+0	:	52	.	56	52.56	Parallel(Func(models['villa_2'].detachNode), Func(set_card[5].show), Func(subtitles[8].hide))	szum 6x przerywany - 6 poczatek	0.18		
+0	:	52	.	74	52.74	Parallel(Func(models['villa_2'].reparent_to, base.render), Func(set_card[5].detachNode), Func(subtitles[8].show))	szum 6x przerywany - 6 koniec			
+0	:	53	.	38	53.38	Parallel(Func(models['villa_2'].detachNode), Func(retro_card['retro_rw.mkv'].show), Func(retro_tex['retro_rw.mkv'].play), Func(subtitles[8].hide))	(szum echo 2x)	0.89		
 0	:	53	.	70	53.70		(szum echo 2x)			
 0	:	54	.	27	54.27	Parallel(Func(retro_card['retro_rw.mkv'].detachNode), Func(retro_card['retro_sf.mkv'].show), Func(retro_tex['retro_sf.mkv'].play))	(szum z basowym efektem) - poczatek	1.06		
 0	:	55	.	33	55.33	Parallel(Func(retro_card['retro_sf.mkv'].detachNode))	(szum z basowym efektem) - koniec			
 0	:	55	.	38	55.38	Parallel(Func(retro_card['retro_v1.mkv'].show), Func(retro_tex['retro_v1.mkv'].play))	szum	0.32		
-0	:	55	.	70	55.70	Parallel(Func(retro_card['retro_v1.mkv'].detachNode), board_intervals['p1'])	od kilku lat odbywaja sie tu zloty bandy komputerowcow	od kilku lat odbywaja sie tu zloty bandy komputerowcow	For several years, rallies of computer enthusiasts have been held here.	
-0	:	58	.	80	58.80	board_intervals['p2']	demoscenowacmi (jakies zdjecie kwit z archiwow demosceny;)	samozwanczo nazywaja sie demoscenowcami	They self-proclaimed themselves as Demoscene.	
-0	:	61	.	90	61.90	board_intervals['p3']	oprocz spozywania... - poczatek	oprocz spozywania ogromnych ilosci trunkow wyskokowych	Apart from consuming huge amounts of alcoholic beverages,	
-0	:	65	.	00	65.00	board_intervals['alco']	muzyki (cos z muzyka)	ow partowicze sluchaja dziwnej muzyki	these partygoers listen to strange music,	
-0	:	68	.	10	68.10	board_intervals['protracker']	bohomazy (cos z grafika)	ogladaja jakies bohomazy	watch some daubs,	
-0	:	71	.	20	71.20	board_intervals['nox']	dema (jakies demo by Damage)	oraz jakies dema	and some demos.	
-0	:	74	.	30	74.30	board_intervals['xenium']	xenium	party nazywa sie xenium, a wczesniej w wolnym tlumaczeniu	The party is called \"Xenium\", and earlier in free translation,	
-0	:	77	.	40	77.40	board_intervals['river']	riverwash - poczatek	twoja stara pierze w rzece	\"Your Mother Washes in the River\".	
-0	:	84	.	00	84.00	Parallel(Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, .2, 90, blendType='easeOut'))	efekt przejscia w demo			
+0	:	55	.	70	55.70	Parallel(Func(retro_card['retro_v1.mkv'].detachNode), Func(subtitles[9].show), board_intervals['p1'])	od kilku lat odbywaja sie tu zloty bandy komputerowcow	od kilku lat odbywaja sie tu zloty bandy komputerowcow	For several years, rallies of computer enthusiasts have been held here.	
+0	:	58	.	80	58.80	board_intervals['p2']	demoscenowacmi (jakies zdjecie kwit z archiwow demosceny;)	samozwanczo nazywaja sie demoscenowcami		
+0	:	61	.	73	61.73	Sequence(Func(subtitles[9].destroy), Func(subtitles[10].show))	They self-proclaimed themselves as Demoscene.			
+0	:	61	.	90	61.90	board_intervals['p3']	oprocz spozywania... - poczatek	oprocz spozywania ogromnych ilosci trunkow wyskokowych		
+0	:	63	.	74	63.74	Sequence(Func(subtitles[10].destroy), Func(subtitles[11].show))	Apart from consuming huge amounts of alcoholic beverages,			
+0	:	65	.	00	65.00	board_intervals['alco']	muzyki (cos z muzyka)	ow partowicze sluchaja dziwnej muzyki		
+0	:	68	.	10	68.10	board_intervals['protracker']	bohomazy (cos z grafika)	ogladaja jakies bohomazy		
+0	:	69	.	22	69.22	Sequence(Func(subtitles[11].destroy), Func(subtitles[12].show))	these partygoers listen to strange music,			
+0	:	70	.	70	70.70	Sequence(Func(subtitles[12].destroy), Func(subtitles[13].show))	watch some daubs,			
+0	:	71	.	20	71.20	board_intervals['nox']	dema (jakies demo by Damage)	oraz jakies dema		
+0	:	72	.	08	72.08	Sequence(Func(subtitles[13].destroy), Func(subtitles[14].show))	and some demos.			
+0	:	74	.	30	74.30	board_intervals['xenium']	xenium	party nazywa sie xenium, a wczesniej w wolnym tlumaczeniu		
+0	:	74	.	38	74.38	Sequence(Func(subtitles[14].destroy), Func(subtitles[15].show))	The party is called \"Xenium\", and earlier in free translation,			
+0	:	77	.	40	77.40	board_intervals['river']	riverwash - poczatek	twoja stara pierze w rzece		
+0	:	77	.	45	77.45	Sequence(Func(subtitles[15].destroy), Func(subtitles[16].show))	\"Your Mother Washes in the River\".			
+0	:	84	.	00	84.00	Parallel(Func(subtitles[16].destroy), Func(models['sign'].reparent_to, base.render), LerpFunc(lens_function, 2, .2, 90, blendType='easeOut'))	efekt przejscia w demo			
 1	:	26	.	00	86.00	Func(models['garden'].reparent_to, base.render)	kramsta by damage			
 1	:	27	.	00	87.00	Func(base.camLens.setFov, 90)	https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses			
 1	:	29	.	00	89.00	rain_interval	Ogrodek+deszcz			
@@ -64,12 +75,14 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 2	:	04	.	50	124.50		wstawienie obiektu room_2			
 2	:	10	.	00	130.00	Sequence(Func(models['room_1'].detachNode), Func(models['room_3'].reparent_to, base.render))	wywalenie obiektu room_1			
 2	:	12	.	50	132.50		wstawienie obiektu room_3			
-2	:	30	.	00	150.00	Sequence(Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render), beat_interval)	bar + corridor in front of the toilet (first loop by the bar)			
+2	:	30	.	00	150.00	Sequence(Func(models['room_3'].detachNode), Func(models['room_2'].detachNode), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].reparent_to, base.render), beat_interval)	bar + corridor in front of the toilet (first loop by the bar)	Func(subtitles[17].show), 		
+2	:	38	.	00	158.00			Func(subtitles[17].destroy)		
 2	:	46	.	00	166.00	dust_interval	dust			
 3	:	05	.	00	185.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.			
 3	:	06	.	00	186.00		(dolly or trainspotting effect) !!!! I do not know. I would have to see a demo with this version.			
 3	:	09	.	00	189.00	Func(models['hall_low'].reparent_to, base.render)	models['hall_low'].reparent_to(base.render)			
-3	:	16	.	00	196.00	Sequence(Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render), beat_interval)	the moment of inlet to the toilet			
+3	:	15	.	00	195.00		the worst toilet in scotland	Func(subtitles[18].show)		
+3	:	16	.	00	196.00	Sequence(Func(models['bar'].detachNode), Func(models['hall_low'].detachNode), Func(set_modes_and_filters, PRESETS[7]), Func(models['wc'].reparent_to, base.render), beat_interval)	the moment of inlet to the toilet	Func(subtitles[18].destroy), 		
 3	:	18	.	00	198.00	trainspotting_sequence	action in the toilet until the end of the stop on the mirror) (to be negotiated!)			
 3	:	26	.	00	206.00	wc_splash_interval	trainspotting_sequence			
 3	:	28	.	56	208.56	greetings_interval	greetings	7.44		
@@ -121,4 +134,4 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 4	:	21	.	19	261.19	cube_parallels[16]	snare	18	2.81	1.00
 4	:	22	.	19	262.19		transition			
 4	:	24	.	00	264.00	Parallel(beat_interval, Func(models['compo'].reparent_to, base.render), steam_interval)	inlet to the main hall			
-4	:	40	.	00	280.00		credits appear in full screen.			
+4	:	39	.	75	279.75	Sequence(LerpColorScaleInterval(credits_node_path, .25, (1, 1, 1, 1), (0, 0, 0, 1), blendType='easeIn'), LerpColorScaleInterval(credits_node_path, 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'))	credits appear in full screen.			

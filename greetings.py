@@ -19,21 +19,4 @@ my_image.write(Filename(OUTPUT))
 # convert tex_dmg_480x120.png tex_dmg_480x120.png tex_dmg_480x120.png tex_dmg_480x120.png tex_dmg_480x120.png tex_dmg_480x120.png tex_dmg_480x120.png tex_dmg_480x120.png -append tex_dmg_mosaic.png
 #
 
-# ASD
-# Aberration Creations
-# Altair
-# Amnesty
-# Appendix
-# CNCD
-# FCI
-# Fairlight
-# Faurbraush
-# Futuris
-# Joker
-# Lamers
-# MFX
-# Madwizards
-# Nah Kolor
-# Oftenhide
-# Satori
-# TRSI
+
