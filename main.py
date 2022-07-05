@@ -49,7 +49,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DOWNLOAD = False  # True/False
 print('DOWNLOAD:', DOWNLOAD)
-JUMP = 132  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -1219,7 +1219,7 @@ for text in texts:
             pos=(0, -.95),  # +.96
             fg=(1, 1, 1, 1),
             bg=(0, 0, 0, .5),
-            scale=0.1,  # 0.05
+            scale=0.06,  # 40%
             align=TextNode.ACenter,
         )
     )
@@ -1496,7 +1496,8 @@ greetings_interval = ParticleInterval(
     particleEffect=init_greetings_particle_effect(PRESETS[7]['render_mode_thickness']),
     parent=base.render,
     worldRelative=True,
-    duration=7.44,
+    duration=7.44,  # 7.44, 11.44
+    # softStopT=-1,
     softStopT=-2.25,  # Greetsy do końca nie wygasaja
     # cleanup=True,
     name='greetings'
@@ -1587,7 +1588,7 @@ credits_node = GeomNode('credits gnode')
 credits_node.addGeom(credits_geom)
 credits_node_path = base.render.attachNewNode(credits_node)
 credits_node_path.setTransparency(TransparencyAttrib.M_alpha)
-credits_tex = base.loader.loadTexture('models/credits.png')
+credits_tex = base.loader.loadTexture('models/credits.jpeg')
 credits_node_path.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
 credits_node_path.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr(LVecBase3f(0, -90, 180)))
 credits_node_path.setTexOffset(TextureStage.getDefault(), .5, .5)
