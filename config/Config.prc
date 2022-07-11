@@ -109,3 +109,6 @@ yield-timeslice 0
 lock-to-one-cpu #f
 
 # gl-version 3 2
+
+gl-check-errors #t
+# framebuffer-alpha #f

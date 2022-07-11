@@ -6,10 +6,12 @@ import platform
 import queue
 import requests
 import sys
+import time
 import urllib3
 
 # Related third party imports
 from direct.filter.CommonFilters import CommonFilters
+from direct.gui.DirectGui import *
 from direct.gui.OnscreenText import OnscreenText
 from direct.interval.IntervalGlobal import *
 from direct.interval.LerpInterval import LerpPosHprInterval
@@ -27,11 +29,10 @@ current_modes_and_filters = {
 }
 enable_roping = True
 done = False
-# pos_hpr_amplitudes = [.05, .05, .05, .5, .5, .5]  # .005, .5
 pos_hpr_amplitudes = [.1, .1, .1, 5, 5, 5]  # .005, .5
-# pos_hpr_amplitudes = [.010 * (Randomizer().randomRealUnit() / 25 + 1) for a in range(3)] + \
-#                      [.500 * (Randomizer().randomRealUnit() / 25 + 1) for b in range(3)]
-# pos_hpr_offsets = [Randomizer().randomReal(2*pi) for i in range(6)]
+profile_list = []
+retro_card = {}
+tab_mode = False
 
 # Constants
 COLOR_SCALES = (
@@ -43,13 +44,13 @@ COLOR_SCALES = (
     ('Key Lime', (239, 252, 147)),
     ('Dollar Bill', (128, 194, 113))
 )
-print('sys.executable:', sys.executable)
+# print('sys.executable:', sys.executable)
 if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python':
-    DOWNLOAD = True  # True/False
+    DEVEL = True  # True/False
 else:
-    DOWNLOAD = False  # True/False
-print('DOWNLOAD:', DOWNLOAD)
-JUMP = 206  # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+    DEVEL = False  # True/False
+# DEVEL = False
+JUMP = 102   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -117,9 +118,9 @@ PRESETS = [
     },
 ]
 SHAKE_DEN = 1
+START = time.time()  # Start time
 STILL_START = 25
 STILL_STOP = 280
-VERBOSE = True  # False
 
 
 def change_mode_or_filter(mode_or_filter, change):
@@ -139,7 +140,7 @@ def set_modes_and_filters(set_preset=None):
         # current_modes_and_filters = set_preset
         for key in set_preset:
             current_modes_and_filters[key] = set_preset[key]
-    print(current_modes_and_filters)
+    # print(current_modes_and_filters)
     # quit()
     if current_modes_and_filters['bloom']:
         filters.set_bloom(
@@ -233,63 +234,84 @@ def beat(t):
 #     # return task
 
 def escape():
-    print('Escape pressed -> sys.exit')
+    if DEVEL:
+        print('Escape pressed -> sys.exit')
+        with open('profile_list.csv', 'w') as profile_file:
+            for profile_time in profile_list:
+                profile_file.write(f'{profile_time}\n')
     sys.exit()
+
+
+def tab():
+    global tab_mode
+    if tab_mode:
+        if DEVEL:
+            print('Switching tab_mode to False')
+        base.set_frame_rate_meter(False)
+        tab_mode = False
+    else:
+        if DEVEL:
+            print('Switching tab_mode to True')
+        base.set_frame_rate_meter(True)
+        tab_mode = True
 
 
 def accept():
     base.accept('escape', escape)
-    base.accept('v', toggle_volume)
-    base.accept('f', toggle_fullscreen)
-    base.accept('m', move_to_random)
-    base.accept('b', beat_interval.start)
-    base.accept('o', toggle_pos_intervals)
-    base.accept('shift-b', change_mode_or_filter, ['bloom', None])
-    base.accept('shift-0', change_mode_or_filter, ['bloom_intensity', +0.1])
-    base.accept('shift-9', change_mode_or_filter, ['bloom_intensity', -0.1])
-    base.accept('shift-c', change_mode_or_filter, ['cartoon_ink', None])
-    base.accept('shift-.', change_mode_or_filter, ['cartoon_ink_separation', +1])
-    base.accept('shift-,', change_mode_or_filter, ['cartoon_ink_separation', -1])
-    base.accept('shift-u', change_mode_or_filter, ['blur_sharpen', None])
-    base.accept('shift-]', change_mode_or_filter, ['blur_sharpen_amount', +0.1])
-    base.accept('shift-[', change_mode_or_filter, ['blur_sharpen_amount', -0.1])
-    base.accept(']', change_mode_or_filter, ['render_mode_thickness', +1])
-    base.accept('[', change_mode_or_filter, ['render_mode_thickness', -1])
-    base.accept('p', change_mode_or_filter, ['render_mode_perspective', None])
-    base.accept('0', set_modes_and_filters, [PRESETS[0]])
-    base.accept('1', set_modes_and_filters, [PRESETS[1]])
-    base.accept('2', set_modes_and_filters, [PRESETS[2]])
-    base.accept('3', set_modes_and_filters, [PRESETS[3]])
-    base.accept('4', set_modes_and_filters, [PRESETS[4]])
-    base.accept('5', set_modes_and_filters, [PRESETS[5]])
-    base.accept('6', set_modes_and_filters, [PRESETS[6]])
-    base.accept('7', set_modes_and_filters, [PRESETS[7]])
-    base.accept('s', start_steam)
-    base.accept('w', accept_water)
-    base.accept('g', start_glow)
-    base.accept('z', start_zoom)
-    base.accept('d', dust_storm)
-    base.accept('i', init_display_sequence)
-    base.accept('a', change_mode_or_filter, ['color_scale', +1])
-    base.accept('t', accept_trainspotting)
-    base.accept('h', accept_handshaking)
-    base.accept('r', accept_roping)
-    base.accept('space', accept_roping)
-    base.accept('c', accept_cubes)
-    base.accept('arrow_left', accept_yaw, [+2])
-    base.accept('arrow_right', accept_yaw, [-2])
-    base.accept('arrow_left-repeat', accept_yaw, [+2])
-    base.accept('arrow_right-repeat', accept_yaw, [-2])
-    base.accept('arrow_up', accept_pitch, [+2])
-    base.accept('arrow_down', accept_pitch, [-2])
-    base.accept('arrow_up-repeat', accept_pitch, [+2])
-    base.accept('arrow_down-repeat', accept_pitch, [-2])
-    # base.accept('lshift', accept_shift, [-5])
-    # base.accept('rshift', accept_shift, [+5])
-    base.accept(',', accept_shift, [-5])
-    base.accept('.', accept_shift, [+5])
-    base.accept('e', accept_effect)
-    base.accept('j', demo_parallel.setT, [JUMP])
+    base.accept('tab', tab)
+    if DEVEL:
+        base.accept('v', toggle_volume)
+        base.accept('f', toggle_fullscreen)
+        base.accept('m', move_to_random)
+        base.accept('b', beat_interval.start)
+        base.accept('o', toggle_pos_intervals)
+        base.accept('shift-b', change_mode_or_filter, ['bloom', None])
+        base.accept('shift-0', change_mode_or_filter, ['bloom_intensity', +0.1])
+        base.accept('shift-9', change_mode_or_filter, ['bloom_intensity', -0.1])
+        base.accept('shift-c', change_mode_or_filter, ['cartoon_ink', None])
+        base.accept('shift-.', change_mode_or_filter, ['cartoon_ink_separation', +1])
+        base.accept('shift-,', change_mode_or_filter, ['cartoon_ink_separation', -1])
+        base.accept('shift-u', change_mode_or_filter, ['blur_sharpen', None])
+        base.accept('shift-]', change_mode_or_filter, ['blur_sharpen_amount', +0.1])
+        base.accept('shift-[', change_mode_or_filter, ['blur_sharpen_amount', -0.1])
+        base.accept(']', change_mode_or_filter, ['render_mode_thickness', +1])
+        base.accept('[', change_mode_or_filter, ['render_mode_thickness', -1])
+        base.accept('p', change_mode_or_filter, ['render_mode_perspective', None])
+        base.accept('0', set_modes_and_filters, [PRESETS[0]])
+        base.accept('1', set_modes_and_filters, [PRESETS[1]])
+        base.accept('2', set_modes_and_filters, [PRESETS[2]])
+        base.accept('3', set_modes_and_filters, [PRESETS[3]])
+        base.accept('4', set_modes_and_filters, [PRESETS[4]])
+        base.accept('5', set_modes_and_filters, [PRESETS[5]])
+        base.accept('6', set_modes_and_filters, [PRESETS[6]])
+        base.accept('7', set_modes_and_filters, [PRESETS[7]])
+        base.accept('s', start_steam)
+        base.accept('w', accept_water)
+        base.accept('g', start_glow)
+        base.accept('z', start_zoom)
+        base.accept('d', dust_storm)
+        base.accept('i', init_display_sequence)
+        base.accept('a', change_mode_or_filter, ['color_scale', +1])
+        base.accept('t', accept_trainspotting)
+        base.accept('h', accept_handshaking)
+        base.accept('r', accept_roping)
+        base.accept('space', accept_roping)
+        base.accept('c', accept_cubes)
+        base.accept('arrow_left', accept_yaw, [+2])
+        base.accept('arrow_right', accept_yaw, [-2])
+        base.accept('arrow_left-repeat', accept_yaw, [+2])
+        base.accept('arrow_right-repeat', accept_yaw, [-2])
+        base.accept('arrow_up', accept_pitch, [+2])
+        base.accept('arrow_down', accept_pitch, [-2])
+        base.accept('arrow_up-repeat', accept_pitch, [+2])
+        base.accept('arrow_down-repeat', accept_pitch, [-2])
+        # base.accept('lshift', accept_shift, [-5])
+        # base.accept('rshift', accept_shift, [+5])
+        base.accept(',', accept_shift, [-5])
+        base.accept('.', accept_shift, [+5])
+        base.accept('e', accept_effect)
+        # base.accept('j', demo_parallel.setT, [JUMP])
+        base.accept('j', demo_sequence.setT, [JUMP])
 
 
 def main_task(task):
@@ -303,7 +325,8 @@ def main_task(task):
 Yo FuCkErS!
 time: {str(round(music.get_time(), 2))}
 '''
-    if not demo_parallel.isPlaying():
+    # if not demo_parallel.isPlaying():
+    if not demo_sequence.isPlaying():
         text += f'''\
 escape: sys.exit
 space: start/stop demo (,/. to skip)
@@ -357,13 +380,14 @@ f: toggle full-screen - window properties (now: {fullscreen})
 '''
     if 'text_object' in globals():
         text_object.destroy()
-    text_object = OnscreenText(text=text,  # text
-                               # pos=(-1.77, +.96),  # +.96
-                               pos=(-base.getAspectRatio(), +.97),  # +.96
-                               fg=(1, 1, 0, 1),
-                               bg=(0, 0, 0, .5),
-                               scale=0.037,  # 0.05
-                               align=TextNode.ALeft)
+    if DEVEL or tab_mode:
+        text_object = OnscreenText(text=text,  # text
+                                   # pos=(-1.77, +.96),  # +.96
+                                   pos=(-base.getAspectRatio(), +.97),  # +.96
+                                   fg=(1, 1, 0, 1),
+                                   bg=(0, 0, 0, .5),
+                                   scale=0.037,  # 0.05
+                                   align=TextNode.ALeft)
 
     # decay = 1
 
@@ -471,6 +495,8 @@ def start_steam():
 def roping_function(t):
     global points
     global looks
+    profile_list.append(music.get_time())
+    # profile_list.append(len(points) * t / 5000)
     i = int(len(points)*t)-1
     if i < 0:
         i = 0
@@ -494,29 +520,34 @@ def model_function(model, add):
 
 def accept_roping():
     global demo_parallel
+    global demo_sequence
     r.removeNode()
     rope_look.removeNode()
     np.removeNode()
     for tn in text_nodes:
         tn.removeNode()
     if demo_parallel.getT() == 0:
-        # demo_parallel.setPlayRate(.5)
         for key in models.keys():
-            models[key].detachNode()
-        # demo_parallel.setT(JUMP)
-    # if demo_parallel.isStopped():
-    #     demo_parallel.start()
-    #     print('demo_parallel.start()')
-    #     print(f'demo_parallel.getDuration() = {demo_parallel.getDuration()}')
-    # print(demo_parallel.getT())
-    if demo_parallel.isPlaying():
-        demo_parallel.pause()
-        print('demo_parallel.pause()')
-        base.render.ls()
+            models[key].hide()
+
+    # if demo_parallel.isPlaying():
+    #     demo_parallel.pause()
+    #     print('demo_parallel.pause()')
+    #     base.render.ls()
+    # else:
+    #     demo_parallel.resume()
+    #     print('demo_parallel.resume()')
+
+    if demo_sequence.isPlaying():
+        demo_sequence.pause()
+        if DEVEL:
+            print('demo_sequence.pause()')
+            base.render.ls()
+            print(f'base.camLens.getFov(): {base.camLens.getFov()}')
     else:
-        demo_parallel.resume()
-        print('demo_parallel.resume()')
-    # interval.getDuration()
+        demo_sequence.resume()
+        if DEVEL:
+            print('demo_sequence.resume()')
 
 
 # noinspection PyArgumentList
@@ -856,90 +887,156 @@ def display_cleanup():
     for display_particle_effect in display_particle_effects:
         display_particle_effect.cleanup()
 
-# def init_task(task):
-# #     # Add some text
-# #     # bk_text = "This is my Demo"
-# #     # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
-# #     #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
-# #     #                           mayChange=1)
-# #     # from time import sleep
-# #     # sleep(1)
-# #
-# #     print('pre interval start')
-# #     init_interval = Func(init_function)
-# #     init_sequence = Sequence()
-# #     init_sequence.append(Wait(2/60))
-# #     # init_sequence.append(Wait(5))
-# #     init_sequence.append(init_interval)
-# #     init_sequence.append(Wait(20))
-# #     init_sequence.append(init_interval)
-# #     # init_sequence.append(init_interval)
-# #     init_sequence.start()
-# #     init_function()
-# #     print('post interval start')
-# #
-# #     # textObject.setText(bk_text)
-# #
+
+def stamp(msg):
+    if DEVEL:
+        print(f'{round(time.time()-START, 1)}s {msg}')
+
+
+def retro(retro_key, from_frame, to_frame):
+    retro_card[retro_key].find('**/+SequenceNode').node().play(from_frame, to_frame)
+    retro_card[retro_key].reparent_to(base.render2d)
+
+
+def ball_func():
+    ball_capture.find('**/+SequenceNode').node().play(0, 215)
+    ball_capture.reparent_to(base.render)
+
+
+def retro_load(retro_key):
+    if DEVEL:
+        print(f'Loading {retro_key}')
+    retro_card[retro_key] = base.loader.loadModel(f'models/{retro_key[:-3]}bam')
+    retro_card[retro_key].set_scale(1920/800)
+
+
+def bar_value(value):
+    bar['value'] = value
+    base.taskMgr.step(), base.taskMgr.step()
+
+
+def init_task(task):
+    print('init_task')
+    # Add some text
+    # bk_text = "This is my Demo"
+    # textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
+    #                           fg=(1, 0.5, 0.5, 1), align=TextNode.ACenter,
+    #                           mayChange=1)
+    # print('before sleep')
+    # time.sleep(3)
+    # if task.time < 3.0:
+    #     return Task.cont
+    # print('after sleep')
+    # textObject.destroy()
+    # print('after destroy')
+
 #
-#     return Task.done
+#     print('pre interval start')
+#     init_interval = Func(init_function)
+#     init_sequence = Sequence()
+#     init_sequence.append(Wait(2/60))
+#     # init_sequence.append(Wait(5))
+#     init_sequence.append(init_interval)
+#     init_sequence.append(Wait(20))
+#     init_sequence.append(init_interval)
+#     # init_sequence.append(init_interval)
+#     init_sequence.start()
+#     init_function()
+#     print('post interval start')
+#
+#     # textObject.setText(bk_text)
+#
+    return Task.done
+
+# Start stamp
+stamp('Start loading')
 
 # Config
-print('sys.platform:', sys.platform)
-# if sys.platform == 'darwin':
-#     loadPrcFile("config/Confauto.prc")
-#     loadPrcFile("config/Config.prc")
+stamp('Config')
+if DEVEL:
+    print('sys.platform:', sys.platform)
 loadPrcFile("config/Confauto.prc")
 loadPrcFile("config/Config.prc")
 
 # Init ShowBase
+stamp('Init ShowBase')
 base = ShowBase()
+# base.taskMgr.step(), base.taskMgr.step()
 
 # noinspection PyUnresolvedReferences
-print(cpMgr)
-# exit()
-
-has_force = False
-
-# Print platform
-if VERBOSE:
+# Print cpMgr, platform, base.win.gsg, etc.
+stamp('Print cpMgr, platform, base.win.gsg, etc.')
+if DEVEL:
+    print(ConfigPageManager.getGlobalPtr())
     print('platform.python_version:', platform.python_version())
     print('platform.machine:', platform.machine())
-
-# Print base.win.gsg
-if VERBOSE:
     print('base.win.gsg.driver_vendor:', base.win.gsg.driver_vendor)
     print('base.win.gsg.driver_renderer:', base.win.gsg.driver_renderer)
     print('base.win.gsg.supports_basic_shaders:', base.win.gsg.supports_basic_shaders)
-    # exit()
-
-if VERBOSE:
     print("PandaSystem.version_string:", PandaSystem.version_string)
 
-# if VERBOSE:
-#     print("Thread.isThreadingSupported:", Thread.isThreadingSupported())
-
-# Set window
+# Set window & background color
+stamp('Set window & background color')
 fullscreen = False
 props = WindowProperties()
 props.setIconFilename('icons/icon-256.png')
 props.setTitle('Kramsta by Damage')
+if not DEVEL:
+    props.setCursorHidden(True)
 base.win.request_properties(props)
+base.setBackgroundColor(0, 0, 0)
 toggle_fullscreen()
 
-# Setting background color
-base.setBackgroundColor(0, 0, 0)
-
-# Set frame rate meter
-base.set_frame_rate_meter(True)
-# frm = FrameRateMeter()
-# frm.setUpdateInterval(10)
+# Init direct wait bar
+bar = DirectWaitBar(text='Dekramsting...')
+bar['barBorderWidth'] = (10, 10)
+# bar.setBarRelief(0)
+base.taskMgr.step(), base.taskMgr.step(), base.taskMgr.step()
 
 # Set camera lens field of view
-# base.camLens.setFov(150)
-# base.camLens.setFov(40)
+stamp('Set camera lens field of view')
 base.camLens.setFov(90)
-# base.camLens.fov = 100
 base.camLens.setNear(.1)
+
+# base.camLens.setAspectRatio(1920/1080)
+# print(f'base.camLens.getAspectRatio(): {base.camLens.getAspectRatio()}')
+
+# Set frame rate meter
+stamp('Set frame rate meter')
+if DEVEL:
+    base.set_frame_rate_meter(True)
+
+# Setting fullscreen
+# props = WindowProperties()
+# props.set_fullscreen(True)
+# base.win.request_properties(props)
+
+# Setting fullscreen with correct size
+# props = WindowProperties()
+# props.set_size(base.pipe.get_display_width(), base.pipe.get_display_height())
+# props.set_fullscreen(True)
+# base.win.request_properties(props)
+
+# props.setCursorHidden(True)
+
+# "Fullscreen" with upper bar and bottom dock
+# props = WindowProperties()
+# props.set_size(base.pipe.get_display_width(), base.pipe.get_display_height())
+# props.setOrigin((0, 0))
+# base.win.request_properties(props)
+
+# props.set_size(1920, 1080)
+# props.set_size(1280, 720)
+# props.setFixedSize(True)
+# props.set_size(1280, 720)
+# props.set_size(1920, 1080)
+# props.set_size(2560, 1600)
+# print(base.pipe.get_display_width(), base.pipe.get_display_height())
+# props.set_size(base.pipe.get_display_width(), base.pipe.get_display_height())
+# props.setOrigin((-2, -2))
+# props.setOrigin((0, 0))
+# props.set_fullscreen(True)
+# base.win.request_properties(props)
 
 # Set currents, lasts, deltas and weights
 currents = [0, 0, 0, 0, 0, 0, 1, base.camLens.getFov()[0]]
@@ -968,27 +1065,48 @@ base.camera.reparent_to(spectator)
 path = sys.path[0]
 if path.endswith('Contents/MacOS/../Frameworks'):
     path = str(pathlib.Path().absolute())
-print('path:', path)
+if DEVEL:
+    print('path:', path)
 
-if DOWNLOAD:
+# Download
+stamp('Download')
+if DEVEL:
     # noinspection PyUnresolvedReferences
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
     print('Downloading camera.csv')
     # url = 'http'+'://camera.leszcz.uk'
     url = 'https://docs.google.com/spreadsheets/d/14FrIBHotjeTTjMmCdHFe7VlGDkBHL83Vpx5ArMxZL8k/export?format=csv&id=14FrIBHotjeTTjMmCdHFe7VlGDkBHL83Vpx5ArMxZL8k'
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/camera.csv', 'wb').write(r.content)
-
     print('Downloading events.tsv')
     # url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuBd20jiDYamDCsvKyWJgqer1KWPbpylgGYppawi4XOQ5eOQOYvJjr4db3CwnnQ3uOzhWPGdGMPcn/pub?gid=0&single=true&output=tsv'
     url = 'https://docs.google.com/spreadsheets/d/13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0/export?format=tsv&id=13dFTwxkqh0AiPdm_jZd1tMuqR0y-uJxUz0cbWgAUcp0'
     r = requests.get(url, allow_redirects=True, verify=False)
     open(path+'/models/events.tsv', 'wb').write(r.content)
 
+# Rope
+steps = 7
+stamp('Rope')
 look_color = (1, .5, 1, 1)
 demo_parallel = Parallel()
-# models_sequence = Sequence()
+demo_sequence = Sequence(
+    # Func(retro_load, 'retro_td.mkv'), Func(bar_value, 1/steps),
+    # Func(retro_load, 'retro_rw.mkv'), Func(bar_value, 2/steps),
+    # Func(retro_load, 'retro_sf.mkv'), Func(bar_value, 3/steps),
+    # Func(retro_load, 'retro_v1b.mkv'), Func(bar_value, 4/steps),
+    # Func(retro_load, 'retro_v2.mkv'), Func(bar_value, 5/steps),
+    # Func(retro_load, 'retro_v1.mkv'), Func(bar_value, 6/steps),
+    # Func(time.sleep, 1), Func(bar_value, 1/steps*100),
+    # Func(time.sleep, 1), Func(bar_value, 2/steps*100),
+    # Func(time.sleep, 1), Func(bar_value, 3/steps*100),
+    # Wait(1), Func(bar_value, 4/steps*100),
+    # Wait(1), Func(bar_value, 5/steps*100),
+    # Wait(1), Func(bar_value, 50),
+    # Wait(1), Func(bar_value, 100),
+    # Func(bar.destroy),
+    Wait(2),
+    demo_parallel,
+)
 roping_sequence = Sequence()
 with open(path+'/models/camera.csv') as file_object:
     csv_lines = file_object.readlines()
@@ -999,43 +1117,36 @@ lines.setColor(1, 0, 1)
 text_nodes = []
 for csv_line in csv_lines[1+0:]:
     cols = csv_line.split(',')
-    text = TextNode(cols[2])
-    text.setText(cols[2])
-    text_nodes.append(base.render.attachNewNode(text))
-    text_nodes[-1].setP(-90)
-    text_nodes[-1].setPos(float(cols[3]), float(cols[4]), float(cols[5]))
-    text_nodes[-1].setScale(.5)
-    text_nodes[-1].reparentTo(base.render)
+    if DEVEL:
+        text = TextNode(cols[2])
+        text.setText(cols[2])
+        text_nodes.append(base.render.attachNewNode(text))
+        text_nodes[-1].setP(-90)
+        text_nodes[-1].setPos(float(cols[3]), float(cols[4]), float(cols[5]))
+        text_nodes[-1].setScale(.5)
+        text_nodes[-1].reparentTo(base.render)
     vertices.append((None, (float(cols[3]), float(cols[4]), float(cols[5]))))
     look_vertices.append({'point': (float(cols[6]), float(cols[7]), float(cols[8])), 'color': look_color})
     lines.moveTo(float(cols[3]), float(cols[4]), float(cols[5]))
     lines.drawTo(float(cols[6]), float(cols[7]), float(cols[8]))
-#     if cols[9]:
-#         models_sequence.append(Func(model_function, cols[9], int(cols[10])))
-#     models_sequence.append(Wait(1))
-# print(models_sequence)
-# lines.setThickness(4)
 node = lines.create()
 np = NodePath(node)
-np.reparentTo(base.render)
-
 r = Rope()
 r.setup(4, vertices)
 r.ropeNode.setThickness(2)
 r.ropeNode.setNumSubdiv(1 * 120)
 r.setPos(0, 0, 0)
-r.reparentTo(base.render)
+if DEVEL:
+    np.reparentTo(base.render)
+    r.reparentTo(base.render)
 r.recompute()
-
 rope_look = Rope()
 rope_look.setup(4, look_vertices)
 rope_look.ropeNode.setUseVertexColor(1)
 rope_look.ropeNode.setThickness(2)
 rope_look.ropeNode.setNumSubdiv(1 * 120)
 rope_look.setPos(0, 0, 0)
-# rope_look.reparentTo(base.render)
 rope_look.recompute()
-
 roping_sequence.append(LerpFunc(
     function=roping_function,
     fromData=0,
@@ -1049,6 +1160,7 @@ demo_parallel.append(roping_sequence)
 # points = r.getPoints(5 * 120 * 100)
 
 # Append position intervals
+stamp('Append position intervals')
 dummy = base.render.attachNewNode("dummy")
 sequence = Sequence()
 rn = Randomizer()
@@ -1081,18 +1193,14 @@ for interval_index in range(64):
 
 
 # Append beat intervals
+stamp('Append beat intervals')
 beat_interval = LerpFunc(beat, fromData=0, toData=1, duration=period/4)
 beat_count = 0
 
-# print(current_modes_and_filters['color_scale'])
-# print(current_modes_and_filters)
-# quit()
-
-# display_sequence = init_display_sequence()
-
 pos_intervals = False
 
-# Load models and make point-clouds
+# Load models, make point-clouds and hide models
+stamp('Load models, make point-clouds and hide models')
 model_dict = {
     'alco': {'name': 'alco', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'spodek': {'name': 'spodek', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
@@ -1130,36 +1238,68 @@ model_dict = {
     'register': {'name': 'register_half', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
 }
-
 models = {}
-
 for model_key in model_dict:
-    print(model_key, model_dict[model_key])
+    # print(model_key, model_dict[model_key])
     name = model_dict[model_key]['name']
     models[model_key] = base.loader.loadModel(f'models/{name}.bam')
     models[model_key].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
     models[model_key].reparentTo(base.render)
-
+    models[model_key].hide()
 models['ball'].setTransparency(TransparencyAttrib.M_alpha)
 models['ball'].setScale(.75)
 
-# print('podium: ', models['podium'].getTightBounds())
-# print('garden: ', models['garden'].getTightBounds())
+bar['value'] += 10
+base.taskMgr.step(), base.taskMgr.step()
 
 # Render modes and common filters
+stamp('Render modes and common filters')
 filters = CommonFilters(base.win, base.cam)
-for preset in PRESETS[::-1]:
+# for preset in (PRESETS[7], PRESETS[6], PRESETS[3], PRESETS[2], PRESETS[1], PRESETS[0]):
+for preset in (PRESETS[7], PRESETS[6], PRESETS[2], PRESETS[1], PRESETS[0]):
     set_modes_and_filters(preset)
-    # pass
-# print("DONE!")
+# for preset in PRESETS[::-1]:
+#     set_modes_and_filters(preset)
 
-for key in models.keys():
-    models[key].detachNode()
-
+# Get points and looks
+stamp('Get points and looks')
 points = r.getPoints(len(vertices) * 5000)
 looks = rope_look.getPoints(len(vertices) * 5000)
-# print(len(looks))
+bar['value'] += 10
+base.taskMgr.step(), base.taskMgr.step()
+jumps = (
+    (4 * 60 + 22.28) * 5000,
+    (4 * 60 + 22.38) * 5000,
+    (4 * 60 + 22.47) * 5000,
+    (4 * 60 + 22.56) * 5000,
+    (4 * 60 + 22.66) * 5000,
+    (4 * 60 + 23.00) * 5000,
+    (4 * 60 + 23.09) * 5000,
+    (4 * 60 + 23.19) * 5000,
+    (4 * 60 + 23.28) * 5000,
+    (4 * 60 + 23.38) * 5000,
+    (4 * 60 + 23.47) * 5000,
+    (4 * 60 + 23.56) * 5000,
+    (4 * 60 + 23.66) * 5000,
+    (4 * 60 + 24.00) * 5000,
+)
+for jump_i in range(len(jumps)-1):
+    jump_to = points[int(jumps[jump_i+1])]
+    print(jump_to)
+    for points_i in range(int(jumps[jump_i]), int(jumps[jump_i+1])):
+        points[points_i] = jump_to
+
+
+# print(len(points)/5000)
+
 # exit()
+
+
+
+# Set spectator pos & hpr
+stamp('Set spectator pos & hpr')
+
+# print(len(looks))
 # spectator.set_pos(points[0])
 # spectator.lookAt(looks[0])
 spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
@@ -1168,7 +1308,7 @@ spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
 # spectator.set_pos_hpr(18.5, 9.6, 2.8, 90, 0, 0)
 # models['sign'].reparent_to(base.render)
 # models['garden'].reparent_to(base.render)
-# models['garden_large'].reparent_to(base.render)
+models['garden_large'].show()
 # models['podium'].reparent_to(base.render)
 # models['entrance'].reparent_to(base.render)
 # models['room_1'].reparent_to(base.render)
@@ -1181,36 +1321,41 @@ spectator.set_pos_hpr(0, 0, 10, 0, -90, 0)
 # models['register'].reparent_to(base.render)
 # models['compo'].reparent_to(base.render)
 
-# print()
-
-if VERBOSE:
-    base.render.ls()
-    base.render.analyze()
-
+# Enable particles
+stamp('Enable particles')
 base.enableParticles()
 
 # Subtitles
+stamp('Subtitles')
 texts = (
-    'Polish Scene Chronicle',
-    'The von Kramsta family villa',
-    'a villa with a garden',
-    'built in the third quarter of the 19th century',
-    'in the center of Katowice,',
-    'at ul. Warszawska 37,',
-    'it is entered in the register of immovable monuments of the Silesia Voivodeship.',
-    'In the 1950s, the facility was assigned to the Creative Work Club.',
-    'from the side of ul. Warszawska was occupied by the editorial staff of the ephemeral weekly',
-    'For several years, rallies of computer enthusiasts have been held here.',
-    'They self-proclaimed themselves as Demoscene.',
-    'Apart from consuming huge amounts of alcoholic beverages,',
-    'these party goers listen to strange music,',
-    'watch some daubs,',
-    'and some demos.',
-    'The party is called \"Xenium\", and earlier in free translation,',
-    '\"Your Mother Washes in the River\".',
-    'That sad guy at the bar is Argasek ^ BrCr',
-    'the worst TOILET in Scotland',
-    'GLORY TO SCIENCE',
+    'Polish Scene Chronicle',  # 0
+    'The von Kramsta family villa',  # 1
+    'a villa with a garden',  # 2
+    'built in the third quarter of the 19th century',  # 3
+    'in the center of Katowice,',  # 4
+    'at ul. Warszawska 37,',  # 5
+    'it is entered',  # 6
+    'In the 1950s,',  # 7
+    'from the side of ul. Warszawska',  # 8
+    'For several years',  # 9
+    'They self-proclaimed themselves as Demoscene.',  # 10
+    'Apart from consuming huge amounts of alcoholic beverages,',  # 11
+    'these party goers',  # 12
+    'watch some daubs, and some demos.',  # 13
+    '',  # 14
+    'The party is called \"Xenium\",',  # 15
+    '\"Your Mother Washes in the River\".',  # 16
+    'That sad guy at the bar is Argasek ^ BrCr',  # 17
+    'the worst TOILET in Scotland',  # 18
+    'GLORY TO SCIENCE',  # 19
+    'in the register of immovable monuments of the Silesia Voivodeship.',  # 20
+    '',  # 21
+    'the facility was allocated to the Creative Work Club.',  # 22
+    'In these',  # 23
+    'was occupied by the editorial staff of the ephemeral',  # 24
+    'rallies of computer enthusiasts have been held here.',  # 25
+    'listen to strange music,',  # 26
+    'and earlier in free translation,',  # 27
 )
 subtitles = []
 for text in texts:
@@ -1226,12 +1371,13 @@ for text in texts:
 for subtitle in subtitles:
     subtitle.hide()
 
-
 # Init display_sequence
+stamp('Init display_sequence')
 my_image_path = 'models/lead_new_48x27.png'
 if path.startswith('/'):
     my_image_path = path+'/'+my_image_path
-print('my_image_path:', my_image_path)
+if DEVEL:
+    print('my_image_path:', my_image_path)
 my_image = PNMImage(my_image_path)  # Read image (opt: 64x36)
 display_sequence = Sequence()  # Initialise sequence
 display_particle_effects = []  # Append particle effects
@@ -1255,18 +1401,21 @@ for x in range(my_image.getXSize()):
                 max_z,
                 xel_a
             ))
-print('len(display_particle_effects):', len(display_particle_effects))
+if DEVEL:
+    print('len(display_particle_effects):', len(display_particle_effects))
 for display_particle_effect in display_particle_effects:  # Append functions
     display_sequence.append(Func(start_display, display_particle_effect))
 display_sequence.append(Wait(5))  # Append wait
 for display_particle_effect in display_particle_effects:  # Append particle outs
     display_sequence.append(Func(force_display, display_particle_effect))
-# exit()
 
 # Sound interval
+stamp('Sound interval')
 music = base.loader.loadSfx("audio/Kramsta by Damage.ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
+# Rain interval
+stamp('Rain interval')
 rain_interval = ParticleInterval(
     particleEffect=init_water_particle_effect(PRESETS[1]['render_mode_thickness']),
     parent=base.render,
@@ -1277,6 +1426,8 @@ rain_interval = ParticleInterval(
     name='rain'
 )
 
+# Glow interval
+stamp('Glow interval')
 glow_interval = ParticleInterval(
     particleEffect=init_glow_particle_effect(PRESETS[1]['render_mode_thickness']),
     parent=base.render,
@@ -1287,46 +1438,68 @@ glow_interval = ParticleInterval(
     name='glow'
 )
 
-
+# Zoom sequence and dust intervals
+stamp('Zoom sequence and dust intervals')
 zoom_sequence = Sequence()
 zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=4, blendType='easeInOut'))
 zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=4, blendType='easeInOut'))
-# zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=4, blendType='easeInOut'))
-# zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=4, blendType='easeInOut'))
-# zoom_sequence.append(LerpFunc(zoom_function, fromData=0, toData=1, duration=4, blendType='easeInOut'))
-# zoom_sequence.append(LerpFunc(zoom_function, fromData=1, toData=0, duration=4, blendType='easeInOut'))
 dust_parent = base.render.attachNewNode("dust parent")
 dust_parent.reparentTo(base.render)
 dust_parent.setPos(-0.3, -1.2, -.55)  # dust start pos
 # dust_parent.setPos(5.5, -1.6, -.5)  # dust end pos
+dust_lerp_pos_interval = LerpPosInterval(
+    nodePath=dust_parent,
+    duration=8,
+    pos=(5.4, -1.6, -.55),
+    startPos=(-0.3, -1.2, -.55),
+    blendType='easeOut',
+)
 dust_interval = Parallel(
     ParticleInterval(
         particleEffect=init_dust_particle_effect(PRESETS[2]['render_mode_thickness']),
         parent=dust_parent,
         worldRelative=False,
-        duration=24,
+        duration=16,
         softStopT=-1,  # 11.8
-        cleanup=True,
+        cleanup=False,
     ),
     Sequence(
-        LerpPosInterval(
-            nodePath=dust_parent,
-            duration=8,
-            pos=(5.4, -1.6, -.55),
-            blendType='easeOut',
-        ),
-    zoom_sequence,
+        dust_lerp_pos_interval,
+        zoom_sequence,
+    )
+)
+dust_interval_2 = Parallel(
+    ParticleInterval(
+        particleEffect=init_dust_particle_effect(PRESETS[2]['render_mode_thickness']),
+        parent=dust_parent,
+        worldRelative=False,
+        duration=8,
+        softStopT=-1,  # 11.8
+        cleanup=False,
+    ),
+    dust_lerp_pos_interval,
+)
+dust_interval_3 = Parallel(
+    ParticleInterval(
+        particleEffect=init_dust_particle_effect(PRESETS[2]['render_mode_thickness']),
+        parent=dust_parent,
+        worldRelative=False,
+        duration=8,
+        softStopT=-1,  # 11.8
+        cleanup=False,
+    ),
+    LerpPosInterval(
+        nodePath=dust_parent,
+        duration=8,
+        pos=(-0.3, -1.2, -1.16693),
+        startPos=(-2.7, -3.6, -1.16693),
+        # blendType='easeOut',
     )
 )
 
+# Trainspotting sequence
+stamp('Trainspotting sequence')
 trainspotting_sequence = Sequence()
-# trainspotting_sequence.append(LerpPosHprInterval(
-#     nodePath=spectator,
-#     pos=(-4, -3.5, .35),
-#     hpr=(90, 0, 0),
-#     duration=2,
-#     blendType='easeInOut',
-# ))
 trainspotting_sequence.append(LerpFunctionInterval(
     trainspotting_lerp_function,
     fromData=0,
@@ -1342,6 +1515,8 @@ trainspotting_sequence.append(LerpFunctionInterval(
     blendType='easeInOut',
 ))
 
+# Boards
+stamp('Boards')
 MAX_POS = .1/2
 MAX_HPR = 5/2
 board_intervals = {}
@@ -1368,7 +1543,7 @@ for board_key in (
     models[board_key].setTransparency(TransparencyAttrib.M_alpha)
     duration = 3.1 # 1.44
     board_interval = Sequence(
-        Func(models[board_key].reparent_to, base.render),
+        Func(models[board_key].show),
         Parallel(
             LerpColorScaleInterval(
                 nodePath=models[board_key],
@@ -1407,11 +1582,8 @@ for board_key in (
     )
     board_intervals[board_key] = board_interval
 
-# Retro demo player
-retro_tex = {}
-retro_cm = {}
-retro_card = {}
-import time
+# # Retro demo player
+stamp('Retro demo player')
 for retro_key in (
         'retro_td.mkv',
         'retro_rw.mkv',
@@ -1420,22 +1592,29 @@ for retro_key in (
         'retro_v2.mkv',
         'retro_v1.mkv'
 ):
-    retro_tex[retro_key] = MovieTexture(retro_key)
-    success = retro_tex[retro_key].read(f'video/{retro_key}')
-    assert success, "Failed to load video!"
-    retro_tex[retro_key].stop()
-    retro_cm[retro_key] = CardMaker(f"{retro_key} fullscreen card")
-    retro_cm[retro_key].setFrameFullscreenQuad()
-    retro_cm[retro_key].setUvRange(retro_tex[retro_key])
-    retro_card[retro_key] = NodePath(retro_cm[retro_key].generate())
-    retro_card[retro_key].setTexture(retro_tex[retro_key])
-    retro_card[retro_key].reparentTo(base.render2d)
-    retro_card[retro_key].hide()
+    # retro_card[retro_key] = base.render.attach_new_node(retro_key)
+    retro_load(retro_key)
+    bar['value'] += 10
+    base.taskMgr.step(), base.taskMgr.step()
 
+stamp('Loading ball capture')
+ball_capture = base.loader.loadModel('models/ball_capture.bam')
+ball_capture.set_pos_hpr(19.8, -21.7, 1.80, 180, 0, 0)
+ball_capture.set_scale(1.920*2.8, 1, 1.080*2.8)
+# print(ball_capture.get_tight_bounds())
+# print(models['garden_large'].get_tight_bounds())
+# exit()
+bar['value'] += 10
+base.taskMgr.step(), base.taskMgr.step()
+
+# Making cards
+stamp('Making cards')
 set_cm = {}
 set_card = {}
 set_tex = {}
 for i in range(12+1):
+    if DEVEL:
+        print(f'models/set_{i}_fit.png')
     set_cm[i] = CardMaker(f'Set Rector {i}')
     set_cm[i].setFrameFullscreenQuad()
     set_card[i] = base.render2d.attachNewNode(set_cm[i].generate())
@@ -1445,8 +1624,11 @@ for i in range(12+1):
 set_card[6].setTransparency(TransparencyAttrib.M_alpha)
 set_card[7].setTransparency(TransparencyAttrib.M_alpha)
 set_card[6].setPos(0, 0, 1.3)
+bar['value'] += 10
+base.taskMgr.step(), base.taskMgr.step()
 
 # Mirror
+stamp('Mirror')
 format = GeomVertexFormat.getV3n3c4()
 vertexData = GeomVertexData('mirror', format, Geom.UHStatic)
 vertexData.setNumRows(4)
@@ -1464,6 +1646,7 @@ geom.addPrimitive(primitive)
 node = GeomNode('mirror gnode')
 node.addGeom(geom)
 mirror_node_path = base.render.attachNewNode(node)
+mirror_node_path.hide()
 mirror_node_path.setTransparency(TransparencyAttrib.M_alpha)
 # tex = base.loader.loadTexture('models/Neon-Square-PNG-Clipart.png')
 tex = base.loader.loadTexture('models/greetings.png')
@@ -1475,7 +1658,6 @@ mirror_node_path.setTexProjector(TextureStage.getDefault(), base.render, mirror_
 mirror_node_path.setTexture(tex)
 mirror_node_path.set_pos_hpr(-4.75, -5.25, 0.35, 180, 0, 0)
 mirror_node_path.set_scale(0.8)
-
 wc_splash_parent = base.render.attachNewNode('wc_splash_parent')
 wc_splash_parent.reparentTo(base.render)
 wc_splash_parent.setPos(-6.2, -4.23, -.8)
@@ -1486,12 +1668,11 @@ wc_splash_interval = ParticleInterval(
     ),
     parent=wc_splash_parent,
     worldRelative=False,
-    duration=2,
-    softStopT=1.5,
+    duration=4,
+    softStopT=-.5,
     cleanup=True,
     name='wc_splash'
 )
-
 greetings_interval = ParticleInterval(
     particleEffect=init_greetings_particle_effect(PRESETS[7]['render_mode_thickness']),
     parent=base.render,
@@ -1503,6 +1684,8 @@ greetings_interval = ParticleInterval(
     name='greetings'
 )
 
+# Cube
+stamp('Cube')
 cube_duration = 1.18
 rotation = 180
 cube_parent_0 = base.render.attachNewNode('cube_parent_0')
@@ -1559,6 +1742,8 @@ for cube_number in range(17):
     cube_parallels.append(cube_parallel)
 # exit()
 
+# Steam interval
+stamp('Steam interval')
 steam_interval = ParticleInterval(
     particleEffect=init_steam_particle_effect(PRESETS[6]['render_mode_thickness']),
     parent=base.render,
@@ -1570,6 +1755,7 @@ steam_interval = ParticleInterval(
 )
 
 # Credits
+stamp('Credits')
 credits_format = GeomVertexFormat.getV3n3c4()
 credits_vertex_data = GeomVertexData('credits', format, Geom.UHStatic)
 credits_vertex_data.setNumRows(4)
@@ -1602,8 +1788,8 @@ credits_node_path.set_scale(1.4)
 credits_node_path.set_color_scale(0, 0, 0, 1)
 # credits_node_path.set_color(1, 1, 1, 1)
 
-
 # Events
+stamp('Events')
 with open(path+'/models/events.tsv') as file_object:
     # a = file_object.read()
     # print(a[5700:5800])
@@ -1611,13 +1797,13 @@ with open(path+'/models/events.tsv') as file_object:
     csv_lines = file_object.readlines()
 for csv_line in csv_lines[1:]:
     cols = csv_line.split('\t')
-    # print(f'{cols[5]}\t{cols[6]}\t\t\t\t{cols[7][:]}')
-    print(csv_line[:-1])
-    demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), Func(print, "{csv_line[:-1]}"), {cols[6]})'))
+    if DEVEL:
+        demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), Func(print, "{csv_line[:-1]}"), {cols[6]})'))
+    else:
+        demo_parallel.append(eval(f'Sequence(Wait({cols[5]}), {cols[6]})'))
 
-# models['villa_0'].setTransparency(1)
-# models['villa_0'].setAlphaScale(.8)
-
+# Handshaking
+stamp('Handshaking')
 pos_shake_rope_vertices = []
 hpr_shake_rope_vertices = []
 for pos_shake_rope_vertices_i in range(round(demo_parallel.getDuration() * SHAKE_DEN)):
@@ -1643,7 +1829,6 @@ hpr_shake_rope.setup(4, hpr_shake_rope_vertices)
 pos_shake = pos_shake_rope.getPoints(round(demo_parallel.getDuration())*5000)
 hpr_shake = hpr_shake_rope.getPoints(round(demo_parallel.getDuration())*5000)
 # print(len(pos_shake))
-
 handshaking_sequence = Sequence()
 handshaking_sequence.append(LerpFunctionInterval(
     handshaking_lerp_function,
@@ -1660,7 +1845,14 @@ demo_parallel.append(handshaking_sequence)
 max_delta = 0
 
 # Add and start main task
-# base.taskMgr.add(init_task, "init_task")
+# base.taskMgr.doMethodLater(3, init_task, "init_task")
+
+# taskMgr.setupTaskChain('chain', numThreads = None, tickClock = None,
+#                        threadPriority = None, frameBudget = None,
+#                        frameSync = None, timeslicePriority = None)
+# base.taskMgr.add(main_task, "main_task")
+
+
 base.taskMgr.add(main_task, "main_task")
 
 # On screen text object
@@ -1668,5 +1860,21 @@ text_object = OnscreenText()
 
 # Accept events
 accept()
+
+# bar.finish(), base.taskMgr.step(), base.taskMgr.step()
+bar.destroy()
+
+if not DEVEL:
+    base.disableMouse()
+    accept_roping()
+
+# has_force = False
+
+# base.camLens.setAspectRatio(1920/1080)
+# base.camLens.setAspectRatio(2560/1600)
+# base.camLens.setAspectRatio(1.82)
+# print(f'base.camLens.getAspectRatio(): {base.camLens.getAspectRatio()}')
+
+stamp('Running demo')
 
 base.run()

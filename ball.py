@@ -71,5 +71,5 @@ print(model.get_tight_bounds())
 base.set_frame_rate_meter(True)
 
 model.setHpr(90, -60, 0)
-model.writeBamFile('models/ball.bam')
+# model.writeBamFile('models/ball.bam')
 base.run()

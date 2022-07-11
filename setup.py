@@ -17,7 +17,7 @@ setup(
             'include_patterns': [
                 'models/**',
                 'audio/*',
-                'video/*',
+                # 'video/*',
                 'icons/*',
                 'config/*',
                 # 'particles/*'

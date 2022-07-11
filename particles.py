@@ -16,7 +16,7 @@ from panda3d.physics import PointParticleRenderer
 
 
 def init_cube_particle_effect(point_size, x, y, z, xel_a, duration):
-    print(point_size, x, y, z, xel_a, duration)
+    # print(point_size, x, y, z, xel_a, duration)
     # litter_size = round(abs(400_000*x*y*z))  # 250  # 10  # 20
     # print(x, y, z, litter_size)
     # life_span = 10  # Default: 8
