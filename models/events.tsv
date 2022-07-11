@@ -109,7 +109,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 1	:	52	.	50	112.50	Parallel(Func(models['garden_large'].detach_node), Func(ball_capture.remove_node))	wywalenie obiektu garden_large	Func(models['garden_large'].detachNode)		
 1	:	53	.	50	113.50	Func(models['entrance'].show)	wstawienie obiektu entrance	Func(models['entrance'].reparent_to, base.render)		
 1	:	56	.	00	116.00	Func(models['podium'].detach_node)	wywalenie obiektu podium	Func(models['podium'].detachNode)		
-1	:	58	.	00	118.00	Sequence(Func(set_modes_and_filters, PRESETS[2]), Func(models['room_1'].show), beat_interval)	lot po wlocie do srodka az do baru	Sequence(Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].show), beat_interval)		
+1	:	58	.	00	118.00	Sequence(Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].show), beat_interval)	lot po wlocie do srodka az do baru	Sequence(Func(set_modes_and_filters, PRESETS[3]), Func(models['room_1'].show), beat_interval)		
 1	:	59	.	00	119.00	Func(models['room_2'].show)	https://docs.panda3d.org/1.10/python/programming/camera-control/perspective-lenses			
 2	:	10	.	00	130.00	Sequence(Func(models['entrance'].detach_node), Func(models['room_1'].detach_node), Func(models['room_3'].show))	wywalenie obiektu room_1			
 2	:	30	.	00	150.00	Sequence(Func(models['room_3'].detach_node), Func(models['room_2'].detach_node), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].show), beat_interval)	bar + corridor in front of the toilet (first loop by the bar)	Func(subtitles[17].show), 		
