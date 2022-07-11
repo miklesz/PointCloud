@@ -1255,8 +1255,7 @@ base.taskMgr.step(), base.taskMgr.step()
 # Render modes and common filters
 stamp('Render modes and common filters')
 filters = CommonFilters(base.win, base.cam)
-# for preset in (PRESETS[7], PRESETS[6], PRESETS[3], PRESETS[2], PRESETS[1], PRESETS[0]):
-for preset in (PRESETS[7], PRESETS[6], PRESETS[2], PRESETS[1], PRESETS[0]):
+for preset in (PRESETS[7], PRESETS[6], PRESETS[3], PRESETS[2], PRESETS[1], PRESETS[0]):
     set_modes_and_filters(preset)
 # for preset in PRESETS[::-1]:
 #     set_modes_and_filters(preset)
@@ -1267,34 +1266,27 @@ points = r.getPoints(len(vertices) * 5000)
 looks = rope_look.getPoints(len(vertices) * 5000)
 bar['value'] += 10
 base.taskMgr.step(), base.taskMgr.step()
-jumps = (
-    (4 * 60 + 22.28) * 5000,
-    (4 * 60 + 22.38) * 5000,
-    (4 * 60 + 22.47) * 5000,
-    (4 * 60 + 22.56) * 5000,
-    (4 * 60 + 22.66) * 5000,
-    (4 * 60 + 23.00) * 5000,
-    (4 * 60 + 23.09) * 5000,
-    (4 * 60 + 23.19) * 5000,
-    (4 * 60 + 23.28) * 5000,
-    (4 * 60 + 23.38) * 5000,
-    (4 * 60 + 23.47) * 5000,
-    (4 * 60 + 23.56) * 5000,
-    (4 * 60 + 23.66) * 5000,
-    (4 * 60 + 24.00) * 5000,
-)
-for jump_i in range(len(jumps)-1):
-    jump_to = points[int(jumps[jump_i+1])]
-    print(jump_to)
-    for points_i in range(int(jumps[jump_i]), int(jumps[jump_i+1])):
-        points[points_i] = jump_to
-
-
-# print(len(points)/5000)
-
-# exit()
-
-
+# jumps = (
+#     (4 * 60 + 22.28) * 5000,
+#     (4 * 60 + 22.38) * 5000,
+#     (4 * 60 + 22.47) * 5000,
+#     (4 * 60 + 22.56) * 5000,
+#     (4 * 60 + 22.66) * 5000,
+#     (4 * 60 + 23.00) * 5000,
+#     (4 * 60 + 23.09) * 5000,
+#     (4 * 60 + 23.19) * 5000,
+#     (4 * 60 + 23.28) * 5000,
+#     (4 * 60 + 23.38) * 5000,
+#     (4 * 60 + 23.47) * 5000,
+#     (4 * 60 + 23.56) * 5000,
+#     (4 * 60 + 23.66) * 5000,
+#     (4 * 60 + 24.00) * 5000,
+# )
+# for jump_i in range(len(jumps)-1):
+#     jump_to = points[int(jumps[jump_i+1])]
+#     print(jump_to)
+#     for points_i in range(int(jumps[jump_i]), int(jumps[jump_i+1])):
+#         points[points_i] = jump_to
 
 # Set spectator pos & hpr
 stamp('Set spectator pos & hpr')
