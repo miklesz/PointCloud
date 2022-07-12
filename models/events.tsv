@@ -172,5 +172,5 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 4	:	20	.	38	260.38	cube_parallels[15]	snare	17	1.81	0.81
 4	:	21	.	19	261.19	cube_parallels[16]	snare	18	2.81	1.00
 4	:	22	.	19	262.19		transition			
-4	:	24	.	00	264.00	Parallel(beat_interval, Func(models['compo'].show), steam_interval)	inlet to the main hall			
-4	:	39	.	75	279.75	Sequence(LerpColorScaleInterval(credits_node_path, .25, (1, 1, 1, 1), (0, 0, 0, 1), blendType='easeIn'), LerpColorScaleInterval(credits_node_path, 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'))	credits appear in full screen.			
+4	:	24	.	00	264.00	Parallel(beat_interval, Func(models['compo'].show), steam_interval, Func(clock.show), LerpHprInterval(clock, 16, (-180, 0, 0), (0, 0, 0)), Sequence(LerpColorScaleInterval(clock, 8, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeInOut'), LerpColorScaleInterval(clock, 8, (1, 1, 1, 0), (1, 1, 1, 1), blendType='easeInOut')), clock_background_interval)	inlet to the main hall			
+4	:	38	.	00	278.00	Sequence(LerpColorScaleInterval(credits_node_path, 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeIn'), LerpColorScaleInterval(credits_node_path, 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'))	credits appear in full screen.			

@@ -50,7 +50,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DEVEL = False  # True/False
 # DEVEL = False
-JUMP = 102   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+JUMP = 240   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -526,9 +526,10 @@ def accept_roping():
     np.removeNode()
     for tn in text_nodes:
         tn.removeNode()
-    if demo_parallel.getT() == 0:
-        for key in models.keys():
-            models[key].hide()
+
+    # if demo_parallel.getT() == 0:
+    #     for key in models.keys():
+    #         models[key].hide()
 
     # if demo_parallel.isPlaying():
     #     demo_parallel.pause()
@@ -1237,6 +1238,8 @@ model_dict = {
     'stairs_hi': {'name': 'stairs_hi', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'register': {'name': 'register_half', 'pos_hpr': (-4.1, -2.0, 1.5, 0, 0, 0)},
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
+
+    'background': {'name': 'background', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
 }
 models = {}
 for model_key in model_dict:
@@ -1248,6 +1251,25 @@ for model_key in model_dict:
     models[model_key].hide()
 models['ball'].setTransparency(TransparencyAttrib.M_alpha)
 models['ball'].setScale(.75)
+models['background'].show()
+clock = base.render.attach_new_node('clock')
+models['background'].reparent_to(clock)
+clock.set_pos_hpr(5.6, -4.0, 3.1, 0, 0, 0)
+clock.set_scale(1.5)
+clock.hide()
+clock_background_interval = Sequence()
+for angle in range(1*30, (16+1)*30, 30):
+    print(angle)
+    clock_background_interval.append(
+        LerpHprInterval(
+            nodePath=models['background'],
+            duration=1,
+            hpr=(0, 0, angle),
+            blendType='easeIn',
+        )
+    )
+print(clock_background_interval)
+# exit()
 
 bar['value'] += 10
 base.taskMgr.step(), base.taskMgr.step()
@@ -1777,7 +1799,7 @@ credits_node_path.setTexProjector(TextureStage.getDefault(), base.render, credit
 credits_node_path.setTexture(credits_tex)
 credits_node_path.set_pos_hpr(6.5, -4, 3.1, -90, 0, 180)
 credits_node_path.set_scale(1.4)
-credits_node_path.set_color_scale(0, 0, 0, 1)
+credits_node_path.set_color_scale(0, 0, 0, 0)
 # credits_node_path.set_color(1, 1, 1, 1)
 
 # Events

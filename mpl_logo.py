@@ -152,6 +152,6 @@ make_logo(height_px=1100, lw_bars=7, lw_grid=5, lw_border=10,
           rgrid=[1, 3, 5, 7])
 # make_logo(height_px=1100, lw_bars=7, lw_grid=0, lw_border=0,
 #           rgrid=[1, 3, 5, 7])
-plt.savefig('background.png')
+plt.savefig('background.png', transparent=True)
 # plt.savefig(f'{layer}.png')
 plt.show()
