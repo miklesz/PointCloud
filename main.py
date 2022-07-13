@@ -911,9 +911,9 @@ def retro_load(retro_key):
     retro_card[retro_key].set_scale(1920/800)
 
 
-def bar_value(value):
-    bar['value'] = value
-    base.taskMgr.step(), base.taskMgr.step()
+# def bar_value(value):
+#     bar['value'] = value
+#     base.taskMgr.step(), base.taskMgr.step()
 
 
 def init_task(task):
@@ -930,6 +930,15 @@ def init_task(task):
     # print('after sleep')
     # textObject.destroy()
     # print('after destroy')
+
+
+def argasek(t):
+    if Randomizer().randomReal(1) < t:
+        models['argasek'].show()
+        # models['argasek'].set_color_scale(1, 1, 1, 1)
+    else:
+        models['argasek'].hide()
+        # models['argasek'].set_color_scale(1, 1, 1, .15)
 
 #
 #     print('pre interval start')
@@ -988,11 +997,29 @@ base.win.request_properties(props)
 base.setBackgroundColor(0, 0, 0)
 toggle_fullscreen()
 
+# Load Dekramsting
+stamp('Load Dekramsting')
+set_cm = {}
+set_card = {}
+set_tex = {}
+for i in range(14, 24+1):
+    if DEVEL:
+        print(f'models/set_{i}_fit.png')
+    set_cm[i] = CardMaker(f'Dekramsting {i}')
+    set_cm[i].setFrameFullscreenQuad()
+    set_card[i] = base.render2d.attachNewNode(set_cm[i].generate())
+    set_tex[i] = base.loader.loadTexture(f'models/set_{i}_fit.png')
+    set_card[i].setTexture(set_tex[i])
+    set_card[i].setTransparency(TransparencyAttrib.M_alpha)
+    set_card[i].hide()
+
+
 # Init direct wait bar
-bar = DirectWaitBar(text='Dekramsting...')
-bar['barBorderWidth'] = (10, 10)
+set_card[14].show()
+# bar = DirectWaitBar(text='Dekramsting...')
+# bar['barBorderWidth'] = (10, 10)
 # bar.setBarRelief(0)
-base.taskMgr.step(), base.taskMgr.step(), base.taskMgr.step()
+base.taskMgr.step(), base.taskMgr.step(), base.taskMgr.step(), base.taskMgr.step()
 
 # Set camera lens field of view
 stamp('Set camera lens field of view')
@@ -1221,6 +1248,7 @@ model_dict = {
     'p2': {'name': 'p2', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
     'p3': {'name': 'p3', 'pos_hpr': (0, 1, 0, 0, 0, 0)},
 
+    'argasek': {'name': 'argasek', 'pos_hpr': (4.6, -0.95, 0.15, -90, 0, 0)},
     'ball': {'name': 'ball', 'pos_hpr': (2.7, -0.25, 0-.75/2, 90, -60, 0)},
 
     'sign': {'name': 'sign', 'pos_hpr': (17.5, 9.4, 2.8, 0, 0, 0)},
@@ -1249,12 +1277,13 @@ for model_key in model_dict:
     models[model_key].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
     models[model_key].reparentTo(base.render)
     models[model_key].hide()
+models['argasek'].setTransparency(TransparencyAttrib.M_alpha)
 models['ball'].setTransparency(TransparencyAttrib.M_alpha)
 models['ball'].setScale(.75)
 models['background'].show()
 clock = base.render.attach_new_node('clock')
 models['background'].reparent_to(clock)
-clock.set_pos_hpr(5.6, -4.0, 3.1, 0, 0, 0)
+clock.set_pos_hpr(5.1, -4.0, 3.1, 0, 0, 0)
 clock.set_scale(1.5)
 clock.hide()
 clock_background_interval = Sequence()
@@ -1269,9 +1298,12 @@ for angle in range(1*30, (16+1)*30, 30):
         )
     )
 print(clock_background_interval)
+# models['argasek'].show()
 # exit()
 
-bar['value'] += 10
+# bar['value'] += 10
+set_card[14].remove_node()
+set_card[15].show()
 base.taskMgr.step(), base.taskMgr.step()
 
 # Render modes and common filters
@@ -1286,7 +1318,9 @@ for preset in (PRESETS[7], PRESETS[6], PRESETS[3], PRESETS[2], PRESETS[1], PRESE
 stamp('Get points and looks')
 points = r.getPoints(len(vertices) * 5000)
 looks = rope_look.getPoints(len(vertices) * 5000)
-bar['value'] += 10
+# bar['value'] += 10
+set_card[15].remove_node()
+set_card[16].show()
 base.taskMgr.step(), base.taskMgr.step()
 # jumps = (
 #     (4 * 60 + 22.28) * 5000,
@@ -1425,7 +1459,7 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
 
 # Sound interval
 stamp('Sound interval')
-music = base.loader.loadSfx("audio/Kramsta by Damage.ogg")  # Load music
+music = base.loader.loadSfx("audio/Kramsta by Damage (nowe przejście).ogg")  # Load music
 demo_parallel.append(SoundInterval(music))
 
 # Rain interval
@@ -1598,6 +1632,7 @@ for board_key in (
 
 # # Retro demo player
 stamp('Retro demo player')
+dekramsting_i = 17
 for retro_key in (
         'retro_td.mkv',
         'retro_rw.mkv',
@@ -1608,7 +1643,10 @@ for retro_key in (
 ):
     # retro_card[retro_key] = base.render.attach_new_node(retro_key)
     retro_load(retro_key)
-    bar['value'] += 10
+    set_card[dekramsting_i-1].remove_node()
+    set_card[dekramsting_i].show()
+    dekramsting_i += 1
+    # bar['value'] += 10
     base.taskMgr.step(), base.taskMgr.step()
 
 stamp('Loading ball capture')
@@ -1618,15 +1656,17 @@ ball_capture.set_scale(1.920*2.8, 1, 1.080*2.8)
 # print(ball_capture.get_tight_bounds())
 # print(models['garden_large'].get_tight_bounds())
 # exit()
-bar['value'] += 10
+set_card[22].remove_node()
+set_card[23].show()
+# bar['value'] += 10
 base.taskMgr.step(), base.taskMgr.step()
 
 # Making cards
 stamp('Making cards')
-set_cm = {}
-set_card = {}
-set_tex = {}
-for i in range(12+1):
+# set_cm = {}
+# set_card = {}
+# set_tex = {}
+for i in range(13+1):
     if DEVEL:
         print(f'models/set_{i}_fit.png')
     set_cm[i] = CardMaker(f'Set Rector {i}')
@@ -1638,8 +1678,13 @@ for i in range(12+1):
 set_card[6].setTransparency(TransparencyAttrib.M_alpha)
 set_card[7].setTransparency(TransparencyAttrib.M_alpha)
 set_card[6].setPos(0, 0, 1.3)
-bar['value'] += 10
+set_card[13].setTransparency(TransparencyAttrib.M_alpha)
+set_card[13].set_color_scale(1, 1, 1, 0)
+# bar['value'] += 10
+set_card[23].remove_node()
+set_card[24].show()
 base.taskMgr.step(), base.taskMgr.step()
+# set_card[13].show()
 
 # Mirror
 stamp('Mirror')
@@ -1799,7 +1844,8 @@ credits_node_path.setTexProjector(TextureStage.getDefault(), base.render, credit
 credits_node_path.setTexture(credits_tex)
 credits_node_path.set_pos_hpr(6.5, -4, 3.1, -90, 0, 180)
 credits_node_path.set_scale(1.4)
-credits_node_path.set_color_scale(0, 0, 0, 0)
+credits_node_path.hide()
+# credits_node_path.set_color_scale(0, 0, 0, 0)
 # credits_node_path.set_color(1, 1, 1, 1)
 
 # Events
@@ -1876,7 +1922,9 @@ text_object = OnscreenText()
 accept()
 
 # bar.finish(), base.taskMgr.step(), base.taskMgr.step()
-bar.destroy()
+# bar.destroy()
+set_card[24].remove_node()
+
 
 if not DEVEL:
     base.disableMouse()
@@ -1892,3 +1940,5 @@ if not DEVEL:
 stamp('Running demo')
 
 base.run()
+
+Sequence(LerpColorScaleInterval(credits_node_path, 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeIn'), Parallel(LerpColorScaleInterval(credits_node_path, 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'), LerpColorScaleInterval(models['compo'], 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut')))

@@ -86,5 +86,5 @@ print(model.get_tight_bounds())
 base.set_frame_rate_meter(True)
 
 # model.setHpr(90, -60, 0)
-model.writeBamFile(f'models/{IMAGE_NAMES[IMAGE_I]}.bam')
+# model.writeBamFile(f'models/{IMAGE_NAMES[IMAGE_I]}.bam')
 base.run()

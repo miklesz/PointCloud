@@ -115,7 +115,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 2	:	30	.	00	150.00	Sequence(Func(models['room_3'].detach_node), Func(models['room_2'].detach_node), Func(set_modes_and_filters, PRESETS[2]), Func(models['bar'].show), beat_interval)	bar + corridor in front of the toilet (first loop by the bar)	Func(subtitles[17].show), 		
 2	:	38	.	00	158.00			Func(subtitles[17].destroy)		
 2	:	46	.	00	166.00	dust_interval	dust			
-3	:	02	.	00	182.00	dust_interval_2				
+3	:	02	.	00	182.00	Parallel(dust_interval_2, Func(models['argasek'].show), Sequence(LerpFunctionInterval(argasek, 2, .70, .70), LerpFunctionInterval(argasek, 2, .70, 0, 'easeInOut'), Func(models['argasek'].hide)))				
 3	:	06	.	00	186.00					
 3	:	08	.	00	188.00	Func(models['hall_low'].show)				
 3	:	10	.	00	190.00	dust_interval_3				
@@ -136,22 +136,12 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 3	:	59	.	50	239.50	Func(models['stairs_low'].detach_node)				
 4	:	00	.	00	240.00	Parallel(beat_interval, Func(models['register'].show), Func(models['ball'].show), LerpPosInterval(models['ball'], 4, (-3.25, -4, 3.1), blendType='easeInOut'), LerpHprInterval(models['ball'], 4, (360, -60, 180*5)))				
 4	:	04	.	00	244.00	Parallel(beat_interval, Func(models['stairs_hi'].detach_node), LerpHprInterval(models['ball'], 4, (360, -60, 180*6)))				
-4	:	05	.	63	245.63	LerpScaleInterval(models['ball'], 0.05, .75*15/16, blendType='easeOut')	entry 1	0.05		
-4	:	05	.	68	245.68	LerpScaleInterval(models['ball'], 0.05, .75*14/16, blendType='easeOut')	entry 2	0.05		
-4	:	05	.	73	245.73	LerpScaleInterval(models['ball'], 0.05, .75*13/16, blendType='easeOut')	entry 3	0.27		
-4	:	06	.	00	246.00	LerpScaleInterval(models['ball'], 0.05, .75*12/16, blendType='easeOut')	entry 4	0.09		
-4	:	06	.	09	246.09	LerpScaleInterval(models['ball'], 0.05, .75*11/16, blendType='easeOut')	entry 5	0.10		
-4	:	06	.	19	246.19	LerpScaleInterval(models['ball'], 0.05, .75*10/16, blendType='easeOut')	entry 6	0.09		
-4	:	06	.	28	246.28	LerpScaleInterval(models['ball'], 0.05, .75*9/16, blendType='easeOut')	entry 7	0.10		
-4	:	06	.	38	246.38	LerpScaleInterval(models['ball'], 0.05, .75*8/16, blendType='easeOut')	entry 8	0.09		
-4	:	06	.	47	246.47	LerpScaleInterval(models['ball'], 0.05, .75*7/16, blendType='easeOut')	entry 9	0.09		
-4	:	06	.	56	246.56	LerpScaleInterval(models['ball'], 0.05, .75*6/16, blendType='easeOut')	entry 10	0.10		
-4	:	06	.	66	246.66	LerpScaleInterval(models['ball'], 0.05, .75*5/16, blendType='easeOut')	entry 11	0.34		
-4	:	07	.	00	247.00	LerpScaleInterval(models['ball'], 0.05, .75*4/16, blendType='easeOut')	entry 12	0.09		
-4	:	07	.	09	247.09	LerpScaleInterval(models['ball'], 0.05, .75*3/16, blendType='easeOut')	entry 13	0.10		
-4	:	07	.	19	247.19	LerpScaleInterval(models['ball'], 0.05, .75*2/16, blendType='easeOut')	entry 14	0.09		
-4	:	07	.	28	247.28	LerpScaleInterval(models['ball'], 0.05, .75*1/16, blendType='easeOut')	entry 15	0.20		
-4	:	07	.	48	247.48	LerpScaleInterval(models['ball'], 0.08, .75*1, blendType='easeOut')	the last 1st accent	0.08		
+4	:	06	.	00	246.00	LerpScaleInterval(models['ball'], 0.09, .75*6/7, blendType='easeOut')	entry 4	0.19	LerpScaleInterval(models['ball'], 0.05, .75*12/16, blendType='easeOut')	Func(models['ball'].set_scale, .75*12/16)
+4	:	06	.	19	246.19	LerpScaleInterval(models['ball'], 0.09, .75*5/7, blendType='easeOut')	entry 5	0.28	LerpScaleInterval(models['ball'], 0.05, .75*11/16, blendType='easeOut')	Func(models['ball'].set_scale, .75*11/16)
+4	:	06	.	47	246.47	LerpScaleInterval(models['ball'], 0.09, .75*4/7, blendType='easeOut')	entry 6	0.53	LerpScaleInterval(models['ball'], 0.05, .75*10/16, blendType='easeOut')	Func(models['ball'].set_scale, .75*10/16)
+4	:	07	.	00	247.00	LerpScaleInterval(models['ball'], 0.09, .75*3/7, blendType='easeOut')	entry 12	0.09	LerpScaleInterval(models['ball'], 0.05, .75*4/16, blendType='easeOut')	Func(models['ball'].set_scale, .75*4/16)
+4	:	07	.	09	247.09	LerpScaleInterval(models['ball'], 0.09, .75*2/7, blendType='easeOut')	entry 13	0.29	LerpScaleInterval(models['ball'], 0.05, .75*3/16, blendType='easeOut')	Func(models['ball'].set_scale, .75*3/16)
+4	:	07	.	38	247.38	LerpScaleInterval(models['ball'], 0.09, .75*1/7, blendType='easeOut')	entry 14	0.18	LerpScaleInterval(models['ball'], 0.05, .75*2/16, blendType='easeOut')	Func(models['ball'].set_scale, .75*2/16)
 4	:	07	.	56	247.56	LerpScaleInterval(models['ball'], 0.44, .75*7, blendType='easeOut')	the last 2nd accent	0.44		
 4	:	08	.	00	248.00	Sequence(Func(models['ball'].remove_node), beat_interval)	actions in the registration room			
 4	:	08	.	38	248.38	cube_parallels[0]	snare	1	2.00	0.81
@@ -172,5 +162,7 @@ min	:	s	.	cs	delay [s]	interval(s)	comment	pl	en
 4	:	20	.	38	260.38	cube_parallels[15]	snare	17	1.81	0.81
 4	:	21	.	19	261.19	cube_parallels[16]	snare	18	2.81	1.00
 4	:	22	.	19	262.19		transition			
-4	:	24	.	00	264.00	Parallel(beat_interval, Func(models['compo'].show), steam_interval, Func(clock.show), LerpHprInterval(clock, 16, (-180, 0, 0), (0, 0, 0)), Sequence(LerpColorScaleInterval(clock, 8, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeInOut'), LerpColorScaleInterval(clock, 8, (1, 1, 1, 0), (1, 1, 1, 1), blendType='easeInOut')), clock_background_interval)	inlet to the main hall			
-4	:	38	.	00	278.00	Sequence(LerpColorScaleInterval(credits_node_path, 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeIn'), LerpColorScaleInterval(credits_node_path, 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'))	credits appear in full screen.			
+4	:	24	.	00	264.00	Parallel(beat_interval, Func(models['compo'].show), Func(credits_node_path.show), steam_interval, Func(clock.show), LerpHprInterval(clock, 16, (-180, 0, 0), (0, 0, 0)), Sequence(LerpColorScaleInterval(clock, 8, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeInOut'), LerpColorScaleInterval(clock, 8, (1, 1, 1, 0), (1, 1, 1, 1), blendType='easeInOut')), clock_background_interval)	inlet to the main hall			
+4	:	38	.	00	278.00	Sequence(Func(set_card[13].show), LerpColorScaleInterval(set_card[13], 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeIn'))	credits appear in full screen.	Sequence(LerpColorScaleInterval(credits_node_path, 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeIn'), Parallel(LerpColorScaleInterval(credits_node_path, 8, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'), LerpColorScaleInterval(models['compo'], 8, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut')))		
+4	:	40	.	00	280.00	LerpColorScaleInterval(set_card[13], 15.93, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut')	Sequence(Func(set_modes_and_filters, PRESETS[0]), Func(set_card[13].show))			
+4	:	55	.	93	295.93	Func(escape)				
