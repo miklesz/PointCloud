@@ -72,6 +72,7 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     litter_size = 1  # 250  # 10  # 20
     grow_time = 5  # Default: 8, moje 4:
     life_span = 14.46 - (grow_time * 11) / 60 * 2  # Default: 8, moje: 16.42, 9.46
+    # life_span = 12
     particle_effect = ParticleEffect()
     particles = Particles('display')
     # Particles parameters
@@ -79,8 +80,8 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     particles.set_renderer("PointParticleRenderer")
     particles.renderer.set_point_size(point_size)
     particles.set_emitter("BoxEmitter")
-    particles.setPoolSize(litter_size*11*round(grow_time))  # 11
-    particles.setBirthRate(1/30)
+    particles.setPoolSize(litter_size*8*round(grow_time))  # 11
+    particles.setBirthRate(1/30)  # 1/30 1/20
     particles.setLitterSize(litter_size)
     # Factory parameters
     particles.factory.set_lifespan_base(life_span)
@@ -95,14 +96,14 @@ def init_display_particle_effect(point_size, min_x, min_z, max_x, max_z, xel_a):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.0000))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((min_x, .98, min_z))
-    particles.emitter.set_max_bound((max_x, .98, max_z))
+    particles.emitter.set_min_bound((min_x, .98, min_z))  # .98
+    particles.emitter.set_max_bound((max_x, .98, max_z))  # .98
     particle_effect.add_particles(particles)
 
     # Force
     force_group = ForceGroup('zoom_random')
     # Force parameters
-    force_group.addForce(LinearJitterForce(.02, 0))
+    force_group.addForce(LinearJitterForce(.2, 0))  # 0.02 0.2 .15
     particle_effect.add_force_group(force_group)
 
     return particle_effect
@@ -243,8 +244,12 @@ def init_splash_particle_effect(point_size, pool_size):
     return particle_effect
 
 
-def init_steam_particle_effect(point_size):
-    litter_size = 200
+def init_steam_particle_effect(
+        point_size,
+        litter_size=200,
+        min_bound=(0, -8.0, 1.01067),
+        max_bound=(7, -0.1, 1.01067),
+):
     life_span = 4  # Default: 8
     particle_effect = ParticleEffect()
     particles = Particles('steam')
@@ -267,8 +272,8 @@ def init_steam_particle_effect(point_size):
     particles.emitter.set_offset_force(LVector3(0.0000, 0.0000, 0.3800))
     particles.emitter.set_explicit_launch_vector(LVector3(0.0000, 0.0000, 0.0000))
     # Box parameters
-    particles.emitter.set_min_bound((0, -8.0, 1.01067))
-    particles.emitter.set_max_bound((7, -0.1, 1.01067))
+    particles.emitter.set_min_bound(min_bound)
+    particles.emitter.set_max_bound(max_bound)
     particle_effect.add_particles(particles)
     # Force
     force_group = ForceGroup('vertex')
@@ -425,7 +430,7 @@ def init_dust_particle_effect(point_size):
 
 
 def init_greetings_particle_effect(point_size):
-    litter_size = 600  # 250  # 10  # 20  # 900
+    litter_size = 500  # 250  # 10  # 20  # 900  # 600
     life_span = 2
     particle_effect = ParticleEffect()
     particles = Particles('greetings')
@@ -477,4 +482,70 @@ def init_greetings_particle_effect(point_size):
     # force_group.addForce(LinearNoiseForce(.025, 0))
     particle_effect.add_force_group(force_group)
 
+    return particle_effect
+
+
+def init_ring_particle_effect(point_size):
+    litter_size = 1000
+    life_span = 0.30  # 0.5000
+    particle_effect = ParticleEffect(name='ring')
+    particles = Particles('ring')
+    # Particles parameters
+    particles.set_factory("PointParticleFactory")
+    particles.set_renderer("PointParticleRenderer")
+    particles.renderer.set_point_size(point_size)
+    particles.set_emitter("RingEmitter")
+    particles.setPoolSize(1000)  # litter_size*60*life_span, 1000
+    particles.setBirthRate(0)  # 1/60
+    particles.setLitterSize(litter_size)
+    particles.setLitterSpread(100)
+    particles.setSystemLifespan(0.0000)
+    particles.setLocalVelocityFlag(1)
+    particles.setSystemGrowsOlderFlag(0)
+    # Factory parameters
+    particles.factory.set_lifespan_base(life_span)
+    # particles.factory.setLifespanSpread(0.2500)
+    particles.factory.setMassBase(2.0000)
+    particles.factory.setMassSpread(0.0100)
+    particles.factory.set_terminal_velocity_base(400.0000)
+    particles.factory.setTerminalVelocitySpread(0.0000)
+    # Point factory parameters
+    # Renderer parameters
+    particles.renderer.set_alpha_mode(BaseParticleRenderer.PR_ALPHA_OUT)
+    # particles.renderer.set_user_alpha(0.45)
+    # Point parameters
+    particles.renderer.setStartColor(LVector4(1, 1, 0, 1.00))
+    particles.renderer.setEndColor(LVector4(1, 0, 0, 1.00))
+    particles.renderer.setBlendType(PointParticleRenderer.PP_BLEND_LINEAR)
+    particles.renderer.setBlendMethod(BaseParticleRenderer.PPNOBLEND)
+    # Emitter parameters
+    particles.emitter.setRadiateOrigin(LPoint3(0, 0, 0))
+    particles.emitter.setEmissionType(BaseParticleEmitter.ETCUSTOM)
+    # particles.emitter.setExplicitLaunchVector(LVector3(0.0000, 0.0000, 0.0000))
+    particles.emitter.setAmplitude(0.0000)
+    # particles.emitter.setAmplitudeSpread(0.0000)
+
+    # particles.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 4.0000))
+    # particles.emitter.setOffsetForce(LVector3(0.0000, 0.0000, 0.0000))
+
+    # particles.emitter.setExplicitLaunchVector(LVector3(1.0000, 0.0000, 0.0000))
+
+    # particles.emitter.setRadiateOrigin(radiate_origin)
+    # Disc parameters
+    particles.emitter.setRadius(.75)
+    # particles.emitter.setAngle(90)
+    # particles.emitter.setOuterAngle(356.1859)
+    # particles.emitter.setInnerAngle(0.0000)
+    # particles.emitter.setOuterMagnitude(2.0000)
+    # particles.emitter.setInnerMagnitude(1.0000)
+    # particles.emitter.setCubicLerping(0)
+
+
+    particle_effect.add_particles(particles)
+    # Force
+    force_group = ForceGroup('burn')
+    force1 = LinearJitterForce(20, 1)
+    force1.setActive(1)
+    force_group.addForce(force1)
+    particle_effect.addForceGroup(force_group)
     return particle_effect

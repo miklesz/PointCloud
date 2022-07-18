@@ -50,7 +50,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DEVEL = False  # True/False
 # DEVEL = False
-JUMP = 240   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+JUMP = 100   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -117,6 +117,8 @@ PRESETS = [
         'render_mode_thickness': 10,
     },
 ]
+RING_START = -4.2  # -5.0
+RING_STOP = -0.7  # 0.0
 SHAKE_DEN = 1
 START = time.time()  # Start time
 STILL_START = 25
@@ -827,7 +829,7 @@ def accept_effect():
     # print('stairs_low:', models['stairs_low'].getTightBounds())
     # models['stairs_hi'].reparent_to(base.render)
     # print('stairs_hi:', models['stairs_hi'].getTightBounds())
-    # models['register'].reparent_to(base.render)
+    models['register'].show()
     # print('register:', models['register'].getTightBounds())
     # models['compo'].reparent_to(base.render)
     # print('compo:', models['compo'].getTightBounds())
@@ -861,7 +863,7 @@ def accept_effect():
     # base.camLens.setFov(115)
     # spectator.set_pos_hpr(-4.75, -4.95, 0.10, 180, 0, 0)
 
-    wc_splash_interval.start()
+    # wc_splash_interval.start()
 
     # set_modes_and_filters(PRESETS[1])
     # rain_splash_parent = base.render.attachNewNode('rain_splash_parent')
@@ -882,6 +884,9 @@ def accept_effect():
     # rain_splash_interval.start()
 
     # spectator.set_pos_hpr(-5.5, -4.25, -.7, 90, 0, 0)
+
+    spectator.setPosHpr(-5, -4, 0, 90, 0, 0)
+    ring_intervals[0].start()
 
 
 def display_cleanup():
@@ -1268,6 +1273,13 @@ model_dict = {
     'compo': {'name': 'compo_200k', 'pos_hpr': (5.6, -4.0, 1.1, -109.5, 0, 0)},
 
     'background': {'name': 'background', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '0': {'name': '0', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '1': {'name': '1', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '2': {'name': '2', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '3': {'name': '3', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '4': {'name': '4', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '5': {'name': '5', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
+    '6': {'name': '6', 'pos_hpr': (0, 0, 0, 0, 0, 0)},
 }
 models = {}
 for model_key in model_dict:
@@ -1278,28 +1290,76 @@ for model_key in model_dict:
     models[model_key].reparentTo(base.render)
     models[model_key].hide()
 models['argasek'].setTransparency(TransparencyAttrib.M_alpha)
+models['argasek'].setColorScale(1, 1, 1, 0)
 models['ball'].setTransparency(TransparencyAttrib.M_alpha)
 models['ball'].setScale(.75)
 models['background'].show()
+models['0'].show()
+models['1'].show()
+models['2'].show()
+models['3'].show()
+models['4'].show()
+models['5'].show()
+models['6'].show()
 clock = base.render.attach_new_node('clock')
 models['background'].reparent_to(clock)
-clock.set_pos_hpr(5.1, -4.0, 3.1, 0, 0, 0)
+models['0'].reparent_to(clock)
+models['1'].reparent_to(clock)
+models['2'].reparent_to(clock)
+models['3'].reparent_to(clock)
+models['4'].reparent_to(clock)
+models['5'].reparent_to(clock)
+models['6'].reparent_to(clock)
+# models['0'].setPos(0, -1, 0)
+# models['1'].setPos(0, -1, 0)
+# models['2'].setPos(0, -1, 0)
+# models['3'].setPos(0, -1, 0)
+# models['4'].setPos(0, -1, 0)
+# models['5'].setPos(0, -1, 0)
+# models['6'].setPos(0, -1, 0)
 clock.set_scale(1.5)
-clock.hide()
-clock_background_interval = Sequence()
-for angle in range(1*30, (16+1)*30, 30):
-    print(angle)
-    clock_background_interval.append(
-        LerpHprInterval(
-            nodePath=models['background'],
-            duration=1,
-            hpr=(0, 0, angle),
-            blendType='easeIn',
-        )
-    )
-print(clock_background_interval)
-# models['argasek'].show()
+# print(clock.getTightBounds())
 # exit()
+clock.set_pos_hpr(5.1, -4.0, 3.1, 0, 0, 0)
+clock.hide()
+clock_intervals = []
+for indicator in range(0, 6+1):
+    clock_intervals.append(Sequence())
+    indicator_duration = 2**indicator/8
+    indicator_steps = 2**(6-indicator)*2
+    indicator_sign = 1 if indicator % 2 == 0 else -1
+    # if DEVEL:
+    #     print(f'indicator = {indicator}')
+    #     print(f'indicator_duration = {indicator_duration}')
+    #     print(f'indicator_steps = {indicator_steps}')
+    #     print(f'indicator_sign = {indicator_sign}')
+    for angle in range(1*30, (indicator_steps+1)*30, 30):
+        # if DEVEL:
+        #     print(angle)
+        clock_intervals[indicator].append(
+            LerpHprInterval(
+                nodePath=models[f'{indicator}'],
+                duration=indicator_duration,
+                hpr=(0, 0, angle*indicator_sign),
+                blendType='easeIn',
+            )
+        )
+    # if DEVEL:
+    #     print(clock_intervals[indicator])
+clock_interval = Parallel(
+    clock_intervals[0],
+    clock_intervals[1],
+    clock_intervals[2],
+    clock_intervals[3],
+    clock_intervals[4],
+    clock_intervals[5],
+    clock_intervals[6],
+)
+# if DEVEL:
+#     print(clock_interval)
+# exit()
+
+# models['argasek'].show()
 
 # bar['value'] += 10
 set_card[14].remove_node()
@@ -1438,7 +1498,7 @@ for x in range(my_image.getXSize()):
         max_z = -((z + 1) - (my_image.getYSize() / 2)) * tile_size
         xel_a = my_image.getXelA(x, z)
         # print(xel_a)
-        if xel_a[3] > 0.6:  # 0.5
+        if xel_a[3] > 0.5:  # 0.5 0.6 0.4 0.35
             xel_a[3] = 1
             display_particle_effects.append(init_display_particle_effect(
                 # current_modes_and_filters['render_mode_thickness'],
@@ -1451,6 +1511,7 @@ for x in range(my_image.getXSize()):
             ))
 if DEVEL:
     print('len(display_particle_effects):', len(display_particle_effects))
+    # exit()
 for display_particle_effect in display_particle_effects:  # Append functions
     display_sequence.append(Func(start_display, display_particle_effect))
 display_sequence.append(Wait(5))  # Append wait
@@ -1801,16 +1862,71 @@ for cube_number in range(17):
     cube_parallels.append(cube_parallel)
 # exit()
 
-# Steam interval
+# Rings
+ring_intervals = []
+ring_parents = []
+for ring_i in range(14):
+    ring_parents.append(base.render.attachNewNode(f'ring parent {ring_i}'))
+    ring_x = (RING_STOP-RING_START)*(ring_i+1)/15+RING_START
+    ring_parents[ring_i].setPosHpr(ring_x, -4.0, 3.1, 90, 90, 0)
+    ring_intervals.append(
+        ParticleInterval(
+            particleEffect=init_ring_particle_effect(
+                point_size=PRESETS[6]['render_mode_thickness'],
+            ),
+            parent=ring_parents[ring_i],
+            worldRelative=False,
+            duration=.30,
+            cleanup=False,
+            name=f'ring interval {ring_i}',
+        )
+    )
+
+# Steam interval (middle -3.95)
 stamp('Steam interval')
-steam_interval = ParticleInterval(
-    particleEffect=init_steam_particle_effect(PRESETS[6]['render_mode_thickness']),
-    parent=base.render,
-    worldRelative=True,
-    duration=31,
-    softStopT=16,
-    cleanup=True,
-    name='steam'
+steam_interval = Parallel(
+    ParticleInterval(
+        particleEffect=init_steam_particle_effect(
+            PRESETS[6]['render_mode_thickness'],
+            litter_size=int(200*(2.4/7.8)),
+            min_bound=(0, -7.9, 1.01067),
+            max_bound=(7, -5.5, 1.01067),
+        ),
+        parent=base.render,
+        worldRelative=True,
+        duration=16,
+        softStopT=-4,
+        cleanup=False,
+        name='steam right'
+    ),
+    ParticleInterval(
+        particleEffect=init_steam_particle_effect(
+            PRESETS[6]['render_mode_thickness'],
+            litter_size=int(200*(3.0/7.8)),
+            min_bound=(0, -5.5, 1.01067),
+            max_bound=(7, -2.5, 1.01067),
+        ),
+        parent=base.render,
+        worldRelative=True,
+        duration=6,
+        softStopT=-4,
+        cleanup=False,
+        name='steam center'
+    ),
+    ParticleInterval(
+        particleEffect=init_steam_particle_effect(
+            PRESETS[6]['render_mode_thickness'],
+            litter_size=int(200*(2.4/7.8)),
+            min_bound=(0, -2.5, 1.01067),
+            max_bound=(7, -0.1, 1.01067),
+        ),
+        parent=base.render,
+        worldRelative=True,
+        duration=16,
+        softStopT=-4,
+        cleanup=False,
+        name='steam left'
+    ),
 )
 
 # Credits
@@ -1941,4 +2057,4 @@ stamp('Running demo')
 
 base.run()
 
-Sequence(LerpColorScaleInterval(credits_node_path, 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeIn'), Parallel(LerpColorScaleInterval(credits_node_path, 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut'), LerpColorScaleInterval(models['compo'], 15.94, (0, 0, 0, 1), (1, 1, 1, 1), blendType='easeInOut')))
+

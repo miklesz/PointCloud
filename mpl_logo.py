@@ -51,8 +51,14 @@ def create_icon_axes(fig, ax_position, lw_bars, lw_grid, lw_border, rgrid):
     ax : matplotlib.axes.Axes
         The created Axes.
     """
-    with plt.rc_context({'axes.edgecolor': MPL_BLUE,
-                         'axes.linewidth': lw_border}):
+    with plt.rc_context(
+        {
+            # 'axes.edgecolor': MPL_BLUE,
+            # 'axes.edgecolor': str(129/255),
+            'axes.edgecolor': '#3d3e3f',
+            'axes.linewidth': lw_border
+        }
+    ):
         ax = fig.add_axes(ax_position, projection='polar')
         ax.set_axisbelow(True)
 
@@ -63,9 +69,9 @@ def create_icon_axes(fig, ax_position, lw_bars, lw_grid, lw_border, rgrid):
         radii = np.array([2, 6, 8, 7, 4, 5, 8])
         width = np.pi / 4 * np.array([0.4, 0.4, 0.6, 0.8, 0.2, 0.5, 0.3])
 
-        # theta = [theta[layer]]
-        # radii = [radii[layer]]
-        # width = [width[layer]]
+        theta = [theta[layer]]
+        radii = [radii[layer]]
+        width = [width[layer]]
 
         # theta = []
         # radii = []
@@ -78,8 +84,17 @@ def create_icon_axes(fig, ax_position, lw_bars, lw_grid, lw_border, rgrid):
         # radii = np.array([8])
         # width = np.pi / 4 * np.array([0.5])
 
-        bars = ax.bar(theta, radii, width=width, bottom=0.0, align='edge',
-                      edgecolor='0.3', lw=lw_bars)
+        bars = ax.bar(
+            theta,
+            radii,
+            width=width,
+            bottom=0.0,
+            align='edge',
+            edgecolor='0.3',
+            # edgecolor=str(102/255),
+            lw=lw_bars,
+        )
+
         for r, bar in zip(radii, bars):
             color = *cm.jet(r / 10.)[:3], 0.6  # color from jet with alpha=0.6
             bar.set_facecolor(color)
@@ -87,7 +102,11 @@ def create_icon_axes(fig, ax_position, lw_bars, lw_grid, lw_border, rgrid):
         ax.tick_params(labelbottom=False, labeltop=False,
                        labelleft=False, labelright=False)
 
-        ax.grid(lw=lw_grid, color='0.9')
+        ax.grid(
+            lw=lw_grid,
+            color='0.9',
+            # color=str(141/255),
+        )  # 0.9
         ax.set_rmax(9)
         ax.set_yticks(rgrid)
 
@@ -138,7 +157,7 @@ def make_logo(height_px, lw_bars, lw_grid, lw_border, rgrid, with_text=False):
     dpi = 100
     height = height_px / dpi
     figsize = (5 * height, height) if with_text else (height, height)
-    fig = plt.figure(figsize=figsize, dpi=dpi)
+    fig = plt.figure(figsize=figsize, dpi=dpi*(480/110))
     fig.patch.set_alpha(0)
 
     if with_text:
@@ -148,10 +167,22 @@ def make_logo(height_px, lw_bars, lw_grid, lw_border, rgrid, with_text=False):
 
     return fig, ax
 
-make_logo(height_px=1100, lw_bars=7, lw_grid=5, lw_border=10,
+# Background:
+# make_logo(height_px=110, lw_bars=0.7, lw_grid=0.5, lw_border=1,
+#           rgrid=[1, 3, 5, 7])
+# Indicators:
+make_logo(height_px=110, lw_bars=0.7, lw_grid=0, lw_border=0,
           rgrid=[1, 3, 5, 7])
+
+# Stare
+# make_logo(height_px=240, lw_bars=1.4, lw_grid=1, lw_border=2,
+#           rgrid=[1, 3, 5, 7])
+# make_logo(height_px=240, lw_bars=1.4, lw_grid=0, lw_border=0,
+#           rgrid=[1, 3, 5, 7])
+
+# Stare:
 # make_logo(height_px=1100, lw_bars=7, lw_grid=0, lw_border=0,
 #           rgrid=[1, 3, 5, 7])
-plt.savefig('background.png', transparent=True)
-# plt.savefig(f'{layer}.png')
+# plt.savefig('background.png', transparent=True)
+plt.savefig(f'{layer}.png', transparent=True)
 plt.show()

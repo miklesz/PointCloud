@@ -7,7 +7,7 @@ from panda3d.core import *
 
 # Constants
 IMAGE_NAMES = ('background', '0', '1', '2', '3', '4', '5', '6')
-IMAGE_I = 0
+IMAGE_I = 7
 # STEP = 1
 
 # Init ShowBase
@@ -49,9 +49,9 @@ for y in range(y_size):
         xel_a = image.get_xel_a(x, y)
         if xel_a[3] > 0:
             # print(xel_a)
-            point_x = rand.randomRealUnit() / 20 + (+x - x_size / 2) / (240 / 2)
+            point_x = rand.randomRealUnit() / 20 + (+x - x_size / 2) / (240 / 1)
             point_y = rand.randomRealUnit() / 20
-            point_z = rand.randomRealUnit() / 20 + (-y + y_size / 2) / (240 / 2)
+            point_z = rand.randomRealUnit() / 20 + (-y + y_size / 2) / (240 / 1)
             point = (point_x, point_y, point_z) + tuple(xel_a)
             # print(point)
             points.append(point)
@@ -86,5 +86,5 @@ print(model.get_tight_bounds())
 base.set_frame_rate_meter(True)
 
 # model.setHpr(90, -60, 0)
-# model.writeBamFile(f'models/{IMAGE_NAMES[IMAGE_I]}.bam')
+model.writeBamFile(f'models/{IMAGE_NAMES[IMAGE_I]}.bam')
 base.run()
