@@ -50,7 +50,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DEVEL = False  # True/False
 # DEVEL = False
-JUMP = 100   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+JUMP = 208   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
