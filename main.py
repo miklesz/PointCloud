@@ -50,7 +50,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DEVEL = False  # True/False
 # DEVEL = False
-JUMP = 208   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+JUMP = 248   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -1805,6 +1805,28 @@ greetings_interval = ParticleInterval(
 )
 
 # Cube
+colors = (
+    "ff4800",
+    "e200d5",
+    "305cff",
+    "00d062",
+    "ff3bca",
+    "3bb8ff",
+    "5bb800",
+    "c20000",
+    "dc004e",
+    "8c00dc",
+    "00aeb4",
+    "caff6d",
+    "6dd7ff",
+    "c66dff",
+    "55bd27",
+    "7b37aa",
+    "ff0000",
+    "ffcc00",
+    "2b27cc",
+    "c66a98",
+)
 stamp('Cube')
 cube_duration = 1.18
 rotation = 180
@@ -1816,13 +1838,15 @@ cube_parent_1.setPos(-3.25, (-7.5+0.5)*2/3-0.5, 3.1)
 cube_parallels = []
 for cube_number in range(17):
     cube_parallel = Parallel()
+    color = colors[cube_number]
     cube = init_cube_particle_effect(
         PRESETS[6]['render_mode_thickness'],
         Randomizer().randomReal(.5)*2 + .5,
         Randomizer().randomReal(.5)*2 + .5,
         Randomizer().randomReal(.5)*2 + .5,
         # kolory do poprawy
-        (Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, 1),
+        # (Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, Randomizer().randomReal(.5) + .5, 1),
+        (int(color[0:2], 16)/255, int(color[2:4], 16)/255, int(color[4:6], 16)/255, 1),
         cube_duration,
     )
     cube_parallel.append(
