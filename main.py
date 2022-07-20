@@ -50,7 +50,7 @@ if sys.executable == '/Users/miklesz/PycharmProjects/PointCloud/venv/bin/python'
 else:
     DEVEL = False  # True/False
 # DEVEL = False
-JUMP = 248   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
+JUMP = 264   # 5, 25, 34, 47, 84, 86, 109, 113, 150, 182, 186, 206, 238, 280
 PRESETS = [
     {
         'preset': 0,
@@ -113,6 +113,14 @@ PRESETS = [
         'bloom': False, 'bloom_intensity': 1.0,
         'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
         'cartoon_ink': True, 'cartoon_ink_separation': 1,
+        'render_mode_perspective': False,
+        'render_mode_thickness': 10,
+    },
+    {
+        'preset': 8,
+        'bloom': False, 'bloom_intensity': 1.0,
+        'blur_sharpen': False, 'blur_sharpen_amount': 1.0,
+        'cartoon_ink': False, 'cartoon_ink_separation': 1,
         'render_mode_perspective': False,
         'render_mode_thickness': 10,
     },
@@ -287,6 +295,7 @@ def accept():
         base.accept('5', set_modes_and_filters, [PRESETS[5]])
         base.accept('6', set_modes_and_filters, [PRESETS[6]])
         base.accept('7', set_modes_and_filters, [PRESETS[7]])
+        base.accept('8', set_modes_and_filters, [PRESETS[8]])
         base.accept('s', start_steam)
         base.accept('w', accept_water)
         base.accept('g', start_glow)
@@ -355,7 +364,7 @@ U: toggle blur/sharpen (now: {current_modes_and_filters['blur_sharpen']})
 5: set preset 5 (`Sitkowy`)
 6: set preset 6 (`Mikleszowy`)
 7: set preset 7 (`Outdoor Thin`)
-8: set preset 8 (`???`)
+8: set preset 8 (`Mikleszowy no shader`)
 9: set preset 9 (`???`)
 
 # Motion
@@ -1289,6 +1298,7 @@ for model_key in model_dict:
     models[model_key].set_pos_hpr(*model_dict[model_key]['pos_hpr'])
     models[model_key].reparentTo(base.render)
     models[model_key].hide()
+models['compo'].setTransparency(TransparencyAttrib.M_alpha)
 models['argasek'].setTransparency(TransparencyAttrib.M_alpha)
 models['argasek'].setColorScale(1, 1, 1, 0)
 models['ball'].setTransparency(TransparencyAttrib.M_alpha)
@@ -1369,7 +1379,7 @@ base.taskMgr.step(), base.taskMgr.step()
 # Render modes and common filters
 stamp('Render modes and common filters')
 filters = CommonFilters(base.win, base.cam)
-for preset in (PRESETS[7], PRESETS[6], PRESETS[3], PRESETS[2], PRESETS[1], PRESETS[0]):
+for preset in (PRESETS[8], PRESETS[7], PRESETS[6], PRESETS[3], PRESETS[2], PRESETS[1], PRESETS[0]):
     set_modes_and_filters(preset)
 # for preset in PRESETS[::-1]:
 #     set_modes_and_filters(preset)
@@ -1520,8 +1530,15 @@ for display_particle_effect in display_particle_effects:  # Append particle outs
 
 # Sound interval
 stamp('Sound interval')
-music = base.loader.loadSfx("audio/Kramsta by Damage (nowe przejście).ogg")  # Load music
-demo_parallel.append(SoundInterval(music))
+music = base.loader.loadSfx("audio/Kramsta.ogg")  # Load music
+demo_parallel.append(
+    SoundInterval(
+        music,
+        loop=0,
+        volume=1,
+        startTime=0,
+    )
+)
 
 # Rain interval
 stamp('Rain interval')
@@ -1739,8 +1756,8 @@ for i in range(13+1):
 set_card[6].setTransparency(TransparencyAttrib.M_alpha)
 set_card[7].setTransparency(TransparencyAttrib.M_alpha)
 set_card[6].setPos(0, 0, 1.3)
-set_card[13].setTransparency(TransparencyAttrib.M_alpha)
-set_card[13].set_color_scale(1, 1, 1, 0)
+# set_card[13].setTransparency(TransparencyAttrib.M_alpha)
+# set_card[13].set_color_scale(1, 1, 1, 0)
 # bar['value'] += 10
 set_card[23].remove_node()
 set_card[24].show()
@@ -1911,7 +1928,7 @@ stamp('Steam interval')
 steam_interval = Parallel(
     ParticleInterval(
         particleEffect=init_steam_particle_effect(
-            PRESETS[6]['render_mode_thickness'],
+            PRESETS[8]['render_mode_thickness'],
             litter_size=int(200*(2.4/7.8)),
             min_bound=(0, -7.9, 1.01067),
             max_bound=(7, -5.5, 1.01067),
@@ -1925,7 +1942,7 @@ steam_interval = Parallel(
     ),
     ParticleInterval(
         particleEffect=init_steam_particle_effect(
-            PRESETS[6]['render_mode_thickness'],
+            PRESETS[8]['render_mode_thickness'],
             litter_size=int(200*(3.0/7.8)),
             min_bound=(0, -5.5, 1.01067),
             max_bound=(7, -2.5, 1.01067),
@@ -1939,7 +1956,7 @@ steam_interval = Parallel(
     ),
     ParticleInterval(
         particleEffect=init_steam_particle_effect(
-            PRESETS[6]['render_mode_thickness'],
+            PRESETS[8]['render_mode_thickness'],
             litter_size=int(200*(2.4/7.8)),
             min_bound=(0, -2.5, 1.01067),
             max_bound=(7, -0.1, 1.01067),
@@ -2082,3 +2099,26 @@ stamp('Running demo')
 base.run()
 
 
+
+# Sequence(
+#     Func(models['compo'].show),
+#     Func(credits_node_path.show),
+#     Func(clock.show),
+#     Parallel(
+#         beat_interval,
+#         Func(filters.del_blur_sharpen),
+#         Func(filters.del_cartoon_ink),
+#         steam_interval,
+#         Sequence(
+#             LerpHprInterval(clock, 7, (-90, 0, 0), (0, 0, 0), blendType='easeOut'),
+#             Wait(2),
+#             LerpHprInterval(clock, 7, (-180, 0, 0), (-90, 0, 0), blendType='easeIn'),
+#         ),
+#         Sequence(
+#             LerpColorScaleInterval(clock, 2, (1, 1, 1, 1), (1, 1, 1, 0), blendType='easeOut'),
+#             Wait(12),
+#             LerpColorScaleInterval(clock, 2, (1, 1, 1, 0), (1, 1, 1, 1), blendType='easeOut'),
+#         ),
+#         clock_interval,
+#     )
+# )
